@@ -3,6 +3,7 @@ from json import dumps
 import threading
 import cherrypy
 import os
+from cherrypy._cperror import HTTPError
 from SimulatorThread import SimulatorThread
 
 __author__ = 'jon'
@@ -57,13 +58,7 @@ class Simulator(object):
 
         except Exception, error:
             logMessagesLock.release()
-
-            # Send back the status of the search (remove non-serializable elements)
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            return dumps({
-                'successful': False,
-                'error': error.message
-            })
+            raise HTTPError(message=error.message)
 
 
     @cherrypy.expose
@@ -88,13 +83,7 @@ class Simulator(object):
 
         except Exception, error:
             logMessagesLock.release()
-
-            # Send back the status of the search (remove non-serializable elements)
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            return dumps({
-                'successful': False,
-                'error': error.message
-            })
+            raise HTTPError(message=error.message)
 
 
     @cherrypy.expose
@@ -114,7 +103,7 @@ logMessagesLock = threading.Lock()
 nextClientId = 1
 
 # Server configuration
-STATIC_DIR = os.path.join(os.path.abspath("."), u"static")
+STATIC_DIR = os.path.join(os.path.abspath("../"), u"static")
 config = {
     '/static': {
       'tools.staticdir.on': True,
