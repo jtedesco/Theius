@@ -1,8 +1,6 @@
-from Queue import Queue
 from random import random
 import threading
 from time import sleep
-from LogEvent import LogEvent
 
 __author__ = 'jon'
 
