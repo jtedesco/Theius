@@ -1,6 +1,6 @@
 __author__ = 'jon'
 
-class LogEntry(object):
+class LogEvent(object):
     """
       Contains data about a log event
     """
