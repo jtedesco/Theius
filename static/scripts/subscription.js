@@ -30,5 +30,6 @@ function subscribeSuccess(data) {
  * @param errorData
  */
 function alertError(errorData) {
-    console.log('ERROR: ' + errorData.statusText);
+    var message = 'ERROR: ' + errorData.statusText;
+
 }
