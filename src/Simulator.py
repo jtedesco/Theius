@@ -1,5 +1,5 @@
 from Queue import Queue
-from json import dumps, loads
+from json import dumps
 import threading
 import cherrypy
 import os
@@ -7,11 +7,14 @@ from src.SimulatorThread import SimulatorThread
 
 __author__ = 'jon'
 
+
 # Index of log messages for each thread
 logMessages = {}
 logMessagesLock = threading.Lock()
 
+# Global counter to allow us to assign unique ids to new clients
 nextClientId = 1
+
 
 class Simulator(object):
     """
