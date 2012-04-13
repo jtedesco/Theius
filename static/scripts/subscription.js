@@ -1,6 +1,7 @@
 // The id assigned to this client
 var clientId;
 
+
 /**
  * Subscribe this client to log updates from the simulator
  */
@@ -11,10 +12,11 @@ function subscribe() {
         url: '/subscribe',
         data: {},
         success: subscribeSuccess,
-        error: alertError,
+        error: logError,
         dataType: 'json'
     });
 }
+
 
 /**
  * Handle a successful subscribe, record client id & log it
@@ -22,14 +24,43 @@ function subscribe() {
  */
 function subscribeSuccess(data) {
     clientId = data['clientId'];
-    console.log('Client ID: ' + clientId);
+    var message = 'Client ID: ' + clientId;
+    appendToGarbage(message);
 }
 
+
 /**
- * Handle some AJX error
+ * Subscribe this client to log updates from the simulator
+ */
+function unsubscribe() {
+
+    // Trigger an ajax call to the simulator server
+    $.ajax({
+        url: '/unsubscribe',
+        data: {
+            clientId: clientId
+        },
+        success: unsubscribeSuccess,
+        error: logError,
+        dataType: 'json'
+    });
+}
+
+
+/**
+ * Handle a successful unsubscribe, record client id & log it
+ */
+function unsubscribeSuccess(data) {
+    var message = 'Successfully unsubscribed from log updates';
+    appendToGarbage(message);
+}
+
+
+/**
+ * Handle some AJX error by logging it
  * @param errorData
  */
-function alertError(errorData) {
+function logError(errorData) {
     var message = 'ERROR: ' + errorData.statusText;
-
+    appendToGarbage(message);
 }
