@@ -1,6 +1,37 @@
 // The id assigned to this client
 var clientId;
 
+/**
+ * Receive updates from the
+ */
+function receiveUpdate(data) {
+
+    if(data['successful']) {
+
+        appendToGarbage('Received updates, processing...');
+
+        var updateData = $.parseJSON(data['updates']);
+
+        for(var i in updateData) {
+            var logEvent = updateData[i];
+            appendToGarbage('Received log event ' + logEvent.number);
+        }
+
+        $.ajax({
+            url: '/update',
+            data: {
+                clientId: clientId
+            },
+            success: receiveUpdate,
+            error: logError,
+            dataType: 'json'
+        });
+
+    } else {
+        logError('Update failed: ' + data['message']);
+    }
+}
+
 
 /**
  * Subscribe this client to log updates from the simulator
@@ -26,6 +57,17 @@ function subscribeSuccess(data) {
     clientId = data['clientId'];
     var message = 'Client ID: ' + clientId;
     appendToGarbage(message);
+
+    // Start calling the AJAX update loop
+    $.ajax({
+        url: '/update',
+        data: {
+            clientId: clientId
+        },
+        success: receiveUpdate,
+        error: logError,
+        dataType: 'json'
+    });
 }
 
 
