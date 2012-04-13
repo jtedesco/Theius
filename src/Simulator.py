@@ -123,7 +123,7 @@ config = {
 }
 
 # Start the server
-cherrypy.tree.mount(Search(), '/', config=config)
+cherrypy.tree.mount(Simulator(), '/', config=config)
 cherrypy.engine.start()
 
 # Start the simulator thread
