@@ -3,6 +3,7 @@ import cherrypy
 import os
 from Queue import Queue
 from json import dumps
+from cherrypy._cperror import HTTPError
 from SimulatorThread import SimulatorThread
 
 
@@ -55,8 +56,7 @@ class Simulator(object):
         # Respond to the client's id
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return dumps({
-            'clientId': clientId,
-            'successful': True
+            'clientId': clientId
         })
 
 
@@ -66,17 +66,43 @@ class Simulator(object):
           Removes a client from the log stream
         """
 
-        global logMessagesLock
-        logMessagesLock.acquire()
+        try:
 
-        del logMessagesLock[clientId]
-        logMessagesLock.release()
+            global logMessagesLock
+            logMessagesLock.acquire()
+            del logMessages[int(clientId)]
+            logMessagesLock.release()
 
-        # Send back the status of the unsubscribe request
-        cherrypy.response.headers['Content-Type'] = 'application/json'
-        return dumps({
-            'successful': True
-        })
+            # Send back the status of the unsubscribe request
+            cherrypy.response.headers['Content-Type'] = 'application/json'
+            return dumps({
+                'successful': True
+            })
+
+        except ValueError:
+            logMessagesLock.release()
+
+            # Send back the status of the unsubscribe request
+            cherrypy.response.headers['Content-Type'] = 'application/json'
+            return dumps({
+                'message': 'clientId should be a valid integer client id',
+                'successful': False
+            })
+
+        except KeyError:
+            logMessagesLock.release()
+
+            if clientId not in logMessages:
+
+                # Send back the status of the unsubscribe request
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return dumps({
+                    'message': 'Not subscribed',
+                    'successful': False
+                })
+            else:
+                raise HTTPError()
+
 
 
     @cherrypy.expose
