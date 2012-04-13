@@ -6,7 +6,7 @@ We aim to leverage failure and performance prediction data for Hadoop clusters t
 Dependencies
 ============
 Theius requires several key dependencies:
- * Python 2.7.x
- * CherryPy 3.2
+* Python 2.7.x
+* CherryPy 3.2
 
 
