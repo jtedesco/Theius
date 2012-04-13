@@ -8,13 +8,13 @@ function receiveUpdate(data) {
 
     if(data['successful']) {
 
-        appendToGarbage('Received updates, processing...');
-
         var updateData = $.parseJSON(data['updates']);
 
         for(var i in updateData) {
-            var logEvent = updateData[i];
-            appendToGarbage('Received log event ' + logEvent.number);
+            if(updateData.hasOwnProperty(i)) {
+                var logEvent = updateData[i];
+                appendToGarbage('Received log event ' + logEvent.number + ': "' + logEvent.data + '"');
+            }
         }
 
         $.ajax({

@@ -25,14 +25,13 @@ class SimulatorThread(threading.Thread):
         logEventNumber = 1
         while True:
 
-            # Insert some random delay between 0 and 5 seconds
-            sleep(random() * 5)
+            # Insert some random delay between 0 and 1 second
+            sleep(random())
 
             # Get the new log event
             logEvent = {
                 'number': logEventNumber,
-                'something': 'here',
-                'somethingElse': 'here'
+                'data': 'blah blah'
             }
 
             self.logMessagesLock.acquire()
