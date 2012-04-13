@@ -3,17 +3,9 @@ from json import dumps
 import threading
 import cherrypy
 import os
-from src.SimulatorThread import SimulatorThread
+from SimulatorThread import SimulatorThread
 
 __author__ = 'jon'
-
-
-# Index of log messages for each thread
-logMessages = {}
-logMessagesLock = threading.Lock()
-
-# Global counter to allow us to assign unique ids to new clients
-nextClientId = 1
 
 
 class Simulator(object):
@@ -112,12 +104,19 @@ class Simulator(object):
         pass
 
 
+# Index of log messages for each thread
+logMessages = {}
+logMessagesLock = threading.Lock()
+
+# Global counter to allow us to assign unique ids to new clients
+nextClientId = 1
+
 # Server configuration
 STATIC_DIR = os.path.join(os.path.abspath("."), u"static")
 config = {
     '/static': {
-                  'tools.staticdir.on': True,
-                  'tools.staticdir.dir': STATIC_DIR,
+      'tools.staticdir.on': True,
+      'tools.staticdir.dir': STATIC_DIR,
     }
 }
 
