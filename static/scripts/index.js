@@ -3,5 +3,5 @@
  * @param message
  */
 function appendToGarbage(message) {
-    $('#garbage').html($('#garbage').html() + '<br/>' + message);
+    $('#garbage').html($('#garbage').html() + message + '<br/>');
 }
