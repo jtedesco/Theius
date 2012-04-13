@@ -51,8 +51,13 @@ function unsubscribe() {
  * Handle a successful unsubscribe, record client id & log it
  */
 function unsubscribeSuccess(data) {
-    var message = 'Successfully unsubscribed from log updates';
-    appendToGarbage(message);
+    if(data['successful']) {
+        var message = 'Successfully unsubscribed';
+        appendToGarbage(message);
+    } else {
+        var message = 'Failed to unsubscribe: ' + data['message'];
+        appendToGarbage(message);
+    }
 }
 
 

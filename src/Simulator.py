@@ -92,17 +92,12 @@ class Simulator(object):
         except KeyError:
             logMessagesLock.release()
 
-            if clientId not in logMessages:
-
-                # Send back the status of the unsubscribe request
-                cherrypy.response.headers['Content-Type'] = 'application/json'
-                return dumps({
-                    'message': 'Not subscribed',
-                    'successful': False
-                })
-            else:
-                raise HTTPError()
-
+            # Send back the status of the unsubscribe request
+            cherrypy.response.headers['Content-Type'] = 'application/json'
+            return dumps({
+                'message': 'Not subscribed',
+                'successful': False
+            })
 
 
     @cherrypy.expose
