@@ -1,12 +1,20 @@
-from Queue import Queue
-from json import dumps
 import threading
 import cherrypy
 import os
-from cherrypy._cperror import HTTPError
+from Queue import Queue
+from json import dumps
 from SimulatorThread import SimulatorThread
 
+
 __author__ = 'jon'
+
+
+# Index of log messages for each thread
+logMessages = {}
+logMessagesLock = threading.Lock()
+
+# Global counter to allow us to assign unique ids to new clients
+nextClientId = 1
 
 
 class Simulator(object):
@@ -35,22 +43,19 @@ class Simulator(object):
         clientId = nextClientId
         nextClientId += 1
 
-
         global logMessagesLock
         logMessagesLock.acquire()
-
-        logMessagesLock[clientId] = {
+        logMessages[clientId] = {
             'updates' : Queue(),
-            'clientId'  : clientId,
-            'trigger'   : threading.Semaphore()
+            'clientId' : clientId,
+            'trigger' : threading.Semaphore()
         }
         logMessagesLock.release()
-
 
         # Respond to the client's id
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return dumps({
-            'id': clientId,
+            'clientId': clientId,
             'successful': True
         })
 
@@ -82,13 +87,6 @@ class Simulator(object):
 
         pass
 
-
-# Index of log messages for each thread
-logMessages = {}
-logMessagesLock = threading.Lock()
-
-# Global counter to allow us to assign unique ids to new clients
-nextClientId = 1
 
 # Server configuration
 STATIC_DIR = os.path.join(os.path.abspath("../"), u"static")
