@@ -56,6 +56,7 @@ class Simulator(object):
             })
 
         except Exception, error:
+            logMessagesLock.release()
 
             # Send back the status of the search (remove non-serializable elements)
             cherrypy.response.headers['Content-Type'] = 'application/json'
@@ -86,6 +87,7 @@ class Simulator(object):
             })
 
         except Exception, error:
+            logMessagesLock.release()
 
             # Send back the status of the search (remove non-serializable elements)
             cherrypy.response.headers['Content-Type'] = 'application/json'
