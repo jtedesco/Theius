@@ -47,7 +47,6 @@ class Simulator(object):
         logMessagesLock.acquire()
         logMessages[clientId] = {
             'updates' : Queue(),
-            'clientId' : clientId,
             'trigger' : threading.Semaphore()
         }
         logMessagesLock.release()
@@ -103,9 +102,29 @@ class Simulator(object):
     def update(self, clientId):
         """
           Updates the client with the latest set of messages added by the log simulator
+            (blocks until the SimulatorThread hits the semaphore for this client)
         """
 
-        pass
+        global logMessagesLock
+        logMessagesLock.acquire()
+        logData = logMessages[int(clientId)]
+        logEntries = []
+
+        logUpdates = logData['updates']
+        while not logUpdates.empty():
+            logEntry = logUpdates.get()
+            logEntries.append(logEntry)
+
+        clientLock = logData['trigger']
+        logMessagesLock.release()
+
+        clientLock.acquire()
+
+        logUpdates = dumps(logEntries)
+        return dumps({
+            'updates' : logUpdates,
+            'successful': True
+        })
 
 
 # Server configuration
