@@ -3,7 +3,6 @@ import cherrypy
 import os
 from Queue import Queue
 from json import dumps
-from cherrypy._cperror import HTTPError
 from SimulatorThread import SimulatorThread
 
 
