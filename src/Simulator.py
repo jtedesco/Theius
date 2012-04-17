@@ -155,6 +155,13 @@ class Simulator(object):
             'successful': True
         })
 
+    @cherrypy.expose
+    def testCircleResizing(self):
+        """
+            for now, returns a static JSON string of test data
+        """
+        return open(os.path.join(STATIC_DIR, u'data/sampleData.json')).read()
+
 
 # Server configuration
 STATIC_DIR = os.path.join(os.path.abspath("../"), u"static")

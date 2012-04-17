@@ -134,3 +134,13 @@ function logError(errorData) {
     var message = 'ERROR: ' + errorData;
     appendToGarbage(message);
 }
+
+function testCircleResizing() {
+    $.ajax({
+        url: '/testCircleResizing',
+        data: {},
+        success: resizeCircles,
+        error: logError,
+        dataType: 'json'
+    });
+}

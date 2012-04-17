@@ -39,3 +39,36 @@ function displayGraph(data) {
         displayGraph(window.graphData);
     };
 }
+
+function resizeCircles(data) {
+    var dataMin = NaN,
+        dataMax = NaN;
+
+    for  (var key in data) {
+        if (key == "length" || !data.hasOwnProperty(key)) continue;
+        var value = data[key];
+
+        if (isNaN(dataMin) || isNaN(dataMax)) {
+            dataMin = value;
+            dataMax = value;
+        }
+
+        dataMin = Math.min(dataMin, value);
+        dataMax = Math.max(dataMax, value);
+    }
+
+    var dataRange = dataMax - dataMin;
+    var radiusMin = 5,
+        radiusMax = 20,
+        radiusRange = radiusMax - radiusMin;
+
+    var graph = d3.select("#graph");
+
+    graph.selectAll("g.node")
+        .select("circle")
+        .attr("r", function(d) {
+            var value = data[d.name];
+            var fraction = (value - dataMin) / dataRange;
+            return fraction * radiusRange + radiusMin;
+        });
+}
