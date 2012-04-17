@@ -156,7 +156,7 @@ class Simulator(object):
         })
 
     @cherrypy.expose
-    def testCircleResizing(self):
+    def sampleData(self):
         """
             for now, returns a static JSON string of test data
         """

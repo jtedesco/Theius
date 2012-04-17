@@ -1,4 +1,10 @@
-
+/**
+ * Given some retrieved JSON data of the node structure, displays the information
+ * in a graph using the D3 library. The data is to be structured so that the key
+ * "name" corresponds to a node's name, and the key "children" is an array of its
+ * children.
+ * @param data the JSON data described above
+ */
 function displayGraph(data) {
     window.graphData = data;
     var width = document.documentElement.clientWidth
@@ -40,6 +46,12 @@ function displayGraph(data) {
     };
 }
 
+/**
+ * Resizes all the circles in the graph to have a radius corresponding to some data
+ * passed in. The data should be an associative array whose keys are node names and
+ * whose values are integers.
+ * @param data the data to represent
+ */
 function resizeCircles(data) {
     var dataMin = NaN,
         dataMax = NaN;
@@ -56,10 +68,9 @@ function resizeCircles(data) {
         dataMin = Math.min(dataMin, value);
         dataMax = Math.max(dataMax, value);
     }
-
-    var dataRange = dataMax - dataMin;
     var radiusMin = 5,
-        radiusMax = 20,
+        radiusMax = 20;
+    var dataRange = dataMax - dataMin,
         radiusRange = radiusMax - radiusMin;
 
     var graph = d3.select("#graph");

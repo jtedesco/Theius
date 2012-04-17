@@ -40,6 +40,10 @@ function receiveUpdate(data) {
     }
 }
 
+/**
+ * Decide what to do with the log entry that was received here
+ * @param logEvent the log entry received from the server
+ */
 function processLogEntry(logEvent) {
     //console.log(logEvent.data);
     //appendToGarbage('Received log event ' + logEvent.number + ': "' + logEvent.data + '"');
@@ -79,6 +83,10 @@ function subscribeSuccess(data) {
     });
 }
 
+/**
+ * Handles a successful fetching of the node structure by displaying it
+ * @param data the JSON node structure data
+ */
 function structureSuccess(data) {
     displayGraph(data);
 
@@ -135,9 +143,12 @@ function logError(errorData) {
     appendToGarbage(message);
 }
 
+/**
+ * Tests the resizeCircles function by running it on some sample data
+ */
 function testCircleResizing() {
     $.ajax({
-        url: '/testCircleResizing',
+        url: '/sampleData',
         data: {},
         success: resizeCircles,
         error: logError,
