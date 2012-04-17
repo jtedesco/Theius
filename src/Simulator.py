@@ -125,7 +125,7 @@ class Simulator(object):
                 'successful': False
             })
 
-        #obtain client lock
+        # obtain client lock
         clientLock = logMessages[clientId]['trigger']
         serverLock.release()
 

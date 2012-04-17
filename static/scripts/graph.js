@@ -1,7 +1,8 @@
 
 function displayGraph(data) {
-    var width = window.screen.availWidth;
-    var height = window.screen.availHeight / 2;
+    window.graphData = data;
+    var width = document.documentElement.clientWidth
+    var height = document.documentElement.clientHeight / 2;
 
     var cluster = d3.layout.cluster()
         .size([width, height-100]);
@@ -33,4 +34,8 @@ function displayGraph(data) {
 
     node.append("circle")
         .attr("r", 20)
+
+    window.onresize = function(event) {
+        displayGraph(window.graphData);
+    };
 }
