@@ -1,0 +1,57 @@
+{
+    "name": "master",
+    "children": [
+        {
+            "name": "rack1",
+            "children": [
+                { "name": "machine1-1"} ,
+                { "name": "machine1-2"} ,
+                { "name": "machine1-3"} ,
+                { "name": "machine1-4"} ,
+                { "name": "machine1-5"} ,
+                { "name": "machine1-6"} ,
+                { "name": "machine1-7"} ,
+                { "name": "machine1-8"}
+            ]
+        },
+        {
+            "name": "rack2",
+            "children": [
+                { "name": "machine2-1"} ,
+                { "name": "machine2-2"} ,
+                { "name": "machine2-3"} ,
+                { "name": "machine2-4"} ,
+                { "name": "machine2-5"} ,
+                { "name": "machine2-6"} ,
+                { "name": "machine2-7"} ,
+                { "name": "machine2-8"}
+            ]
+        },
+        {
+            "name": "rack3",
+            "children": [
+                { "name": "machine3-1"} ,
+                { "name": "machine3-2"} ,
+                { "name": "machine3-3"} ,
+                { "name": "machine3-4"} ,
+                { "name": "machine3-5"} ,
+                { "name": "machine3-6"} ,
+                { "name": "machine3-7"} ,
+                { "name": "machine3-8"}
+            ]
+        },
+        {
+            "name": "rack4",
+            "children": [
+                { "name": "machine4-1"} ,
+                { "name": "machine4-2"} ,
+                { "name": "machine4-3"} ,
+                { "name": "machine4-4"} ,
+                { "name": "machine4-5"} ,
+                { "name": "machine4-6"} ,
+                { "name": "machine4-7"} ,
+                { "name": "machine4-8"}
+            ]
+        }
+    ]
+}

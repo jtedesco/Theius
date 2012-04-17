@@ -7,14 +7,14 @@ __author__ = 'jon'
 class SimulatorThread(threading.Thread):
 
 
-    def __init__(self, logMessages, logMessagesLock):
+    def __init__(self, logMessages, serverLock):
         """
           Initialize the simulator thread, given the <code>logMessages</code> map and a lock to access it
         """
         threading.Thread.__init__(self)
 
         self.logMessages = logMessages
-        self.logMessagesLock = logMessagesLock
+        self.serverLock = serverLock
 
 
     def run(self):
@@ -34,7 +34,7 @@ class SimulatorThread(threading.Thread):
                 'data': 'blah blah'
             }
 
-            self.logMessagesLock.acquire()
+            self.serverLock.acquire()
             for clientId in self.logMessages:
 
                 # Add the new log event to the client's queue
@@ -43,8 +43,8 @@ class SimulatorThread(threading.Thread):
                 # Notify client that a message has arrived
                 self.logMessages[clientId]['trigger'].release()
 
-            self.logMessagesLock.release()
+            self.serverLock.release()
 
-            print "Recorded log event " + str(logEventNumber)
+            # print "Recorded log event " + str(logEventNumber)
 
             logEventNumber += 1

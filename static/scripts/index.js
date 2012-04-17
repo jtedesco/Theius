@@ -21,7 +21,7 @@ function receiveUpdate(data) {
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
                 var logEvent = updateData[i];
-                appendToGarbage('Received log event ' + logEvent.number + ': "' + logEvent.data + '"');
+                processLogEntry(logEvent);
             }
         }
 
@@ -40,6 +40,10 @@ function receiveUpdate(data) {
     }
 }
 
+function processLogEntry(logEvent) {
+    //console.log(logEvent.data);
+    //appendToGarbage('Received log event ' + logEvent.number + ': "' + logEvent.data + '"');
+}
 
 /**
  * Subscribe this client to log updates from the simulator
@@ -56,7 +60,6 @@ function subscribe() {
     });
 }
 
-
 /**
  * Handle a successful subscribe, record client id & log it
  *  @param data The successful subscribe data
@@ -65,6 +68,19 @@ function subscribeSuccess(data) {
     clientId = data['clientId'];
     var message = 'Client ID: ' + clientId;
     appendToGarbage(message);
+
+    // Retreive the graph
+    $.ajax({
+        url: '/structure',
+        data: {},
+        success: structureSuccess,
+        error: logError,
+        dataType: 'json'
+    });
+}
+
+function structureSuccess(data) {
+    displayGraph(data);
 
     // Start calling the AJAX update loop
     $.ajax({
@@ -77,7 +93,6 @@ function subscribeSuccess(data) {
         dataType: 'json'
     });
 }
-
 
 /**
  * Subscribe this client to log updates from the simulator
@@ -116,6 +131,6 @@ function unsubscribeSuccess(data) {
  * @param errorData
  */
 function logError(errorData) {
-    var message = 'ERROR: ' + errorData.statusText;
+    var message = 'ERROR: ' + errorData;
     appendToGarbage(message);
 }

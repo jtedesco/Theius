@@ -11,7 +11,7 @@ __author__ = 'jon'
 
 # Index of log messages for each thread
 logMessages = {}
-logMessagesLock = threading.Lock()
+serverLock = threading.Lock()
 
 # Global counter to allow us to assign unique ids to new clients
 nextClientId = 1
@@ -38,18 +38,23 @@ class Simulator(object):
             @return the client id
         """
 
+        global serverLock
+        serverLock.acquire()
+
         # Get this client's id
         global nextClientId
         clientId = nextClientId
         nextClientId += 1
 
-        global logMessagesLock
-        logMessagesLock.acquire()
         logMessages[clientId] = {
             'updates' : Queue(),
             'trigger' : threading.Semaphore()
         }
-        logMessagesLock.release()
+
+        # acquire the client lock immediately, indicating no messages are ready to be processed
+        logMessages[clientId]['trigger'].acquire()
+
+        serverLock.release()
 
         # Respond to the client's id
         cherrypy.response.headers['Content-Type'] = 'application/json'
@@ -57,6 +62,12 @@ class Simulator(object):
             'clientId': clientId
         })
 
+    @cherrypy.expose
+    def structure(self):
+        """
+            for now, returns a static JSON string of the node structure
+        """
+        return open(os.path.join(STATIC_DIR, u'data/structure.json')).read()
 
     @cherrypy.expose
     def unsubscribe(self, clientId):
@@ -64,39 +75,37 @@ class Simulator(object):
           Removes a client from the log stream
         """
 
-        try:
+        global serverLock
+        serverLock.acquire()
 
-            global logMessagesLock
-            logMessagesLock.acquire()
+        try:
+            logMessages[int(clientId)]['trigger'].release()
             del logMessages[int(clientId)]
-            logMessagesLock.release()
 
             # Send back the status of the unsubscribe request
             cherrypy.response.headers['Content-Type'] = 'application/json'
-            return dumps({
+            returnMessage = dumps({
                 'successful': True
             })
 
         except ValueError:
-            logMessagesLock.release()
-
             # Send back the status of the unsubscribe request
             cherrypy.response.headers['Content-Type'] = 'application/json'
-            return dumps({
+            returnMessage = dumps({
                 'message': 'clientId should be a valid integer client id',
                 'successful': False
             })
 
         except KeyError:
-            logMessagesLock.release()
-
             # Send back the status of the unsubscribe request
             cherrypy.response.headers['Content-Type'] = 'application/json'
-            return dumps({
+            returnMessage = dumps({
                 'message': 'Not subscribed',
                 'successful': False
             })
 
+        serverLock.release()
+        return returnMessage
 
     @cherrypy.expose
     def update(self, clientId):
@@ -104,21 +113,41 @@ class Simulator(object):
           Updates the client with the latest set of messages added by the log simulator
             (blocks until the SimulatorThread hits the semaphore for this client)
         """
+        clientId = int(clientId)
 
-        global logMessagesLock
-        logMessagesLock.acquire()
-        logData = logMessages[int(clientId)]
-        logEntries = []
+        global serverLock
+        serverLock.acquire()
 
-        logUpdates = logData['updates']
-        while not logUpdates.empty():
-            logEntry = logUpdates.get()
-            logEntries.append(logEntry)
+        if clientId not in logMessages:
+            serverLock.release()
+            return dumps({
+                'message': 'Not subscribed',
+                'successful': False
+            })
 
-        clientLock = logData['trigger']
-        logMessagesLock.release()
+        #obtain client lock
+        clientLock = logMessages[clientId]['trigger']
+        serverLock.release()
 
+        # wait for data to be available
         clientLock.acquire()
+
+        serverLock.acquire()
+
+        if clientId not in logMessages:
+            serverLock.release()
+            return dumps({
+                'message': 'Not subscribed',
+                'successful': False
+            })
+
+        # take off one log entry off the queue
+        logData = logMessages[clientId]
+        logEntries = []
+        logEntry = logData['updates'].get()
+        logEntries.append(logEntry)
+
+        serverLock.release()
 
         logUpdates = dumps(logEntries)
         return dumps({
@@ -141,5 +170,5 @@ cherrypy.tree.mount(Simulator(), '/', config=config)
 cherrypy.engine.start()
 
 # Start the simulator thread
-simulatorThread = SimulatorThread(logMessages, logMessagesLock)
+simulatorThread = SimulatorThread(logMessages, serverLock)
 simulatorThread.start()
