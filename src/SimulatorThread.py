@@ -35,19 +35,20 @@ class SimulatorThread(threading.Thread):
 
             # Get the new log event
             logEvent = {
-                'name': self.randomValue(self.keys)
+                'name': self.randomElement(self.keys)
             }
 
             # pick one of the two attributes to update
             if random() < 0.5:
-                logEvent['color'] = self.randomValue(self.colors)
+                logEvent['color'] = self.randomElement(self.colors)
             else:
-                logEvent['value'] = self.randomValue(self.values)
+                logEvent['value'] = self.randomElement(self.values)
 
             # update the logMessages structure
             self.serverLock.acquire()
 
             for clientId in self.logMessages:
+
                 # Add the new log event to the client's queue
                 self.logMessages[clientId]['updates'].put(logEvent)
 
@@ -57,7 +58,7 @@ class SimulatorThread(threading.Thread):
             self.serverLock.release()
 
 
-    def randomValue(self, array):
+    def randomElement(self, array):
         """
             Returns a random element from an array
         """
