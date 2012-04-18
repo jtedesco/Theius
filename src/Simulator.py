@@ -2,7 +2,7 @@ import threading
 import cherrypy
 import os
 from Queue import Queue
-from json import dumps
+from json import dumps, load
 from SimulatorThread import SimulatorThread
 
 
@@ -155,20 +155,6 @@ class Simulator(object):
             'successful': True
         })
 
-    @cherrypy.expose
-    def sampleData(self):
-        """
-            for now, returns a static JSON string of test data
-        """
-        return open(os.path.join(STATIC_DIR, u'data/sampleData.json')).read()
-
-    @cherrypy.expose
-    def colorData(self):
-        """
-            for now, returns a static JSON string of test data
-        """
-        return open(os.path.join(STATIC_DIR, u'data/sampleColorData.json')).read()
-
 
 # Server configuration
 STATIC_DIR = os.path.join(os.path.abspath("../"), u"static")
@@ -184,5 +170,6 @@ cherrypy.tree.mount(Simulator(), '/', config=config)
 cherrypy.engine.start()
 
 # Start the simulator thread
-simulatorThread = SimulatorThread(logMessages, serverLock)
+keys = load(open(os.path.join(STATIC_DIR, u'data/keys.json')))
+simulatorThread = SimulatorThread(logMessages, serverLock,  keys)
 simulatorThread.start()

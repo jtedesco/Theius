@@ -45,8 +45,18 @@ function receiveUpdate(data) {
  * @param logEvent the log entry received from the server
  */
 function processLogEntry(logEvent) {
-    //console.log(logEvent.data);
-    //appendToGarbage('Received log event ' + logEvent.number + ': "' + logEvent.data + '"');
+    if (window.data.hasOwnProperty(logEvent['name'])) {
+        var node = window.data[logEvent['name']];
+        for (var elem in logEvent) {
+            if (logEvent.hasOwnProperty(elem)) {
+                node[elem] = logEvent[elem];
+            }
+        }
+        reloadGraph();
+    }
+    else {
+        logError("Key \"" + logEvent['name'] + "\" not found");
+    }
 }
 
 /**
@@ -88,7 +98,12 @@ function subscribeSuccess(data) {
  * @param data the JSON node structure data
  */
 function structureSuccess(data) {
-    displayGraph(data);
+    var nodes = loadGraph(data);
+    loadData(nodes);
+
+    // tie data to circle color and radius
+    circleColor(window.data, 'color');
+    circleRadius(window.data, 'value');
 
     // Start calling the AJAX update loop
     $.ajax({
@@ -100,6 +115,16 @@ function structureSuccess(data) {
         error: logError,
         dataType: 'json'
     });
+}
+
+function loadData(nodes) {
+    window.data = {};
+    for (var i in nodes){
+        if (nodes.hasOwnProperty(i)) {
+            window.data[nodes[i]['name']] = nodes[i];
+            nodes[i]['value'] = 5;
+        }
+    }
 }
 
 /**
@@ -141,26 +166,4 @@ function unsubscribeSuccess(data) {
 function logError(errorData) {
     var message = 'ERROR: ' + errorData;
     appendToGarbage(message);
-}
-
-/**
- * Tests the resizeCircles function by running it on some sample data
- */
-function testCircleResizing() {
-    $.ajax({
-        url: '/sampleData',
-        data: {},
-        success: resizeCircles,
-        error: logError,
-        dataType: 'json'
-    });
-}
-
-function testColorChanging() {
-    $.ajax({
-        url: '/colorData',
-        success: changeColors,
-        error: logError,
-        dataType: 'json'
-    });
 }

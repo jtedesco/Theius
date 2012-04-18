@@ -5,8 +5,10 @@
  * children.
  * @param data the JSON data described above
  */
-function displayGraph(data) {
+function loadGraph(data) {
+    // save graph structure so we can redraw later
     window.graphData = data;
+
     var width = document.documentElement.clientWidth
     var height = document.documentElement.clientHeight / 2;
 
@@ -16,6 +18,7 @@ function displayGraph(data) {
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.x, d.y]; });
 
+    // add main svg element
     d3.select("#graph").selectAll("svg").remove();
     var graph = d3.select("#graph").append("svg")
         .attr("width", width)
@@ -23,36 +26,41 @@ function displayGraph(data) {
         .append("g")
         .attr("transform", "translate(0,40)");
 
-    window.nodes = cluster.nodes(window.graphData);
-    window.links = cluster.links(window.nodes);
+    // get node and link locations from cluster library
+    var nodes = cluster.nodes(window.graphData);
+    var links = cluster.links(nodes);
 
-    console.log(window.nodes);
-
+    // add links
     var link = graph.selectAll("path.link")
-        .data(window.links)
+        .data(links)
         .enter().append("path")
         .attr("class", "link")
         .attr("d", diagonal);
 
+    // add nodes (just the container)
     var node = graph.selectAll("g.node")
-        .data(window.nodes)
+        .data(nodes)
         .enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
     window.radiusFunction = function() { return 20;};
-    window.colorFunction = function() { return "white";};
+    window.colorFunction = function() { return "green";};
 
+    // add circles representing nodes
     node.append("circle")
         .attr("r", window.radiusFunction)
-        .attr("fill", window.colorFunction());
+        .attr("fill", window.colorFunction);
 
     window.onresize = function(event) {
         reloadGraph();
     };
+
+    return nodes;
 }
 
 function reloadGraph() {
+    // get new width and height
     var width = document.documentElement.clientWidth
     var height = document.documentElement.clientHeight / 2;
 
@@ -62,22 +70,30 @@ function reloadGraph() {
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.x, d.y]; });
 
-    window.nodes = cluster.nodes(window.graphData);
-    window.links = cluster.links(window.nodes);
+    var nodes = cluster.nodes(window.graphData);
+    var links = cluster.links(nodes);
 
+    // update width and height of graph
     var graph = d3.select("#graph").select("svg")
         .attr("width", width)
         .attr("height", height)
         .select("g");
 
+    // update links
     var link = graph.selectAll("path.link")
+        .data(links)
         .attr("d", diagonal);
 
+    // update nodes (containers)
     var node = graph.selectAll("g.node")
+        .data(nodes)
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
+    // update circles representing nodes
     node.select("circle")
+        .transition(2000)
         .attr("r", window.radiusFunction)
+        .attr("fill", window.colorFunction);
 }
 
 /**
@@ -86,51 +102,49 @@ function reloadGraph() {
  * whose values are integers.
  * @param data the data to represent
  */
-function resizeCircles(data) {
+function circleRadius(data, key) {
     var dataMin = NaN,
         dataMax = NaN;
-
-    for  (var key in data) {
-        if (key == "length" || !data.hasOwnProperty(key)) continue;
-        var value = data[key];
-
-        if (isNaN(dataMin) || isNaN(dataMax)) {
-            dataMin = value;
-            dataMax = value;
-        }
-
-        dataMin = Math.min(dataMin, value);
-        dataMax = Math.max(dataMax, value);
-    }
     var radiusMin = 5,
-        radiusMax = 25;
-    var dataRange = dataMax - dataMin,
+        radiusMax = 25,
         radiusRange = radiusMax - radiusMin;
 
-    var graph = d3.select("#graph");
-
     window.radiusFunction = function(d) {
-        var value = data[d.name];
-        var fraction = (value - dataMin) / dataRange;
-        return fraction * radiusRange + radiusMin;
+        if (data.hasOwnProperty(d.name) && data[d.name].hasOwnProperty(key)) {
+            var value = data[d.name][key];
+
+            if (isNaN(dataMin) || isNaN(dataMax)) {
+                dataMin = value;
+                dataMax = value;
+            }
+
+            dataMin = Math.min(dataMin, value);
+            dataMax = Math.max(dataMax, value);
+
+            if (dataMax - dataMin == 0) {
+                return radiusMin;
+            }
+
+            var fraction = (value - dataMin) / (dataMax - dataMin);
+            return fraction * radiusRange + radiusMin;
+        }
+        else {
+            return radiusMin;
+        }
     };
 
-    graph.selectAll("g.node")
-        .select("circle")
-        .transition(2000)
-        .attr("r", window.radiusFunction);
+    reloadGraph();
 }
 
-function changeColors(data) {
-    console.log("got here");
-
+function circleColor(data, key) {
     window.colorFunction = function(d) {
-        return data[d.name];
+        if (data.hasOwnProperty(d.name) && data[d.name].hasOwnProperty(key)) {
+            return data[d.name][key];
+        }
+        else {
+            return "green";
+        }
     }
 
-    var graph = d3.select("#graph");
-    graph.selectAll("g.node")
-        .select("circle")
-        .transition(2000)
-        .attr("fill", window.colorFunction);
+   reloadGraph();
 }
