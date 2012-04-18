@@ -61,12 +61,14 @@ class Simulator(object):
             'clientId': clientId
         })
 
+
     @cherrypy.expose
     def structure(self):
         """
             for now, returns a static JSON string of the node structure
         """
         return open(os.path.join(STATIC_DIR, u'data/structure.json')).read()
+
 
     @cherrypy.expose
     def unsubscribe(self, clientId):
@@ -104,6 +106,7 @@ class Simulator(object):
 
         serverLock.release()
         return returnMessage
+
 
     @cherrypy.expose
     def update(self, clientId):
