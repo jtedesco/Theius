@@ -15,8 +15,14 @@ class SimulatorThread(threading.Thread):
 
         self.logMessages = logMessages
         self.serverLock = serverLock
+
+        # names of all nodes
         self.keys = keys
+
+        # possible colors for each node
         self.colors = ["red", "yellow", "green"]
+
+        # possible value for each node
         self.values = range(1,10)
 
     def run(self):
@@ -40,6 +46,7 @@ class SimulatorThread(threading.Thread):
             else:
                 logEvent['value'] = self.randomValue(self.values)
 
+            # update the logMessages structure
             self.serverLock.acquire()
 
             for clientId in self.logMessages:
@@ -54,6 +61,9 @@ class SimulatorThread(threading.Thread):
 
 
     def randomValue(self, array):
+        """
+            Returns a random element from an array
+        """
         index = int(random() * len(array))
         if index == len(array):
             index -= 1

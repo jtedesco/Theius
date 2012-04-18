@@ -52,14 +52,18 @@ function loadGraph(data) {
         .attr("r", window.radiusFunction)
         .attr("fill", window.colorFunction);
 
+    // automatically resize when the window changes
     window.onresize = function(event) {
-        reloadGraph();
+        redrawGraph();
     };
 
     return nodes;
 }
 
-function reloadGraph() {
+/**
+ * Redraws the graph so that it is up to date with it's associated data
+ */
+function redrawGraph() {
     // get new width and height
     var width = document.documentElement.clientWidth
     var height = document.documentElement.clientHeight / 2;
@@ -97,10 +101,9 @@ function reloadGraph() {
 }
 
 /**
- * Resizes all the circles in the graph to have a radius corresponding to some data
- * passed in. The data should be an associative array whose keys are node names and
- * whose values are integers.
- * @param data the data to represent
+ * Resizes all the circles in the graph to have a radius corresponding to the data passed in.
+ * @param data an associative array, where the key is the name of a node, and the value is a node
+ * @param key for each node, we take the value using this key as the radius
  */
 function circleRadius(data, key) {
     var dataMin = NaN,
@@ -121,10 +124,11 @@ function circleRadius(data, key) {
             dataMin = Math.min(dataMin, value);
             dataMax = Math.max(dataMax, value);
 
-            if (dataMax - dataMin == 0) {
+            if (dataMax - dataMin == 0) { //don't want to divide by 0 later!
                 return radiusMin;
             }
 
+            // convert from a value between dataMin and dataMax to a value between radiusMin and radiusMax
             var fraction = (value - dataMin) / (dataMax - dataMin);
             return fraction * radiusRange + radiusMin;
         }
@@ -133,9 +137,14 @@ function circleRadius(data, key) {
         }
     };
 
-    reloadGraph();
+    redrawGraph();
 }
 
+/**
+ * Colors each circle in the graph based on the data associated with the node
+ * @param data an associative array, where the key is the name of a node, and the value is a node
+ * @param key for each node, we take the value using this key as the color
+ */
 function circleColor(data, key) {
     window.colorFunction = function(d) {
         if (data.hasOwnProperty(d.name) && data[d.name].hasOwnProperty(key)) {
@@ -146,5 +155,5 @@ function circleColor(data, key) {
         }
     }
 
-   reloadGraph();
+   redrawGraph();
 }

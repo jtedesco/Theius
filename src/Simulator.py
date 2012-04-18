@@ -38,7 +38,6 @@ class Simulator(object):
             @return the client id
         """
 
-        global serverLock
         serverLock.acquire()
 
         # Get this client's id
@@ -75,7 +74,6 @@ class Simulator(object):
           Removes a client from the log stream
         """
 
-        global serverLock
         serverLock.acquire()
 
         try:
@@ -115,7 +113,6 @@ class Simulator(object):
         """
         clientId = int(clientId)
 
-        global serverLock
         serverLock.acquire()
 
         if clientId not in logMessages:

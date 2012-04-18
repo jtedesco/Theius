@@ -10,7 +10,8 @@ function appendToGarbage(message) {
 var clientId;
 
 /**
- * Receive updates from the
+ * Receive updates from the server
+ * @param data the JSON data
  */
 function receiveUpdate(data) {
 
@@ -46,13 +47,16 @@ function receiveUpdate(data) {
  */
 function processLogEntry(logEvent) {
     if (window.data.hasOwnProperty(logEvent['name'])) {
+
         var node = window.data[logEvent['name']];
+
         for (var elem in logEvent) {
             if (logEvent.hasOwnProperty(elem)) {
-                node[elem] = logEvent[elem];
+                node[elem] = logEvent[elem]; // copy over data
             }
         }
-        reloadGraph();
+
+        redrawGraph();
     }
     else {
         logError("Key \"" + logEvent['name'] + "\" not found");
@@ -117,6 +121,13 @@ function structureSuccess(data) {
     });
 }
 
+/**
+ * Loads the nodes into the global map "data"
+ * Some default values are also given to the nodes
+ * This function is essentially converting an array of nodes to a map
+ * from the name of a node to a node object.
+ * @param nodes an array of nodes
+ */
 function loadData(nodes) {
     window.data = {};
     for (var i in nodes){
