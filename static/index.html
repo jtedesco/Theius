@@ -3,23 +3,23 @@
 <html>
 <head>
     <title>Some silly page</title>
+
     <script type="text/javascript" src="/static/scripts/index.js"></script>
     <script type="text/javascript" src="/static/scripts/graph.js"></script>
+
     <script type="text/javascript" src="/static/scripts/d3.v2.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.pack.js"></script>
+    <script type="text/javascript" src="/static/scripts/jquery-1.7.2.pack.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/static/css/graph.css">
 </head>
 <body>
-    <h3>Demo Controls:</h3>
 
-    <button onclick='subscribe()'>Subscribe to Updates</button>
-    <button onclick='unsubscribe()'>Unsubscribe from Updates</button>
+<div id="graph"></div>
 
-    <h3>Demo:</h3>
-    <div id="graph"></div>
-
-    <h3>Demo Log:</h3>
-    <div id="garbage"></div>
 </body>
+<script type='text/javascript'>
+    $(document).ready(function () {
+        subscribe();
+    })
+</script>
 </html>
