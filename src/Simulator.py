@@ -65,7 +65,7 @@ class Simulator(object):
     @cherrypy.expose
     def structure(self):
         """
-            for now, returns a static JSON string of the node structure
+            Returns JSON describing the network topology to the visualization
         """
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return dumps(networkTopology['structure'])
