@@ -27,7 +27,7 @@ class Simulator(object):
         """
           Just return the static HTML content
         """
-        return open(os.path.join(STATIC_DIR, u'index.html')).read()
+        return open(os.path.join(STATIC_DIR, 'index.html')).read()
 
 
     @cherrypy.expose
@@ -67,7 +67,7 @@ class Simulator(object):
         """
             for now, returns a static JSON string of the node structure
         """
-        return open(os.path.join(STATIC_DIR, u'data/structure.json')).read()
+        return open(os.path.join(STATIC_DIR, 'data/structure.json')).read()
 
 
     @cherrypy.expose
@@ -157,7 +157,7 @@ class Simulator(object):
 
 
 # Server configuration
-STATIC_DIR = os.path.join(os.path.abspath("../"), u"static")
+STATIC_DIR = os.path.join(os.path.abspath('../'), 'static')
 config = {
     '/static': {
       'tools.staticdir.on': True,
@@ -170,6 +170,6 @@ cherrypy.tree.mount(Simulator(), '/', config=config)
 cherrypy.engine.start()
 
 # Start the simulator thread
-keys = load(open(os.path.join(STATIC_DIR, u'data/keys.json')))
+keys = load(open(os.path.join(STATIC_DIR, 'data/keys.json')))
 simulatorThread = SimulatorThread(logMessages, serverLock,  keys)
 simulatorThread.start()
