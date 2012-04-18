@@ -17,33 +17,67 @@ function displayGraph(data) {
         .projection(function(d) { return [d.x, d.y]; });
 
     d3.select("#graph").selectAll("svg").remove();
-
     var graph = d3.select("#graph").append("svg")
         .attr("width", width)
         .attr("height", height)
         .append("g")
         .attr("transform", "translate(0,40)");
 
-    var nodes = cluster.nodes(data);
+    window.nodes = cluster.nodes(window.graphData);
+    window.links = cluster.links(window.nodes);
+
+    console.log(window.nodes);
 
     var link = graph.selectAll("path.link")
-        .data(cluster.links(nodes))
+        .data(window.links)
         .enter().append("path")
         .attr("class", "link")
         .attr("d", diagonal);
 
     var node = graph.selectAll("g.node")
-        .data(nodes)
+        .data(window.nodes)
         .enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
+    window.radiusFunction = function() { return 20;};
+    window.colorFunction = function() { return "white";};
+
     node.append("circle")
-        .attr("r", 20)
+        .attr("r", window.radiusFunction)
+        .attr("fill", window.colorFunction());
 
     window.onresize = function(event) {
-        displayGraph(window.graphData);
+        reloadGraph();
     };
+}
+
+function reloadGraph() {
+    var width = document.documentElement.clientWidth
+    var height = document.documentElement.clientHeight / 2;
+
+    var cluster = d3.layout.cluster()
+        .size([width, height-100]);
+
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.x, d.y]; });
+
+    window.nodes = cluster.nodes(window.graphData);
+    window.links = cluster.links(window.nodes);
+
+    var graph = d3.select("#graph").select("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .select("g");
+
+    var link = graph.selectAll("path.link")
+        .attr("d", diagonal);
+
+    var node = graph.selectAll("g.node")
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    node.select("circle")
+        .attr("r", window.radiusFunction)
 }
 
 /**
@@ -69,17 +103,34 @@ function resizeCircles(data) {
         dataMax = Math.max(dataMax, value);
     }
     var radiusMin = 5,
-        radiusMax = 20;
+        radiusMax = 25;
     var dataRange = dataMax - dataMin,
         radiusRange = radiusMax - radiusMin;
 
     var graph = d3.select("#graph");
 
+    window.radiusFunction = function(d) {
+        var value = data[d.name];
+        var fraction = (value - dataMin) / dataRange;
+        return fraction * radiusRange + radiusMin;
+    };
+
     graph.selectAll("g.node")
         .select("circle")
-        .attr("r", function(d) {
-            var value = data[d.name];
-            var fraction = (value - dataMin) / dataRange;
-            return fraction * radiusRange + radiusMin;
-        });
+        .transition(2000)
+        .attr("r", window.radiusFunction);
+}
+
+function changeColors(data) {
+    console.log("got here");
+
+    window.colorFunction = function(d) {
+        return data[d.name];
+    }
+
+    var graph = d3.select("#graph");
+    graph.selectAll("g.node")
+        .select("circle")
+        .transition(2000)
+        .attr("fill", window.colorFunction);
 }

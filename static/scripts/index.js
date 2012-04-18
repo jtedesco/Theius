@@ -155,3 +155,12 @@ function testCircleResizing() {
         dataType: 'json'
     });
 }
+
+function testColorChanging() {
+    $.ajax({
+        url: '/colorData',
+        success: changeColors,
+        error: logError,
+        dataType: 'json'
+    });
+}

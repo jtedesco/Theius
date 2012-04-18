@@ -162,6 +162,13 @@ class Simulator(object):
         """
         return open(os.path.join(STATIC_DIR, u'data/sampleData.json')).read()
 
+    @cherrypy.expose
+    def colorData(self):
+        """
+            for now, returns a static JSON string of test data
+        """
+        return open(os.path.join(STATIC_DIR, u'data/sampleColorData.json')).read()
+
 
 # Server configuration
 STATIC_DIR = os.path.join(os.path.abspath("../"), u"static")
