@@ -9,6 +9,7 @@ class SimulatorThread(threading.Thread):
         """
           Initialize the simulator thread, given the <code>logMessages</code> map and a lock to access it
         """
+
         threading.Thread.__init__(self)
 
         self.logMessages = logMessages
@@ -60,6 +61,7 @@ class SimulatorThread(threading.Thread):
         """
             Returns a random element from an array
         """
+
         index = int(random() * len(array))
         if index == len(array):
             index -= 1
