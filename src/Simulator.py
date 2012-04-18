@@ -67,7 +67,8 @@ class Simulator(object):
         """
             for now, returns a static JSON string of the node structure
         """
-        return open(os.path.join(STATIC_DIR, 'data/structure.json')).read()
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        return dumps(networkTopology['structure'])
 
 
     @cherrypy.expose
@@ -169,7 +170,10 @@ config = {
 cherrypy.tree.mount(Simulator(), '/', config=config)
 cherrypy.engine.start()
 
+# Load the network topology
+networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
+
+
 # Start the simulator thread
-keys = load(open(os.path.join(STATIC_DIR, 'data/keys.json')))
-simulatorThread = SimulatorThread(logMessages, serverLock,  keys)
+simulatorThread = SimulatorThread(logMessages, serverLock,  networkTopology['machines'])
 simulatorThread.start()
