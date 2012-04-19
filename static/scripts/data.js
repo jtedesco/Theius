@@ -35,7 +35,11 @@ function update(data) {
         updateClusterState(stateChange);
 
         // Update the visualization
-        visualization.update(logEvents);
+        if(visualization && visualization!=null) {
+            visualization.update(logEvents);
+        } else {
+            console.log('Skipping update, invalid visualization');
+        }
 
         // Get next update
         $.ajax({
