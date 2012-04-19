@@ -63,17 +63,9 @@ class Simulator(object):
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return dumps({
             'clientId': clientId,
-            'currentState': currentState
+            'currentState': currentState,
+            'structure': networkTopology['structure']
         })
-
-
-    @cherrypy.expose
-    def structure(self):
-        """
-            Returns JSON describing the network topology to the visualization
-        """
-        cherrypy.response.headers['Content-Type'] = 'application/json'
-        return dumps(networkTopology['structure'])
 
 
     @cherrypy.expose
