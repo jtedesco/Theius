@@ -1,19 +1,14 @@
-.node circle {
+.treeVisualizationNode circle {
     stroke: steelblue;
     stroke-width: 1.5px;
 }
 
-.node {
+.treeVisualizationNode {
     font: 10px sans-serif;
 }
 
-.link {
+.treeVisualizationLink {
     fill: none;
     stroke: #ccc;
     stroke-width: 1.5px;
-}
-
-#visualization {
-    width: 100%;
-    height: 100%;
 }

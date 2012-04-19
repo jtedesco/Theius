@@ -9,3 +9,8 @@
 footer {
     text-align: center;
 }
+
+#visualization {
+    width: 100%;
+    height: 100%;
+}
