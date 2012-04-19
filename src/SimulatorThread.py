@@ -28,7 +28,7 @@ class SimulatorThread(threading.Thread):
 
         # Statistical average time between failures for a node
         baseAverageMinutesBetweenFailures = 5 # For demo purposes
-        averageTimeBetweenFailuresDistribution = numpy.random.normal(
+        averageMinutesBetweenFailures = numpy.random.normal(
             loc=baseAverageMinutesBetweenFailures, # Mean
             scale=1, # Standard deviation
             size=len(machineNames) # The number of entries
@@ -51,14 +51,14 @@ class SimulatorThread(threading.Thread):
                 'memoryUsage': 0.3,
                 'contextSwitchRate': 0.1, # What is this???
                 'lastFailureTime': None,
-                'predictedCrashTime': datetime.now() + averageTimeBetweenFailuresDistribution[nodeIndex],
+                'predictedFailureTime': datetime.now() + averageMinutesBetweenFailures[nodeIndex],
                 'predictedSeverityProbabilities': {
                     'FATAL' : 0.05,
                     'ERROR': 0.1,
                     'WARN': 0.2,
                     'INFO': 0.5
                 },
-                'averageTimeBetweenErrors': averageTimeBetweenFailuresDistribution[nodeIndex],
+                'averageMinutesBetweenFailures': averageMinutesBetweenFailures[nodeIndex],
                 'health': 0.9 # Scale of 0-1
 
             }
@@ -82,9 +82,7 @@ class SimulatorThread(threading.Thread):
                 logEvents.append(self.generateRandomLogEvent())
 
             # Gather updated node info based on each log event
-            updatedNodeInfo = []
-            for logEvent in logEvents:
-                updatedNodeInfo.append(self.getUpdatedNodeInfoBasedOnEvent(logEvent))
+            updatedNodeInfo = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
 
             # update the logMessages structure
             self.serverLock.acquire()
@@ -101,12 +99,74 @@ class SimulatorThread(threading.Thread):
             self.serverLock.release()
 
 
-    def getUpdatedNodeInfoBasedOnEvent(self, logEvent):
+    def getUpdatedNodeInfoBasedOnEvents(self, logEvents):
         """
-          Creates some updated node data (for random parts of the cluster), base don the given log event.
+          Creates some updated node data (for random parts of the cluster), based on the given log events.
         """
 
-        return {}
+        # Create distributions for randomly increasing/decreasing predicted severity probabilities
+        predictedFatalDelta =  numpy.random.normal(loc=0, scale=0.02, size=1000)
+        predictedErrorDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        predictedWarnDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        predictedInfoDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+
+        # Create distributions for randomly increasing/decreasing CPU/memory/context switch stats
+        cpuUsageDelta =  numpy.random.normal(loc=0, scale=0.1, size=1000)
+        memoryUsageDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        contextSwitchRateDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+
+        updatedNodeInfo = {}
+
+        # Definitely update everything (except performance/usage) for nodes associated with log events
+        for logEvent in logEvents:
+
+            # Add an entry if there isn't one already
+            if logEvent['location'] not in updatedNodeInfo:
+                updatedNodeInfo[logEvent['location']] = {}
+            nodeInfo = updatedNodeInfo[logEvent['location']]
+
+            # Update failure data if this log event was FATAL
+            if logEvent['severity'] is 'FATAL':
+
+                lastFailureTime = nodeInfo['lastFailureTime']
+
+                # Update average minutes between failures & last failure info
+                if lastFailureTime is not None:
+                    delta = logEvent['timestamp'] - lastFailureTime
+                    nodeInfo['averageMinutesBetweenFailures'] = (self.nodeInfo[logEvent['location']]['averageMinutesBetweenFailures'] + (delta.seconds//3600))/2
+                nodeInfo['lastFailureTime'] = logEvent['timestamp']
+                nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + nodeInfo['averageMinutesBetweenFailures']
+
+            # Update predicted crash time if
+            elif nodeInfo['predictedFailureTime'] < logEvent['timestamp']:
+                nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + nodeInfo['averageMinutesBetweenFailures']
+
+            # Update the health of this node
+            healthDelta = {
+                'FATAL' : -0.2,
+                'ERROR': -0.5,
+                'WARN': 0.0,
+                'INFO': 0.1
+            }
+            nodeInfo['health'] = self.nodeInfo[logEvent['location']]['health'] + healthDelta[logEvent['severity']]
+
+            # Update this node's predicted severity probabilities
+            nodeInfo['predictedSeverityProbabilities'] = {
+                'FATAL' : nodeInfo['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(predictedFatalDelta),
+                'ERROR': nodeInfo['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(predictedErrorDelta),
+                'WARN': nodeInfo['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(predictedWarnDelta),
+                'INFO': nodeInfo['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(predictedInfoDelta)
+            }
+
+            # Update this node's cpu/memory/context-switch stats
+            nodeInfo['predictedSeverityProbabilities'] = {
+                'cpuUsage' : nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta),
+                'memoryUsage': nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta),
+                'contextSwitchRate': nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta)
+            }
+
+
+        return updatedNodeInfo
 
 
     def generateRandomLogEvent(self):
@@ -124,6 +184,7 @@ class SimulatorThread(threading.Thread):
             'severity': randomSeverity,
             'facility': randomFacility,
             'location': machineName,
+            'timestamp': datetime.now()
         }
 
         return logEvent
@@ -138,3 +199,11 @@ class SimulatorThread(threading.Thread):
         if index == len(array):
             index -= 1
         return array[index]
+
+
+    def normalizeValue(self, value):
+        if value < 0:
+            return 0
+        if value > 1:
+            return 1
+        return value
