@@ -68,6 +68,7 @@ function SplomVisualization(structure, state) {
         cell.selectAll("circle")
             .data(data.values)
             .enter().append("circle")
+            .attr("class", "splomCircle")
             .attr("class", function(machine) { return machine.rackName; })
             .attr("cx", function(d) { return x[p.x](d[p.x]); })
             .attr("cy", function(d) { return y[p.y](d[p.y]); })

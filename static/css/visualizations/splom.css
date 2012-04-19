@@ -1,49 +1,49 @@
-/*svg {*/
-    /*font: 10px sans-serif;*/
-/*}*/
+svg {
+    font: 10px sans-serif;
+}
 
-/*.axis {*/
-    /*shape-rendering: crispEdges;*/
-/*}*/
+.axis {
+    shape-rendering: crispEdges;
+}
 
-/*.axis line {*/
-    /*stroke: #ddd;*/
-    /*stroke-width: .5px;*/
-/*}*/
+.axis line {
+    stroke: #ddd;
+    stroke-width: .5px;
+}
 
-/*.axis path {*/
-    /*display: none;*/
-/*}*/
+.axis path {
+    display: none;
+}
 
-/*rect.extent {*/
-    /*fill: #000;*/
-    /*fill-opacity: .125;*/
-    /*stroke: #fff;*/
-/*}*/
+rect.extent {
+    fill: #000;
+    fill-opacity: .125;
+    stroke: #fff;
+}
 
-/*rect.frame {*/
-    /*fill: #fff;*/
-    /*fill-opacity: .7;*/
-    /*stroke: #aaa;*/
-/*}*/
+rect.frame {
+    fill: #fff;
+    fill-opacity: .7;
+    stroke: #aaa;
+}
 
-/*circle{*/
-    /*fill: #ccc;*/
-    /*fill-opacity: .5;*/
-/*}*/
+.splomCircle {
+    fill: #ccc;
+    fill-opacity: .5;
+}
 
-/*.cell text {*/
-    /*pointer-events: none;*/
-/*}*/
+.cell text {
+    pointer-events: none;
+}
 
-/*.setosa {*/
-    /*fill: #800;*/
-/*}*/
+.setosa {
+    fill: #800;
+}
 
-/*.versicolor {*/
-    /*fill: #080;*/
-/*}*/
+.versicolor {
+    fill: #080;
+}
 
-/*.virginica {*/
-    /*fill: #008;*/
-/*}*/
+.virginica {
+    fill: #008;
+}
