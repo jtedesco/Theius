@@ -81,7 +81,7 @@ function TreeVisualization(structure, state) {
         // add circles representing nodes
         node.append("circle")
             .attr("r", radius)
-            .attr("fillColor", fillColor);
+            .attr("fill", fillColor);
 
         // automatically resize when the window changes
         window.onresize = function(event) {
@@ -136,6 +136,6 @@ function TreeVisualization(structure, state) {
         node.select("circle")
             .transition(2000)
             .attr("r", radius)
-            .attr("fillColor", fillColor);
+            .attr("fill", fillColor);
     };
 }
