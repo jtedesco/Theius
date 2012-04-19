@@ -7,8 +7,7 @@ Dependencies
 ============
 Theius requires several key dependencies:
 <ul>
-<li> Python 2.7.x </li>
-<li> CherryPy 3.2 </li>
+    <li> Python 2.7.x </li>
+    <li> CherryPy 3.2 </li>
+    <li> Numpy </li>
 </ul>
-
-
