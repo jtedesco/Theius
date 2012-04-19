@@ -50,9 +50,10 @@ function TreeVisualization(structure, state) {
     /**
      * Construct the visualization for the first time
      */
-    d3.select(".visualization").selectAll("svg").remove();
-    var initialize = function() {
+    this.initialize = function() {
 
+
+        d3.select(".visualization").selectAll("svg").remove();
         var width = $(".visualization").width();
         var height = $(".visualization").height();
 
@@ -96,7 +97,7 @@ function TreeVisualization(structure, state) {
         window.onresize = function(event) {
             redrawGraph();
         };
-    }();
+    };
 
 
     /**

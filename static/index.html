@@ -26,106 +26,111 @@
     <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/tree.css">
 
-
+    <!-- Global style & scripts -->
     <link rel="stylesheet" type="text/css" href="/static/css/index.css">
+    <script type="text/javascript" src="/static/scripts/index.js"></script>
 
 </head>
 <body>
 
-    <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container-fluid">
-                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </a>
-                <a class="brand" href="#">Theius</a>
-                <div class="nav-collapse">
-                    <ul class="nav">
-                        <li class="active"><a href="#tree">Tree Visualization</a></li>
-                        <li><a href="#scatterplot">Scatterplot Matrix</a></li>
-                        <li><a href="#treemap">Treemap</a></li>
-                        <li><a href="#circlePacking">Circle Packing</a></li>
-                        <li><a href="#chordDiagram">Chord Diagram</a></li>
-                    </ul>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#">Theius</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li id="treeLink" class="active">
+                        <a href="javascript:changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')">
+                            Tree Visualization
+                        </a>
+                    </li>
+                    <li id="matrixLink"><a href="javascript:changeVisualization(null, 'matrixLink')">Scatterplot Matrix</a></li>
+                    <li id="treemapLink"><a href="javascript:changeVisualization(null, 'treemapLink')">Treemap</a></li>
+                    <li id="circlePackingLink"><a href="javascript:changeVisualization(null, 'circlePackingLink')">Circle Packing</a></li>
+                    <li id="chordDiagramLink"><a href="javascript:changeVisualization(null, 'chordDiagramLink')">Chord Diagram</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="row-fluid">
+                <div id="leftSidebar" class="span2">
+                    <div class="well">
+                        <h3>Some options</h3><br/>
+                        <form class="form-vertical" style="width: 100%;">
+                            <fieldset>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input type="text" class="input-medium" id="input01">
+                                        <p class="help-block">Type something...</p>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="control-group">
+                                    <label class="control-label" for="optionsCheckbox">Checkbox</label>
+                                    <div class="controls">
+                                        <label class="checkbox">
+                                            <input type="checkbox" id="optionsCheckbox" value="option1">
+                                            Some option
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button class="btn">Cancel</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="span8">
+                    <div id="visualizationWrapper" class="well">
+                        <div class="visualization"></div>
+                    </div>
+                </div>
+
+                <div id="rightSidebar" class="span2">
+                    <div class="well">
+
+                        <h3>Some ranked data</h3><br/>
+
+                        <ul id="tab" class="nav nav-tabs">
+                            <li class="active"><a href="#nodes" data-toggle="tab">Nodes</a></li>
+                            <li><a href="#events" data-toggle="tab">Events</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="nodes">
+                                <p>node data</p>
+                            </div>
+                            <div class="tab-pane fade" id="events">
+                                <p>events data</p>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid">
+    <footer>
+        <p>&copy; Jon Tedesco, Roman Dudko, and Abhishek Sharma 2012</p>
+    </footer>
 
-        <div class="row-fluid">
-            <div class="span12">
-                <div class="row-fluid">
-                    <div id="leftSidebar" class="span2">
-                        <div class="well">
-                            <h3>Some options</h3><br/>
-                            <form class="form-vertical" style="width: 100%;">
-                                <fieldset>
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <input type="text" class="input-medium" id="input01">
-                                            <p class="help-block">Type something...</p>
-                                        </div>
-                                    </div>
-                                    <br/>
-                                    <div class="control-group">
-                                        <label class="control-label" for="optionsCheckbox">Checkbox</label>
-                                        <div class="controls">
-                                            <label class="checkbox">
-                                                <input type="checkbox" id="optionsCheckbox" value="option1">
-                                                Some option
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-actions">
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                        <button class="btn">Cancel</button>
-                                    </div>
-                                </fieldset>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="span8">
-                        <div class="well">
-                            <div class="visualization"></div>
-                        </div>
-                    </div>
-
-                    <div id="rightSidebar" class="span2">
-                        <div class="well">
-
-                            <h3>Some ranked data</h3><br/>
-
-                            <ul id="tab" class="nav nav-tabs">
-                                <li class="active"><a href="#nodes" data-toggle="tab">Nodes</a></li>
-                                <li><a href="#events" data-toggle="tab">Events</a></li>
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane fade in active" id="nodes">
-                                    <p>node data</p>
-                                </div>
-                                <div class="tab-pane fade" id="events">
-                                    <p>events data</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                 </div>
-            </div>
-        </div>
-
-        <footer>
-            <p>&copy; Jon Tedesco, Roman Dudko, and Abhishek Sharma 2012</p>
-        </footer>
-
-    </div>
+</div>
 
 </body>
 <script type='text/javascript'>

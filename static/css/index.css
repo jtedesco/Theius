@@ -1,8 +1,8 @@
-.visualization, #leftSidebar, #rightSidebar{
+#visualizationWrapper, #leftSidebar, #rightSidebar{
     height: 800px;
 }
 
-#leftSidebar .well, #rightSidebar .well {
+#leftSidebar .well, #rightSidebar .well, .visualization {
     height: 100%;
 }
 
