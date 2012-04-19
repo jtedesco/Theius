@@ -2,6 +2,10 @@
     height: 800px;
 }
 
+#leftSidebar .well, #rightSidebar .well {
+    height: 100%;
+}
+
 footer {
     text-align: center;
 }
