@@ -1,3 +1,10 @@
+// The id assigned to this client
+var clientId;
+
+// The state of the entire cluster
+var clusterState;
+
+
 /**
  * Appends a given message to the 'garbage' div (for demo purposes only)
  * @param message
@@ -6,8 +13,6 @@ function appendToGarbage(message) {
     $('#garbage').html($('#garbage').html() + message + '<br/>');
 }
 
-// The id assigned to this client
-var clientId;
 
 /**
  * Receive updates from the server
@@ -41,6 +46,7 @@ function receiveUpdate(data) {
     }
 }
 
+
 /**
  * Decide what to do with the log entry that was received here
  * @param logEvent the log entry received from the server
@@ -63,6 +69,7 @@ function processLogEntry(logEvent) {
     }
 }
 
+
 /**
  * Subscribe this client to log updates from the simulator
  */
@@ -78,36 +85,25 @@ function subscribe() {
     });
 }
 
+
 /**
  * Handle a successful subscribe, record client id & log it
  *  @param data The successful subscribe data
  */
 function subscribeSuccess(data) {
+
+    // Get info returned from simulator on subscribe
     clientId = data['clientId'];
-    var message = 'Client ID: ' + clientId;
-    appendToGarbage(message);
+    clusterState = data['currentState'];
 
-    // Retreive the graph
-    $.ajax({
-        url: '/structure',
-        data: {},
-        success: structureSuccess,
-        error: logError,
-        dataType: 'json'
-    });
-}
-
-/**
- * Handles a successful fetching of the node structure by displaying it
- * @param data the JSON node structure data
- */
-function structureSuccess(data) {
-    var nodes = loadGraph(data);
+    // Get the structure of the network & build the default visualization
+    var structure = data['structure'];
+    var nodes = loadGraph(structure);
     loadData(nodes);
 
     // tie data to circle color and radius
-    circleColor(window.data, 'color');
-    circleRadius(window.data, 'value');
+//    circleColor(window.data, 'color');
+//    circleRadius(window.data, 'value');
 
     // Start calling the AJAX update loop
     $.ajax({
@@ -120,6 +116,7 @@ function structureSuccess(data) {
         dataType: 'json'
     });
 }
+
 
 /**
  * Loads the nodes into the global map "data"
@@ -137,6 +134,7 @@ function loadData(nodes) {
         }
     }
 }
+
 
 /**
  * Subscribe this client to log updates from the simulator

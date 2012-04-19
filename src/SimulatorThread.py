@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
-import os
-from random import random
+from random import random, choice
+import string
 import threading
 from time import sleep
 import numpy
+
+TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
+
 
 __author__ = 'jon'
 
@@ -51,7 +54,7 @@ class SimulatorThread(threading.Thread):
                 'memoryUsage': 0.3,
                 'contextSwitchRate': 0.1, # What is this???
                 'lastFailureTime': None,
-                'predictedFailureTime': datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]),
+                'predictedFailureTime': datetime.strftime(datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]), TIMESTAMP_FORMAT),
                 'predictedSeverityProbabilities': {
                     'FATAL' : 0.05,
                     'ERROR': 0.1,
@@ -153,11 +156,11 @@ class SimulatorThread(threading.Thread):
                     delta = logEvent['timestamp'] - lastFailureTime
                     nodeInfo['averageMinutesBetweenFailures'] = (self.nodeInfo[nodeName]['averageMinutesBetweenFailures'] + (delta.seconds//3600))/2
                 nodeInfo['lastFailureTime'] = logEvent['timestamp']
-                nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + timedelta(minutes=self.nodeInfo[nodeName]['averageMinutesBetweenFailures'])
+                nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) + timedelta(minutes=self.nodeInfo[nodeName]['averageMinutesBetweenFailures']), TIMESTAMP_FORMAT)
 
             # Update predicted crash time if
-            elif self.nodeInfo[nodeName]['predictedFailureTime'] < logEvent['timestamp']:
-                nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + nodeInfo['averageMinutesBetweenFailures']
+            elif datetime.strptime(self.nodeInfo[nodeName]['predictedFailureTime'], TIMESTAMP_FORMAT) < datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT):
+                nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.stpftime(logEvent['timestamp'], TIMESTAMP_FORMAT) + nodeInfo['averageMinutesBetweenFailures'], TIMESTAMP_FORMAT)
 
             # Update the health of this node
             healthDelta = {
@@ -211,12 +214,16 @@ class SimulatorThread(threading.Thread):
         randomSeverity = self.getRandomElement(self.severities)
         randomFacility = self.getRandomElement(self.facilities)
 
+        # Generate a random ascii string
+        randomLength = int(random() * 50)
+        randomString = ''.join(choice(string.ascii_letters) for x in range(randomLength))
+
         logEvent = {
-            'message': os.urandom(int(random() * 50)), # Generate a random string
+            'message': randomString,
             'severity': randomSeverity,
             'facility': randomFacility,
             'location': machineName,
-            'timestamp': datetime.now()
+            'timestamp': datetime.strftime(datetime.now(), TIMESTAMP_FORMAT)
         }
 
         return logEvent
