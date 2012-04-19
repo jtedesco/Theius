@@ -12,3 +12,8 @@
     stroke: #ccc;
     stroke-width: 1.5px;
 }
+
+#visualization {
+    width: 100%;
+    height: 100%;
+}

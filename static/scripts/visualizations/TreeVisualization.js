@@ -50,11 +50,11 @@ function TreeVisualization(structure, state) {
     /**
      * Construct the visualization for the first time
      */
-    d3.select("#graph").selectAll("svg").remove();
+    d3.select(".visualization").selectAll("svg").remove();
     var initialize = function() {
 
-        var width = document.documentElement.clientWidth;
-        var height = document.documentElement.clientHeight;
+        var width = $(".visualization").width();
+        var height = $(".visualization").height();
 
         var cluster = d3.layout.cluster()
             .size([width, height-100]);
@@ -67,7 +67,7 @@ function TreeVisualization(structure, state) {
         var links = cluster.links(nodes);
 
         // add main svg element
-        var graph = d3.select("#graph").append("svg")
+        var graph = d3.select(".visualization").append("svg")
             .attr("width", width)
             .attr("height", height)
             .append("g")
@@ -113,8 +113,8 @@ function TreeVisualization(structure, state) {
     var redrawGraph = function() {
 
         // get new width and height
-        var width = document.documentElement.clientWidth;
-        var height = document.documentElement.clientHeight;
+        var width = $(".visualization").width();
+        var height = $(".visualization").height();
 
         var cluster = d3.layout.cluster()
             .size([width, height-100]);
@@ -126,7 +126,7 @@ function TreeVisualization(structure, state) {
         var links = cluster.links(nodes);
 
         // update width and height of graph
-        var graph = d3.select("#graph").select("svg")
+        var graph = d3.select(".visualization").select("svg")
             .attr("width", width)
             .attr("height", height)
             .select("g");

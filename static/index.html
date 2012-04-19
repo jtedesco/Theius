@@ -1,20 +1,48 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>Theius - Hadoop Prediction Visualization Tool</title>
 
-    <script type="text/javascript" src="/static/scripts/index.js"></script>
-    <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
+    <!-- Model JS -->
+    <script type="text/javascript" src="/static/scripts/data.js"></script>
 
+    <!-- Jquery & d3 includes -->
     <script type="text/javascript" src="/static/scripts/d3.v2.js"></script>
     <script type="text/javascript" src="/static/scripts/jquery-1.7.2.pack.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/static/css/graph.css">
+    <!-- Bootstrap includes -->
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/tree.css">
+
+    <!-- Tree viz -->
+    <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/tree.css">
+
+
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css">
+
 </head>
 <body>
 
-<div id="graph"></div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+
+            <div class="span2">
+                <!-- Left Sidebar -->
+                Left sidebar
+            </div>
+
+            <div class="span8">
+                <div class="visualization"></div>
+            </div>
+
+            <div class="span2">
+                <!-- Right Sidebar -->
+                Right sidebar
+            </div>
+
+        </div>
+    </div>
 
 </body>
 <script type='text/javascript'>
