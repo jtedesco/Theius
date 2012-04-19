@@ -1,17 +1,7 @@
-.visualization {
-    width: 100%;
+.visualization, #leftSidebar, #rightSidebar{
     height: 800px;
 }
 
 footer {
     text-align: center;
-}
-
-#leftSidebar {
-    height: 100%;
-}
-
-#rightSidebar {
-    height: 100%;
-
 }
