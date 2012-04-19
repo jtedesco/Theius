@@ -70,8 +70,12 @@ function SplomVisualization(structure, state) {
             .enter().append("circle")
             .attr("class", "splomCircle")
             .attr("class", function(machine) { return machine.rackName; })
-            .attr("cx", function(d) { return x[p.x](d[p.x]); })
-            .attr("cy", function(d) { return y[p.y](d[p.y]); })
+            .attr("cx", function(d) {
+                return x[p.x](getCompoundKeyFromDict(d, p.x));
+            })
+            .attr("cy", function(d) {
+                return y[p.y](getCompoundKeyFromDict(d, p.y));
+            })
             .attr("r", 3);
 
         // Plot brush.
@@ -109,6 +113,19 @@ function SplomVisualization(structure, state) {
         return c;
     };
 
+    // Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
+    var getCompoundKeyFromDict = function(dictionary, key) {
+        var keys = key.split('.');
+        if (keys.length > 2) {
+            console.log('Cannot use more than one level of nested keys!');
+            return null;
+        } else if (keys.length === 2) {
+            return dictionary[keys[0]][keys[1]];
+        } else {
+            return dictionary[keys[0]];
+        }
+    };
+
 
     // Size parameters.
     var size = 150,
@@ -119,17 +136,7 @@ function SplomVisualization(structure, state) {
     var x = {}, y = {};
     data.traits.forEach(function(trait) {
         var value = function(machineData) {
-
-            // Split the trait by period if necessary, but only once (allows for keys of dictionaries)
-            var keys = trait.split('.');
-            if (keys.length > 2) {
-                console.log('Cannot use more than one level of nested keys!');
-                return null;
-            } else if (keys.length === 2) {
-                return machineData[keys[0]][keys[1]];
-            } else {
-                return machineData[keys[0]];
-            }
+            return getCompoundKeyFromDict(machineData, trait);
         },
             domain = [d3.min(data.values, value), d3.max(data.values, value)],
             range = [padding / 2, size - padding / 2];
