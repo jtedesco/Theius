@@ -75,8 +75,11 @@ class SimulatorThread(threading.Thread):
             # Insert some random delay between 0 and 2 second
             sleep(2 * random())
 
-            # Create a random log event
-            logEvent = self.generateRandomLogEvent()
+            # Create some random log events
+            numberOfLogEvents = int(4 * random) + 1
+            logEvents = []
+            for i in xrange(0,numberOfLogEvents):
+                logEvents.append(self.generateRandomLogEvent())
 
             # update the logMessages structure
             self.serverLock.acquire()
@@ -84,7 +87,8 @@ class SimulatorThread(threading.Thread):
             for clientId in self.logMessages:
 
                 # Add the new log event to the client's queue
-                self.logMessages[clientId]['updates'].put(logEvent)
+                for logEvent in logEvents:
+                    self.logMessages[clientId]['updates'].put(logEvent)
 
                 # Notify client that a message has arrived
                 self.logMessages[clientId]['trigger'].release()
