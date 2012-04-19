@@ -82,7 +82,7 @@ class SimulatorThread(threading.Thread):
                 logEvents.append(self.generateRandomLogEvent())
 
             # Gather updated node info based on each log event
-            updatedNodeInfo = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
+            nodeInfoUpdates = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
 
             # update the logMessages structure
             self.serverLock.acquire()
@@ -93,10 +93,16 @@ class SimulatorThread(threading.Thread):
                 for logEvent in logEvents:
                     self.logMessages[clientId]['updates'].put(logEvent)
 
+                # Add the node info deltas
+                self.logMessages[clientId]['nodeInfo'] = nodeInfoUpdates
+
                 # Notify client that a message has arrived
                 self.logMessages[clientId]['trigger'].release()
 
             self.serverLock.release()
+
+            # Apply the node info updates to the simulator's state
+
 
 
     def getUpdatedNodeInfoBasedOnEvents(self, logEvents):
@@ -107,13 +113,13 @@ class SimulatorThread(threading.Thread):
         # Create distributions for randomly increasing/decreasing predicted severity probabilities
         predictedFatalDelta =  numpy.random.normal(loc=0, scale=0.02, size=1000)
         predictedErrorDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
-        predictedWarnDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
-        predictedInfoDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        predictedWarnDelta =  predictedErrorDelta
+        predictedInfoDelta =  predictedErrorDelta
 
         # Create distributions for randomly increasing/decreasing CPU/memory/context switch stats
         cpuUsageDelta =  numpy.random.normal(loc=0, scale=0.1, size=1000)
         memoryUsageDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
-        contextSwitchRateDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        contextSwitchRateDelta =  memoryUsageDelta
 
         updatedNodeInfo = {}
 
