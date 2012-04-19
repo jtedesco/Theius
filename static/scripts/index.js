@@ -34,6 +34,10 @@ function update(data) {
         var stateChange = data['stateChange'];
         updateClusterState(stateChange);
 
+        // Update the visualization
+        visualization.update(logEvents);
+
+        // Get next update
         $.ajax({
             url: '/update',
             data: {
