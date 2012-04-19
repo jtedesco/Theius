@@ -26,6 +26,10 @@
     <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/tree.css">
 
+    <!-- Splom viz -->
+    <script type="text/javascript" src="/static/scripts/visualizations/SplomVisualization.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/splom.css">
+
     <!-- Global style & scripts -->
     <link rel="stylesheet" type="text/css" href="/static/css/index.css">
     <script type="text/javascript" src="/static/scripts/index.js"></script>
@@ -51,7 +55,11 @@
                             Tree Visualization
                         </a>
                     </li>
-                    <li id="matrixLink"><a href="javascript:changeVisualization(null, 'matrixLink')">Scatterplot Matrix</a></li>
+                    <li id="matrixLink">
+                        <a href="javascript:changeVisualization(new SplomVisualization(clusterStructure, clusterState), 'matrixLink')">
+                            Scatterplot Matrix
+                        </a>
+                    </li>
                     <li id="treemapLink"><a href="javascript:changeVisualization(null, 'treemapLink')">Treemap</a></li>
                     <li id="circlePackingLink"><a href="javascript:changeVisualization(null, 'circlePackingLink')">Circle Packing</a></li>
                     <li id="chordDiagramLink"><a href="javascript:changeVisualization(null, 'chordDiagramLink')">Chord Diagram</a></li>
