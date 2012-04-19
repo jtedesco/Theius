@@ -53,65 +53,6 @@ function SplomVisualization(structure, state) {
         values: values
     };
 
-    var plot = function(p) {
-        var cell = d3.select(this);
-
-        // Plot frame.
-        cell.append("rect")
-            .attr("class", "frame")
-            .attr("x", padding / 2)
-            .attr("y", padding / 2)
-            .attr("width", size - padding)
-            .attr("height", size - padding);
-
-        // Plot dots.
-        cell.selectAll("circle")
-            .data(data.values)
-            .enter().append("circle")
-            .attr("class", "splomCircle")
-            .attr("class", function(machine) { return machine.rackName; })
-            .attr("cx", function(d) {
-                return x[p.x](getCompoundKeyFromDict(d, p.x));
-            })
-            .attr("cy", function(d) {
-                return y[p.y](getCompoundKeyFromDict(d, p.y));
-            })
-            .attr("r", 3);
-
-        // Plot brush.
-        cell.call(brush.x(x[p.x]).y(y[p.y]));
-    };
-
-    // Clear the previously-active brush, if any.
-    var brushstart = function(p) {
-        if (brush.data !== p) {
-            cell.call(brush.clear());
-            brush.x(x[p.x]).y(y[p.y]).data = p;
-        }
-    };
-
-    // Highlight the selected circles.
-    var brush = function(p) {
-        var e = brush.extent();
-        svg.selectAll("circle").attr("class", function(machine) {
-            return e[0][0] <= machine[p.x] && machine[p.x] <= e[1][0]
-                && e[0][1] <= machine[p.y] && machine[p.y] <= e[1][1]
-                ? machine.rackName : null;
-        });
-    };
-
-    // If the brush is empty, select all circles.
-    var brushend = function() {
-        if (brush.empty()) svg.selectAll("circle").attr("class", function(machine) {
-            return machine.rackName;
-        });
-    };
-
-    var cross = function(a, b) {
-        var c = [], n = a.length, m = b.length, i, j;
-        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
-        return c;
-    };
 
     // Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
     var getCompoundKeyFromDict = function(dictionary, key) {
@@ -126,6 +67,11 @@ function SplomVisualization(structure, state) {
         }
     };
 
+    var cross = function(a, b) {
+        var c = [], n = a.length, m = b.length, i, j;
+        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
+        return c;
+    };
 
     // Size parameters.
     var size = 150,
@@ -156,9 +102,9 @@ function SplomVisualization(structure, state) {
 
     // Brush.
     var brush = d3.svg.brush()
-        .on("brushstart", brushstart)
-        .on("brush", brush)
-        .on("brushend", brushend);
+        .on("brushstart", onBrushStart)
+        .on("brush", onBrush)
+        .on("brushend", onBrushEnd);
 
     // Root panel.
     var svg = d3.select(".visualization").append("svg")
@@ -195,4 +141,65 @@ function SplomVisualization(structure, state) {
         .attr("y", padding)
         .attr("dy", ".71em")
         .text(function(d) { return d.x; });
+
+    // Actually plots the data
+    var plot = function(p) {
+        var cell = d3.select(this);
+
+        // Plot frame.
+        cell.append("rect")
+            .attr("class", "frame")
+            .attr("x", padding / 2)
+            .attr("y", padding / 2)
+            .attr("width", size - padding)
+            .attr("height", size - padding);
+
+        // Plot dots.
+        cell.selectAll("circle")
+            .data(data.values)
+            .enter().append("circle")
+            .attr("class", "splomCircle")
+            .attr("class", function(machine) { return machine.rackName; })
+            .attr("cx", function(d) {
+                return x[p.x](getCompoundKeyFromDict(d, p.x));
+            })
+            .attr("cy", function(d) {
+                return y[p.y](getCompoundKeyFromDict(d, p.y));
+            })
+            .attr("r", 3);
+
+        // Plot brush.
+        cell.call(brush.x(x[p.x]).y(y[p.y]));
+    };
+
+    // Clear the previously-active brush, if any.
+    var onBrushStart = function(p) {
+        if (brush.data !== p) {
+            cell.call(brush.clear());
+            brush.x(x[p.x]).y(y[p.y]).data = p;
+        }
+    };
+
+    // Highlight the selected circles.
+    var onBrush = function(p) {
+        var e = brush.extent();
+        svg.selectAll("circle").attr("class", function(machine) {
+            return e[0][0] <= machine[p.x] && machine[p.x] <= e[1][0]
+                && e[0][1] <= machine[p.y] && machine[p.y] <= e[1][1]
+                ? machine.rackName : null;
+        });
+    };
+
+    // If the brush is empty, select all circles.
+    var onBrushEnd = function() {
+        if (brush.empty()) svg.selectAll("circle").attr("class", function(machine) {
+            return machine.rackName;
+        });
+    };
+
+    /**
+     * Expose the function to initialize the viz
+     */
+    this.initialize = function() { return plot(data); }
+
 }
