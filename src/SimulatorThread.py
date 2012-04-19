@@ -148,21 +148,21 @@ class SimulatorThread(threading.Thread):
                 'WARN': 0.0,
                 'INFO': 0.1
             }
-            nodeInfo['health'] = self.nodeInfo[logEvent['location']]['health'] + healthDelta[logEvent['severity']]
+            nodeInfo['health'] = self.normalizeValue(self.nodeInfo[logEvent['location']]['health'] + healthDelta[logEvent['severity']])
 
             # Update this node's predicted severity probabilities
             nodeInfo['predictedSeverityProbabilities'] = {
-                'FATAL' : nodeInfo['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(predictedFatalDelta),
-                'ERROR': nodeInfo['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(predictedErrorDelta),
-                'WARN': nodeInfo['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(predictedWarnDelta),
-                'INFO': nodeInfo['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(predictedInfoDelta)
+                'FATAL' : self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(predictedFatalDelta)),
+                'ERROR': self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(predictedErrorDelta)),
+                'WARN': self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(predictedWarnDelta)),
+                'INFO': self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(predictedInfoDelta))
             }
 
             # Update this node's cpu/memory/context-switch stats
             nodeInfo['predictedSeverityProbabilities'] = {
-                'cpuUsage' : nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta),
-                'memoryUsage': nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta),
-                'contextSwitchRate': nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta)
+                'cpuUsage' : self.normalizeValue(nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta)),
+                'memoryUsage': self.normalizeValue(nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta)),
+                'contextSwitchRate': self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
             }
 
 
