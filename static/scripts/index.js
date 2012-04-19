@@ -11,20 +11,22 @@ function changeVisualization(newVisualization, liId) {
     $('#' + liId).addClass('active');
 
     // Remove the current content of the visualization
-    $('.visualization').fadeOut('fast');
+    $('.visualization').hide();
     $('.visualization').children().remove();
+    $('#visualizationWrapper .hero-unit').remove();
 
     // Show a loading message temporarily
-    $('.visualization').parent().prepend('<div id="loadingMessage" class="hero-unit"><h3>Loading...</h3><br/><p>Please be patient</p></div>');
+    $('#visualizationWrapper').prepend($('<div id="loadingMessage" class="hero-unit"><h3>Loading...</h3><br/><p>Please be patient</p></div>'));
 
     // Update the visualization variable
     visualization = newVisualization;
     if(visualization != null) {
         visualization.initialize();
+    } else {
+        $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
     }
 
     // Find the loading message
     $('#loadingMessage').remove();
-
     $('.visualization').fadeIn('fast');
 }
