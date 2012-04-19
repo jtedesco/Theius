@@ -12,8 +12,9 @@
 
     <!-- Bootstrap includes -->
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="/static/bootstrap/js/bootstrap.js">
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-responsive.css">
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap-tab.js"></script>
 
     <!-- Tree viz -->
     <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
@@ -34,8 +35,66 @@
 
                 <div class="row-fluid">
                     <div id="leftSidebar" class="well span2">
-                        <!-- Left Sidebar -->
-                        Left sidebar
+                        <h3>Some options</h3><br/>
+                        <form class="form-vertical">
+                            <fieldset>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input type="text" class="input-large" id="input01">
+                                        <p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="optionsCheckbox">Checkbox</label>
+                                    <div class="controls">
+                                        <label class="checkbox">
+                                            <input type="checkbox" id="optionsCheckbox" value="option1">
+                                            Option one is this and that&mdash;be sure to include why it's great
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="select01">Select list</label>
+                                    <div class="controls">
+                                        <select id="select01">
+                                            <option>something</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="multiSelect">Multicon-select</label>
+                                    <div class="controls">
+                                        <select multiple="multiple" id="multiSelect">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="fileInput">File input</label>
+                                    <div class="controls">
+                                        <input class="input-file" id="fileInput" type="file">
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="textarea">Textarea</label>
+                                    <div class="controls">
+                                        <textarea class="input-large" id="textarea" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                    <button class="btn">Cancel</button>
+                                </div>
+                            </fieldset>
+                        </form>
                     </div>
 
                     <div class="well span7">
@@ -43,8 +102,21 @@
                     </div>
 
                     <div id="rightSidebar" class="well span2">
-                        <!-- Right Sidebar -->
-                        Right sidebar
+                        <h3>Some ranked data</h3><br/>
+
+                        <ul id="tab" class="nav nav-tabs">
+                            <li class="active"><a href="#nodes" data-toggle="tab">Nodes</a></li>
+                            <li><a href="#events" data-toggle="tab">Events</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="nodes">
+                                <p>node data</p>
+                            </div>
+                            <div class="tab-pane fade" id="events">
+                                <p>events data</p>
+                            </div>
+                        </div>
+
                     </div>
                  </div>
             </div>
@@ -60,6 +132,12 @@
 <script type='text/javascript'>
     $(document).ready(function () {
         subscribe();
+        $('#a').tab('show');
+        $('.tabs a:first').tab('show');
+        $('a[data-toggle="tab"]').on('shown', function (e) {
+            e.target // activated tab
+            e.relatedTarget // previous tab
+        })
     })
 </script>
 </html>
