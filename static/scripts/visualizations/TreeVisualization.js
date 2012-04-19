@@ -25,7 +25,7 @@ function TreeVisualization(structure, state) {
                 return 'green';
             } else if (health > 0.6) {
                 return 'yellow';
-            } else if (health > 0.4) {
+            } else if (health > 0.3) {
                 return 'orange';
             } else {
                 return 'red';
