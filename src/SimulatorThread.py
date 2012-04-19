@@ -166,7 +166,7 @@ class SimulatorThread(threading.Thread):
             # Update the health of this node
             healthDelta = {
                 'FATAL' : -0.2,
-                'ERROR': -0.5,
+                'ERROR': -0.05,
                 'WARN': 0.0,
                 'INFO': 0.1
             }
