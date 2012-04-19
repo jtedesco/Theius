@@ -161,7 +161,7 @@ class SimulatorThread(threading.Thread):
 
             # Update predicted crash time if
             elif datetime.strptime(self.nodeInfo[nodeName]['predictedFailureTime'], TIMESTAMP_FORMAT) < datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT):
-                nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.stpftime(logEvent['timestamp'], TIMESTAMP_FORMAT) + nodeInfo['averageMinutesBetweenFailures'], TIMESTAMP_FORMAT)
+                nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) + self.nodeInfo[nodeName]['averageMinutesBetweenFailures'], TIMESTAMP_FORMAT)
 
             # Update the health of this node
             healthDelta = {
