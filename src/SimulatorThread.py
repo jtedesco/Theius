@@ -30,7 +30,7 @@ class SimulatorThread(threading.Thread):
         self.errorLocations = machineNames
 
         # Statistical average time between failures for a node
-        baseAverageMinutesBetweenFailures = 5 # For demo purposes
+        baseAverageMinutesBetweenFailures = 60 # For demo purposes
         averageMinutesBetweenFailures = numpy.random.normal(
             loc=baseAverageMinutesBetweenFailures, # Mean
             scale=1, # Standard deviation
@@ -166,9 +166,9 @@ class SimulatorThread(threading.Thread):
             # Update the health of this node
             healthDelta = {
                 'FATAL' : -0.2,
-                'ERROR': -0.05,
-                'WARN': 0.0,
-                'INFO': 0.1
+                'ERROR': 0.05,
+                'WARN': 0.1,
+                'INFO': 0.15
             }
             nodeInfo['health'] = self.normalizeValue(self.nodeInfo[nodeName]['health'] + healthDelta[logEvent['severity']])
 
