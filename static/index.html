@@ -11,8 +11,9 @@
     <script type="text/javascript" src="/static/scripts/jquery-1.7.2.pack.js"></script>
 
     <!-- Bootstrap includes -->
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/js/bootstrap.js">
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-responsive.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/tree.css">
 
     <!-- Tree viz -->
     <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
@@ -25,23 +26,34 @@
 <body>
 
     <div class="container-fluid">
+
         <div class="row-fluid">
+            <div class="span12">
 
-            <div class="span2">
-                <!-- Left Sidebar -->
-                Left sidebar
+                <center>hello</center>
+
+                <div class="row-fluid">
+                    <div id="leftSidebar" class="well span2">
+                        <!-- Left Sidebar -->
+                        Left sidebar
+                    </div>
+
+                    <div class="well span7">
+                        <div class="visualization"></div>
+                    </div>
+
+                    <div id="rightSidebar" class="well span2">
+                        <!-- Right Sidebar -->
+                        Right sidebar
+                    </div>
+                 </div>
             </div>
-
-            <div class="span8">
-                <div class="visualization"></div>
-            </div>
-
-            <div class="span2">
-                <!-- Right Sidebar -->
-                Right sidebar
-            </div>
-
         </div>
+
+        <footer>
+            <p>&copy; Jon Tedesco, Roman Dudko, and Abhishek Sharma 2012</p>
+        </footer>
+
     </div>
 
 </body>

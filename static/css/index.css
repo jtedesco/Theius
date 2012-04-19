@@ -2,3 +2,16 @@
     width: 100%;
     height: 800px;
 }
+
+footer {
+    text-align: center;
+}
+
+#leftSidebar {
+    height: 100%;
+}
+
+#rightSidebar {
+    height: 100%;
+
+}
