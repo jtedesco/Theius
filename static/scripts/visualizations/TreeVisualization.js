@@ -20,7 +20,16 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 'white';
         } else {
-            return 'green';
+            var health = state[node['name']]['health'];
+            if (health > 0.7) {
+                return 'green';
+            } else if (health > 0.6) {
+                return 'yellow';
+            } else if (health > 0.4) {
+                return 'orange';
+            } else {
+                return 'red';
+            }
         }
     };
 
@@ -45,7 +54,7 @@ function TreeVisualization(structure, state) {
     var initialize = function() {
 
         var width = document.documentElement.clientWidth;
-        var height = document.documentElement.clientHeight / 2;
+        var height = document.documentElement.clientHeight;
 
         var cluster = d3.layout.cluster()
             .size([width, height-100]);
@@ -105,7 +114,7 @@ function TreeVisualization(structure, state) {
 
         // get new width and height
         var width = document.documentElement.clientWidth;
-        var height = document.documentElement.clientHeight / 2;
+        var height = document.documentElement.clientHeight;
 
         var cluster = d3.layout.cluster()
             .size([width, height-100]);
