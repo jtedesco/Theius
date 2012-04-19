@@ -1,3 +1,4 @@
+from copy import deepcopy
 import threading
 import cherrypy
 import os
@@ -53,12 +54,16 @@ class Simulator(object):
         # acquire the client lock immediately, indicating no messages are ready to be processed
         logMessages[clientId]['trigger'].acquire()
 
+        # Get the current system state
+        currentState = deepcopy(simulatorThread.nodeInfo)
+
         serverLock.release()
 
         # Respond to the client's id
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return dumps({
-            'clientId': clientId
+            'clientId': clientId,
+            'currentState': currentState
         })
 
 
