@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from random import random
 import threading
@@ -51,7 +51,7 @@ class SimulatorThread(threading.Thread):
                 'memoryUsage': 0.3,
                 'contextSwitchRate': 0.1, # What is this???
                 'lastFailureTime': None,
-                'predictedFailureTime': datetime.now() + averageMinutesBetweenFailures[nodeIndex],
+                'predictedFailureTime': datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]),
                 'predictedSeverityProbabilities': {
                     'FATAL' : 0.05,
                     'ERROR': 0.1,
