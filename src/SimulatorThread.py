@@ -75,11 +75,16 @@ class SimulatorThread(threading.Thread):
             # Insert some random delay between 0 and 2 second
             sleep(2 * random())
 
-            # Create some random log events
+            # Create some random log events (between 1 and 5)
             numberOfLogEvents = int(4 * random) + 1
             logEvents = []
             for i in xrange(0,numberOfLogEvents):
                 logEvents.append(self.generateRandomLogEvent())
+
+            # Gather updated node info based on each log event
+            updatedNodeInfo = []
+            for logEvent in logEvents:
+                updatedNodeInfo.append(self.getUpdatedNodeInfoBasedOnEvent(logEvent))
 
             # update the logMessages structure
             self.serverLock.acquire()
@@ -94,6 +99,14 @@ class SimulatorThread(threading.Thread):
                 self.logMessages[clientId]['trigger'].release()
 
             self.serverLock.release()
+
+
+    def getUpdatedNodeInfoBasedOnEvent(self, logEvent):
+        """
+          Creates some updated node data (for random parts of the cluster), base don the given log event.
+        """
+
+        return {}
 
 
     def generateRandomLogEvent(self):
@@ -112,7 +125,6 @@ class SimulatorThread(threading.Thread):
             'facility': randomFacility,
             'location': machineName,
         }
-
 
         return logEvent
 
