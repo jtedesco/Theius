@@ -102,7 +102,18 @@ class SimulatorThread(threading.Thread):
             self.serverLock.release()
 
             # Apply the node info updates to the simulator's state
+            self.applyNodeInfoUpdates(nodeInfoUpdates)
 
+
+    def applyNodeInfoUpdates(self, updates):
+        """
+          Apply the node info updates to the simulator thread's state
+        """
+
+        for nodeName in updates:
+            nodeDataToUpdate = updates[nodeName]
+            for entryName in nodeDataToUpdate:
+                self.nodeInfo[nodeName][entryName] = nodeDataToUpdate[entryName]
 
 
     def getUpdatedNodeInfoBasedOnEvents(self, logEvents):
