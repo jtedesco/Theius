@@ -103,7 +103,7 @@ function subscribeSuccess(data) {
     clusterStructure = data['structure'];
 
     // Build the default visualization
-    visualization = new TreeVisualization(clusterStructure, clusterState);
+    changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')  ;
 
     // Start calling the AJAX update loop
     $.ajax({
