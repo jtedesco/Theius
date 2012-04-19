@@ -22,7 +22,7 @@ class SimulatorThread(threading.Thread):
         self.machineNames = machineNames
 
         # Possible severities, categories, error codes, and error locations of log events (error code denoted by index of list)
-        self.severities =  ['FATAL', 'WARNING', 'INFO', 'SEVERE', 'FAILURE', 'ERROR']
+        self.severities =  ['FATAL', 'WARN', 'INFO', 'ERROR']
         self.facilities = ['MMCS', 'APP', 'KERNEL', 'LINKCARD', 'MONITOR', 'HARDWARE', 'DISCOVERY']
         self.errorLocations = machineNames
 
@@ -76,7 +76,7 @@ class SimulatorThread(threading.Thread):
             sleep(2 * random())
 
             # Create some random log events (between 1 and 5)
-            numberOfLogEvents = int(4 * random) + 1
+            numberOfLogEvents = int(4 * random()) + 1
             logEvents = []
             for i in xrange(0,numberOfLogEvents):
                 logEvents.append(self.generateRandomLogEvent())
@@ -138,24 +138,25 @@ class SimulatorThread(threading.Thread):
         for logEvent in logEvents:
 
             # Add an entry if there isn't one already
-            if logEvent['location'] not in updatedNodeInfo:
-                updatedNodeInfo[logEvent['location']] = {}
-            nodeInfo = updatedNodeInfo[logEvent['location']]
+            nodeName = logEvent['location']
+            if nodeName not in updatedNodeInfo:
+                updatedNodeInfo[nodeName] = {}
+            nodeInfo = updatedNodeInfo[nodeName]
 
             # Update failure data if this log event was FATAL
             if logEvent['severity'] is 'FATAL':
 
-                lastFailureTime = nodeInfo['lastFailureTime']
+                lastFailureTime = self.nodeInfo[nodeName]['lastFailureTime']
 
                 # Update average minutes between failures & last failure info
                 if lastFailureTime is not None:
                     delta = logEvent['timestamp'] - lastFailureTime
-                    nodeInfo['averageMinutesBetweenFailures'] = (self.nodeInfo[logEvent['location']]['averageMinutesBetweenFailures'] + (delta.seconds//3600))/2
+                    nodeInfo['averageMinutesBetweenFailures'] = (self.nodeInfo[nodeName]['averageMinutesBetweenFailures'] + (delta.seconds//3600))/2
                 nodeInfo['lastFailureTime'] = logEvent['timestamp']
-                nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + nodeInfo['averageMinutesBetweenFailures']
+                nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + timedelta(minutes=self.nodeInfo[nodeName]['averageMinutesBetweenFailures'])
 
             # Update predicted crash time if
-            elif nodeInfo['predictedFailureTime'] < logEvent['timestamp']:
+            elif self.nodeInfo[nodeName]['predictedFailureTime'] < logEvent['timestamp']:
                 nodeInfo['predictedFailureTime'] = logEvent['timestamp'] + nodeInfo['averageMinutesBetweenFailures']
 
             # Update the health of this node
@@ -165,33 +166,37 @@ class SimulatorThread(threading.Thread):
                 'WARN': 0.0,
                 'INFO': 0.1
             }
-            nodeInfo['health'] = self.normalizeValue(self.nodeInfo[logEvent['location']]['health'] + healthDelta[logEvent['severity']])
+            nodeInfo['health'] = self.normalizeValue(self.nodeInfo[nodeName]['health'] + healthDelta[logEvent['severity']])
 
             # Update this node's predicted severity probabilities
             nodeInfo['predictedSeverityProbabilities'] = {
-                'FATAL' : self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(predictedFatalDelta)),
-                'ERROR': self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(predictedErrorDelta)),
-                'WARN': self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(predictedWarnDelta)),
-                'INFO': self.normalizeValue(nodeInfo['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(predictedInfoDelta))
+                'FATAL' : self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(predictedFatalDelta)),
+                'ERROR': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(predictedErrorDelta)),
+                'WARN': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(predictedWarnDelta)),
+                'INFO': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(predictedInfoDelta))
             }
 
             # Update this node's cpu/memory/context-switch stats
-            nodeInfo['cpuUsage'] = self.normalizeValue(nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
-            nodeInfo['memoryUsage'] = self.normalizeValue(nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
-            nodeInfo['contextSwitchRate'] = self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
+            nodeInfo['cpuUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
+            nodeInfo['memoryUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
+            nodeInfo['contextSwitchRate'] = self.normalizeValue(self.nodeInfo[nodeName]['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
 
 
         # Randomly update between 0 and 1/2 of the usage statistics of the nodes
         numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
         for nodeNum in xrange(0, numberOfMachinesToUpdate):
-            nodeNameToUpdate = self.getRandomElement(self.machineNames)
+            nodeName = self.getRandomElement(self.machineNames)
 
-            nodeInfo = updatedNodeInfo[nodeNameToUpdate]
+            if nodeName in updatedNodeInfo:
+                nodeInfo = updatedNodeInfo[nodeName]
+            else:
+                updatedNodeInfo[nodeName] = {}
+                nodeInfo = updatedNodeInfo[nodeName]
 
             # Update this node's cpu/memory/context-switch stats
-            nodeInfo['cpuUsage'] = self.normalizeValue(nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
-            nodeInfo['memoryUsage'] = self.normalizeValue(nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
-            nodeInfo['contextSwitchRate'] = self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
+            nodeInfo['cpuUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
+            nodeInfo['memoryUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
+            nodeInfo['contextSwitchRate'] = self.normalizeValue(self.nodeInfo[nodeName]['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
 
         return updatedNodeInfo
 
