@@ -165,11 +165,22 @@ class SimulatorThread(threading.Thread):
             }
 
             # Update this node's cpu/memory/context-switch stats
-            nodeInfo['predictedSeverityProbabilities'] = {
-                'cpuUsage' : self.normalizeValue(nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta)),
-                'memoryUsage': self.normalizeValue(nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta)),
-                'contextSwitchRate': self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
-            }
+            nodeInfo['cpuUsage'] = self.normalizeValue(nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
+            nodeInfo['memoryUsage'] = self.normalizeValue(nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
+            nodeInfo['contextSwitchRate'] = self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
+
+
+        # Randomly update between 0 and 1/2 of the usage statistics of the nodes
+        numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
+        for nodeNum in xrange(0, numberOfMachinesToUpdate):
+            nodeNameToUpdate = self.getRandomElement(self.machineNames)
+
+            nodeInfo = updatedNodeInfo[nodeNameToUpdate]
+
+            # Update this node's cpu/memory/context-switch stats
+            nodeInfo['cpuUsage'] = self.normalizeValue(nodeInfo['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
+            nodeInfo['memoryUsage'] = self.normalizeValue(nodeInfo['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
+            nodeInfo['contextSwitchRate'] = self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
 
         return updatedNodeInfo
 
