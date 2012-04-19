@@ -149,8 +149,6 @@ class Simulator(object):
         # get the state change of the cluster
         stateChange = logData['stateChange']
 
-        print stateChange
-
         serverLock.release()
 
         return dumps({
