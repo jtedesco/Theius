@@ -4,20 +4,29 @@ var clientId;
 // The state of the entire cluster
 var clusterState;
 
+// The structure of the cluster
+var clusterStructure;
+
+// The visualization to call (initialized on subscribe success)
+var visualization = null;
+
+
 /**
  * Receive updates from the server
  * @param data the JSON data
  */
-function receiveUpdate(data) {
+function update(data) {
 
+    // Only update if successful
     if(data['successful']) {
 
-        // Process all new log entries
+        // Collect all new log entries
         var updateData = data['events'];
+        var logEvents = [];
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
                 var logEvent = updateData[i];
-                processLogEntry(logEvent);
+                logEvents.push(logEvent);
             }
         }
 
@@ -30,7 +39,7 @@ function receiveUpdate(data) {
             data: {
                 clientId: clientId
             },
-            success: receiveUpdate,
+            success: update,
             error: logError,
             dataType: 'json'
         });
@@ -40,30 +49,20 @@ function receiveUpdate(data) {
     }
 }
 
-function updateClusterState(stateChange) {
-//    console.log(stateChange);
-}
-
 
 /**
- * Decide what to do with the log entry that was received here
- * @param logEvent the log entry received from the server
+ * Update the cluster state based on the state change provided by the simulator
  */
-function processLogEntry(logEvent) {
-    if (window.data.hasOwnProperty(logEvent['location'])) {
+function updateClusterState(stateChange) {
+    for(var nodeName in stateChange) {
+        if(stateChange.hasOwnProperty(nodeName)) {
+            for(var nodeProperty in stateChange[nodeName]) {
+                if(stateChange[nodeName].hasOwnProperty(nodeProperty)) {
+                    clusterState[nodeName][nodeProperty] = stateChange[nodeName][nodeProperty];
 
-        var node = window.data[logEvent['location']];
-
-        for (var elem in logEvent) {
-            if (logEvent.hasOwnProperty(elem)) {
-                node[elem] = logEvent[elem]; // copy over data
+                }
             }
         }
-
-        redrawGraph();
-    }
-    else {
-        logError("Key \"" + logEvent['location'] + "\" not found");
     }
 }
 
@@ -93,15 +92,10 @@ function subscribeSuccess(data) {
     // Get info returned from simulator on subscribe
     clientId = data['clientId'];
     clusterState = data['currentState'];
+    clusterStructure = data['structure'];
 
-    // Get the structure of the network & build the default visualization
-    var structure = data['structure'];
-    var nodes = loadGraph(structure);
-    loadData(nodes);
-
-    // tie data to circle color and radius
-//    circleColor(window.data, 'color');
-//    circleRadius(window.data, 'value');
+    // Build the default visualization
+    visualization = new TreeVisualization(clusterStructure, clusterState);
 
     // Start calling the AJAX update loop
     $.ajax({
@@ -109,28 +103,10 @@ function subscribeSuccess(data) {
         data: {
             clientId: clientId
         },
-        success: receiveUpdate,
+        success: update,
         error: logError,
         dataType: 'json'
     });
-}
-
-
-/**
- * Loads the nodes into the global map "data"
- * Some default values are also given to the nodes
- * This function is essentially converting an array of nodes to a map
- * from the name of a node to a node object.
- * @param nodes an array of nodes
- */
-function loadData(nodes) {
-    window.data = {};
-    for (var i in nodes){
-        if (nodes.hasOwnProperty(i)) {
-            window.data[nodes[i]['name']] = nodes[i];
-            nodes[i]['value'] = 5;
-        }
-    }
 }
 
 
@@ -157,20 +133,12 @@ function unsubscribe() {
  */
 function unsubscribeSuccess(data) {
     if(data['successful']) {
-        var message = 'Successfully unsubscribed';
-        console.log(message);
+        console.log('Successfully unsubscribed');
     } else {
-        var message = 'Failed to unsubscribe: ' + data['message'];
-        console.log(message);
+        console.log('Failed to unsubscribe: ' + data['Successfully unsubscribed']);
     }
 }
 
-
-/**
- * Handle some AJX error by logging it
- * @param errorData
- */
-function logError(errorData) {
-    var message = 'ERROR: ' + errorData;
-    console.log(message);
+function logError(errorText) {
+    console.log('ERROR: ' + errorText);
 }
