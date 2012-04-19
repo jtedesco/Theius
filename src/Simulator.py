@@ -47,7 +47,8 @@ class Simulator(object):
         nextClientId += 1
 
         logMessages[clientId] = {
-            'updates' : Queue(),
+            'events' : Queue(),
+            'stateChange': {},
             'trigger' : threading.Semaphore()
         }
 
@@ -142,14 +143,19 @@ class Simulator(object):
         # take off one log entry off the queue
         logData = logMessages[clientId]
         logEntries = []
-        logEntry = logData['updates'].get()
+        logEntry = logData['events'].get()
         logEntries.append(logEntry)
+
+        # get the state change of the cluster
+        stateChange = logData['stateChange']
+
+        print stateChange
 
         serverLock.release()
 
-        logUpdates = dumps(logEntries)
         return dumps({
-            'updates' : logUpdates,
+            'events' : logEntries,
+            'stateChange': stateChange,
             'successful': True
         })
 

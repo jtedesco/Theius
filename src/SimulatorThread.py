@@ -94,10 +94,10 @@ class SimulatorThread(threading.Thread):
 
                 # Add the new log event to the client's queue
                 for logEvent in logEvents:
-                    self.logMessages[clientId]['updates'].put(logEvent)
+                    self.logMessages[clientId]['events'].put(logEvent)
 
                 # Add the node info deltas
-                self.logMessages[clientId]['nodeInfo'] = nodeInfoUpdates
+                self.logMessages[clientId]['stateChange'] = nodeInfoUpdates
 
                 # Notify client that a message has arrived
                 self.logMessages[clientId]['trigger'].release()
@@ -149,12 +149,13 @@ class SimulatorThread(threading.Thread):
             # Update failure data if this log event was FATAL
             if logEvent['severity'] is 'FATAL':
 
-                lastFailureTime = self.nodeInfo[nodeName]['lastFailureTime']
+                if self.nodeInfo[nodeName]['lastFailureTime'] is not None:
+                    lastFailureTime = datetime.strptime(self.nodeInfo[nodeName]['lastFailureTime'], TIMESTAMP_FORMAT)
 
-                # Update average minutes between failures & last failure info
-                if lastFailureTime is not None:
-                    delta = logEvent['timestamp'] - lastFailureTime
+                    # Update average minutes between failures & last failure info
+                    delta = datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) - lastFailureTime
                     nodeInfo['averageMinutesBetweenFailures'] = (self.nodeInfo[nodeName]['averageMinutesBetweenFailures'] + (delta.seconds//3600))/2
+
                 nodeInfo['lastFailureTime'] = logEvent['timestamp']
                 nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) + timedelta(minutes=self.nodeInfo[nodeName]['averageMinutesBetweenFailures']), TIMESTAMP_FORMAT)
 

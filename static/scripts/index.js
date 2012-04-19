@@ -4,16 +4,6 @@ var clientId;
 // The state of the entire cluster
 var clusterState;
 
-
-/**
- * Appends a given message to the 'garbage' div (for demo purposes only)
- * @param message
- */
-function appendToGarbage(message) {
-    $('#garbage').html($('#garbage').html() + message + '<br/>');
-}
-
-
 /**
  * Receive updates from the server
  * @param data the JSON data
@@ -22,14 +12,18 @@ function receiveUpdate(data) {
 
     if(data['successful']) {
 
-        var updateData = $.parseJSON(data['updates']);
-
+        // Process all new log entries
+        var updateData = data['events'];
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
                 var logEvent = updateData[i];
                 processLogEntry(logEvent);
             }
         }
+
+        // Update the global cluster state
+        var stateChange = data['stateChange'];
+        updateClusterState(stateChange);
 
         $.ajax({
             url: '/update',
@@ -46,15 +40,19 @@ function receiveUpdate(data) {
     }
 }
 
+function updateClusterState(stateChange) {
+//    console.log(stateChange);
+}
+
 
 /**
  * Decide what to do with the log entry that was received here
  * @param logEvent the log entry received from the server
  */
 function processLogEntry(logEvent) {
-    if (window.data.hasOwnProperty(logEvent['name'])) {
+    if (window.data.hasOwnProperty(logEvent['location'])) {
 
-        var node = window.data[logEvent['name']];
+        var node = window.data[logEvent['location']];
 
         for (var elem in logEvent) {
             if (logEvent.hasOwnProperty(elem)) {
@@ -65,7 +63,7 @@ function processLogEntry(logEvent) {
         redrawGraph();
     }
     else {
-        logError("Key \"" + logEvent['name'] + "\" not found");
+        logError("Key \"" + logEvent['location'] + "\" not found");
     }
 }
 
@@ -160,10 +158,10 @@ function unsubscribe() {
 function unsubscribeSuccess(data) {
     if(data['successful']) {
         var message = 'Successfully unsubscribed';
-        appendToGarbage(message);
+        console.log(message);
     } else {
         var message = 'Failed to unsubscribe: ' + data['message'];
-        appendToGarbage(message);
+        console.log(message);
     }
 }
 
@@ -174,5 +172,5 @@ function unsubscribeSuccess(data) {
  */
 function logError(errorData) {
     var message = 'ERROR: ' + errorData;
-    appendToGarbage(message);
+    console.log(message);
 }
