@@ -171,7 +171,6 @@ class SimulatorThread(threading.Thread):
                 'contextSwitchRate': self.normalizeValue(nodeInfo['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
             }
 
-
         return updatedNodeInfo
 
 
@@ -208,6 +207,10 @@ class SimulatorThread(threading.Thread):
 
 
     def normalizeValue(self, value):
+        """
+          Returns the value if it is between 0 and 1, otherwise, limits it within [0,1]
+        """
+
         if value < 0:
             return 0
         if value > 1:
