@@ -90,7 +90,6 @@ function TreeVisualization(structure, state) {
      * Process the set of new log entries
      */
     this.update = function(logEvents) {
-        console.log
         redrawGraph(structure);
     };
 
@@ -106,7 +105,7 @@ function TreeVisualization(structure, state) {
      */
     function redrawGraph(source) {
         // duration of animations
-        var duration = 250;
+        var duration = 200;
 
         //update width and height
         var width = $(".visualization").width();
