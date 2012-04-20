@@ -17,6 +17,9 @@ function TreeVisualization(structure, state) {
      * @param node  The node to fill with color
      */
     var fillColor = function(node) {
+        if (node.hasOwnProperty('_children') && node['_children'] != null) {
+            return "lightsteelblue";
+        }
         if (node.hasOwnProperty('children')) {
             return 'white';
         } else {
@@ -40,7 +43,7 @@ function TreeVisualization(structure, state) {
      */
     var radius = function(node) {
         if (node.hasOwnProperty('children')) {
-            return 5;
+            return 15;
         } else {
             return 20;
         }
@@ -50,8 +53,7 @@ function TreeVisualization(structure, state) {
     /**
      * Construct the visualization for the first time
      */
-    this.initialize = function() {
-
+    var draw = function() {
 
         d3.select(".visualization").selectAll("svg").remove();
         var width = $(".visualization").width();
@@ -65,6 +67,7 @@ function TreeVisualization(structure, state) {
 
         // get node and link locations from cluster library
         var nodes = cluster.nodes(structure);
+        nodes.forEach(function(d) { d.y = d.depth * 180; });
         var links = cluster.links(nodes);
 
         // add main svg element
@@ -78,7 +81,6 @@ function TreeVisualization(structure, state) {
         var link = graph.selectAll("path.treeVisualizationLink")
             .data(links)
             .enter().append("path")
-            .attr("class", "link")
             .attr("class", "treeVisualizationLink")
             .attr("d", diagonal);
 
@@ -86,9 +88,9 @@ function TreeVisualization(structure, state) {
         var node = graph.selectAll("g.treeVisualizationNode")
             .data(nodes)
             .enter().append("g")
-            .attr("class", "node")
             .attr("class", "treeVisualizationNode")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+            .on("click", function(d) { toggle(d); draw();});
 
         // add circles representing nodes
         node.append("circle")
@@ -101,6 +103,7 @@ function TreeVisualization(structure, state) {
         };
     };
 
+    this.initialize = draw;
 
     /**
      * Process the set of new log entries
@@ -121,6 +124,9 @@ function TreeVisualization(structure, state) {
      */
     var redrawGraph = function() {
 
+        draw();
+        return;
+
         // get new width and height
         console.log(structure);
         var width = $(".visualization").width();
@@ -133,29 +139,60 @@ function TreeVisualization(structure, state) {
         var diagonal = d3.svg.diagonal()
             .projection(function(d) { return [d.x, d.y]; });
 
-        var nodes = cluster.nodes(structure);
-        var links = cluster.links(nodes);
-
         // update width and height of graph
         var graph = d3.select(".visualization").select("svg")
             .attr("width", width)
             .attr("height", height)
             .select("g");
 
+
+        var nodes = cluster.nodes(structure);
+        nodes.forEach(function(d) { d.y = d.depth * 180; });
+        console.log(nodes);
+
+        var links = cluster.links(nodes);
+
         // update links
         var link = graph.selectAll("path.treeVisualizationLink")
-            .data(links)
+            .data(links, function(d) {return d.target.id; });
+
+        link.enter().append("path")
+            .attr("class", "treeVisualizationLink")
             .attr("d", diagonal);
+
+        link.attr("d", diagonal);
+
+        link.exit()
+            .remove();
 
         // update nodes (containers)
         var node = graph.selectAll("g.treeVisualizationNode")
-            .data(nodes)
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+            .data(nodes, function(d) { return d.id;});
 
-        // update circles representing nodes
-        node.select("circle")
-            .transition(2000)
+        var nodeEnter = node.enter().append("g")
+            .attr("class", "treeVisualizationNode")
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+            .on("click", function(d) { toggle(d); update();});
+
+        nodeEnter.append("circle")
             .attr("r", radius)
-            .attr("fill", fillColor);
+            .style("fill", fillColor);
+
+        node.select("circle")
+            .attr("r", radius)
+            .style("fill", fillColor);
+
+        var nodeExit = node.exit()
+            .remove();
     };
+
+    function toggle(d) {
+        if (d.children) {
+            d._children = d.children;
+            d.children = null;
+        } else {
+            d.children = d._children;
+            d._children = null;
+        }
+    }
 }
