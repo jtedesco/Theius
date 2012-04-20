@@ -176,7 +176,10 @@ function matrixPlot(data, getCompoundKeyFromDict) {
             .attr("cy", function(d) {
                 return y[p.y](getCompoundKeyFromDict(d, p.y));
             })
-            .attr("r", 3);
+            .attr("r", 3)
+            .attr("id", function(node) {
+                return node.name;
+            });
 
         // Plot brush.
         cell.call(brush.x(x[p.x]).y(y[p.y]));

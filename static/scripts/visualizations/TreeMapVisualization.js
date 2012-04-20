@@ -92,6 +92,9 @@ function TreeMapVisualization(structure, state) {
             .enter().append("div")
             .attr("class", "cell")
             .call(cell)
+            .attr("id", function(node) {
+                return node.name;
+            })
             .text(function (d) {
                 return d.name;
             });

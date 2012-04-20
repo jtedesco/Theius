@@ -104,6 +104,7 @@ function TreeVisualization(structure, state) {
      * Redraws the graph so that it is up to date with it's associated data
      */
     function redrawGraph(source) {
+
         // duration of animations
         var duration = 200;
 
@@ -163,7 +164,10 @@ function TreeVisualization(structure, state) {
         // add circles representing computers
         nodeEnter.append("circle")
             .attr("r", 1e-6)
-            .style("fill", fillColor);
+            .style("fill", fillColor)
+            .attr("id", function(node) {
+                return node.name;
+            });
 
         // update existing nodes, with animation
         var nodeUpdate = node.transition()
