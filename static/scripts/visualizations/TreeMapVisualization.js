@@ -11,8 +11,12 @@
 */
 function TreeMapVisualization(structure, state) {
 
+    var color = d3.scale.category20c();
+
     var background = function (d) {
-        if (d.children)
+        return d.children ? color(d.name) : null;
+
+        /*if (d.children)
             return d.children;
 
         if (d){
@@ -28,7 +32,7 @@ function TreeMapVisualization(structure, state) {
             }
         }
 
-        return "lightblue";
+        return "lightblue";*/
     };
 
     var value = function (d) {
@@ -66,7 +70,6 @@ function TreeMapVisualization(structure, state) {
             });
     }
 
-    var color = d3.scale.category20c();
     var treemap = d3.layout.treemap()
         .value(value);
 
@@ -88,9 +91,6 @@ function TreeMapVisualization(structure, state) {
             .data(treemap.nodes, function(d) { return d.name;})
             .enter().append("div")
             .attr("class", "cell")
-            .style("background", function (d) {
-                return d.children ? d.color : null;
-            })
             .call(cell)
             .text(function (d) {
                 return d.name;
