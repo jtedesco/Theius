@@ -49,26 +49,20 @@ function TreeVisualization(structure, state) {
         }
     };
 
+    // layout
+    var cluster = d3.layout.cluster();
+
+    // helper function for links
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.x, d.y]; });
 
     /**
      * Construct the visualization for the first time
      */
-    var draw = function() {
+    this.initialize = function() {
 
-        d3.select(".visualization").selectAll("svg").remove();
         var width = $(".visualization").width();
         var height = $(".visualization").height();
-
-        var cluster = d3.layout.cluster()
-            .size([width, height-100]);
-
-        var diagonal = d3.svg.diagonal()
-            .projection(function(d) { return [d.x, d.y]; });
-
-        // get node and link locations from cluster library
-        var nodes = cluster.nodes(structure);
-        nodes.forEach(function(d) { d.y = d.depth * 180; });
-        var links = cluster.links(nodes);
 
         // add main svg element
         var graph = d3.select(".visualization").append("svg")
@@ -77,39 +71,20 @@ function TreeVisualization(structure, state) {
             .append("g")
             .attr("transform", "translate(0,40)");
 
-        // add links
-        var link = graph.selectAll("path.treeVisualizationLink")
-            .data(links)
-            .enter().append("path")
-            .attr("class", "treeVisualizationLink")
-            .attr("d", diagonal);
+        // stash positions for future use
+        cluster.nodes(structure).forEach(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
 
-        // add nodes (just the container)
-        var node = graph.selectAll("g.treeVisualizationNode")
-            .data(nodes)
-            .enter().append("g")
-            .attr("class", "treeVisualizationNode")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-            .on("click", function(d) { toggle(d); draw();});
-
-        // add circles representing nodes
-        node.append("circle")
-            .attr("r", radius)
-            .attr("fill", fillColor);
-
-        // automatically resize when the window changes
-        window.onresize = function(event) {
-            redrawGraph();
-        };
+        redrawGraph(structure);
     };
-
-    this.initialize = draw;
 
     /**
      * Process the set of new log entries
      */
     this.update = function(logEvents) {
-        redrawGraph();
+        redrawGraph(structure);
     };
 
     /**
@@ -122,68 +97,98 @@ function TreeVisualization(structure, state) {
     /**
      * Redraws the graph so that it is up to date with it's associated data
      */
-    var redrawGraph = function() {
+    function redrawGraph(source) {
+        // duration of animations
+        var duration = 250;
 
-        draw();
-        return;
-
-        // get new width and height
+        //update width and height
         var width = $(".visualization").width();
         var height = $(".visualization").height();
+        cluster.size([width, height-100]);
 
-        var cluster = d3.layout.cluster()
-            .size([width, height-100]);
-
-        var diagonal = d3.svg.diagonal()
-            .projection(function(d) { return [d.x, d.y]; });
-
-        // update width and height of graph
         var graph = d3.select(".visualization").select("svg")
             .attr("width", width)
             .attr("height", height)
             .select("g");
 
-
+        // fix node depths
         var nodes = cluster.nodes(structure);
-        nodes.forEach(function(d) { d.y = d.depth * 180; });
-        console.log(nodes);
-
-        var links = cluster.links(nodes);
+        nodes.forEach(function(d) { d.y = d.depth * 200; });
 
         // update links
-        var link = graph.selectAll("path.treeVisualizationLink")
-            .data(links, function(d) {return d.target.id; });
+        var link = graph.selectAll("path")
+            .data(cluster.links(nodes), function(d) { return d.target.name; });
 
+        // add new links, with animation starting from parent's old position
         link.enter().append("path")
             .attr("class", "treeVisualizationLink")
+            .attr("d", function(d) {
+                var o = {x: source.x0, y: source.y0};
+                return diagonal({source: o, target: o});
+            })
+            .transition()
+            .duration(duration)
             .attr("d", diagonal);
 
-        link.attr("d", diagonal);
+        // update current links
+        link.transition()
+            .duration(duration)
+            .attr("d", diagonal);
 
-        link.exit()
+        // remove old links, with animation to parent's new position
+        link.exit().transition()
+            .duration(duration)
+            .attr("d", function(d) {
+                var o = {x: source.x, y: source.y};
+                return diagonal({source: o, target: o});
+            })
             .remove();
 
-        // update nodes (containers)
-        var node = graph.selectAll("g.treeVisualizationNode")
-            .data(nodes, function(d) { return d.id;});
+        // update nodes
+        var node = graph.selectAll("g")
+            .data(nodes, function(d) { return d.name; });
 
+        // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
             .attr("class", "treeVisualizationNode")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-            .on("click", function(d) { toggle(d); update();});
+            .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+            .on("click", function(d) { toggle(d); redrawGraph(d); });
 
+        // add circles representing computers
         nodeEnter.append("circle")
+            .attr("r", 1e-6)
+            .style("fill", fillColor);
+
+        // update existing nodes, with animation
+        var nodeUpdate = node.transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+        // update circle radius and color
+        nodeUpdate.select("circle")
             .attr("r", radius)
             .style("fill", fillColor);
 
-        node.select("circle")
-            .attr("r", radius)
-            .style("fill", fillColor);
-
-        var nodeExit = node.exit()
+        // remove old nodes, with animation to the parent's new position.
+        var nodeExit = node.exit().transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
             .remove();
-    };
 
+        nodeExit.select("circle")
+            .attr("r", 1e-6);
+
+        // Stash old positions for transition.
+        nodes.forEach(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
+    }
+
+    /**
+     * Toggles whether the given node's children are visible or not
+     * @param d the node
+     */
     function toggle(d) {
         if (d.children) {
             d._children = d.children;
