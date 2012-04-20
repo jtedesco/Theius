@@ -12,7 +12,7 @@ function changeVisualization(newVisualization, liId) {
 
     // Remove the current content of the visualization
     $('.visualization').hide();
-    $('.visualization').children().remove();
+//    $('.visualization').find('svg').remove();
     $('#visualizationWrapper .hero-unit').remove();
 
     // Show a loading message temporarily

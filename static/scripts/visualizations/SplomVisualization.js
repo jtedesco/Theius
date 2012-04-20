@@ -6,7 +6,6 @@ function SplomVisualization(structure, state) {
 
     // Get the racks to build the categories list of points
     var racks = [];
-    var nodesByRack = {};
     if(structure.hasOwnProperty('children')) {
         for(var i in structure['children']) {
             if (structure['children'].hasOwnProperty(i)) {
@@ -15,14 +14,13 @@ function SplomVisualization(structure, state) {
 
                 if($.inArray(rackName, racks) < 0) {
                     racks.push(rackName);
-                    nodesByRack[rackName] = [];
                 }
 
                 var rack2 = rack['children'];
-                for (var machineName in rack2) {
-                    if (rack['children'].hasOwnProperty(machineName)) {
-                        rack['children'][machineName]['rack'] = rackName;
-                        nodesByRack[rackName].push(rack['children'][machineName]);
+                for (var j in rack2) {
+                    if (rack['children'].hasOwnProperty(j)) {
+                        var machineName = rack['children'][j]['name'];
+                        state[machineName]['rackName'] = rackName;
                     }
                 }
             }
@@ -42,17 +40,18 @@ function SplomVisualization(structure, state) {
     // Form the data
     var values = [];
     for (var name in state) {
-        if (state.hasOwnProperty(name) && name.indexOf('machine') === 0) {
+        if (state.hasOwnProperty(name) && name.indexOf('master') === -1) {
             values.push(state[name]); // Get a handle on the state of this machine, which will update
         }
     }
+
 
     var data = {
         traits: traits,
         racks: racks,
         values: values
     };
-
+    console.log(data);
 
     // Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
     var getCompoundKeyFromDict = function(dictionary, key) {
@@ -127,24 +126,13 @@ function SplomVisualization(structure, state) {
         .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
         .each(function(d) { d3.select(this).call(axis.scale(y[d]).orient("right")); });
 
-    // Cell and plot.
-    var cell = svg.selectAll("g.cell")
-        .data(cross(data.traits, data.traits))
-        .enter().append("g")
-        .attr("class", "cell")
-        .attr("transform", function(d) { return "translate(" + d.i * size + "," + d.j * size + ")"; })
-        .each(plot);
-
-    // Titles for the diagonal.
-    cell.filter(function(d) { return d.i == d.j; }).append("text")
-        .attr("x", padding)
-        .attr("y", padding)
-        .attr("dy", ".71em")
-        .text(function(d) { return d.x; });
-
-    // Actually plots the data
+    // Actually plots a single plot
     var plot = function(p) {
+
         var cell = d3.select(this);
+
+//        console.log(p);
+//        console.log(cell);
 
         // Plot frame.
         cell.append("rect")
@@ -171,6 +159,21 @@ function SplomVisualization(structure, state) {
         // Plot brush.
         cell.call(brush.x(x[p.x]).y(y[p.y]));
     };
+
+    // Cell and plot.
+    var cell = svg.selectAll("g.cell")
+        .data(cross(data.traits, data.traits))
+        .enter().append("g")
+        .attr("class", "cell")
+        .attr("transform", function(d) { return "translate(" + d.i * size + "," + d.j * size + ")"; })
+        .each(plot);
+
+    // Titles for the diagonal.
+    cell.filter(function(d) { return d.i == d.j; }).append("text")
+        .attr("x", padding)
+        .attr("y", padding)
+        .attr("dy", ".71em")
+        .text(function(d) { return d.x; });
 
     // Clear the previously-active brush, if any.
     var onBrushStart = function(p) {
