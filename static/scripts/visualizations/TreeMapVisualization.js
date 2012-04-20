@@ -31,6 +31,15 @@ function TreeMapVisualization(structure, state) {
         return "lightblue";
     };
 
+    var value = function (d) {
+        var selected = $("#dataSetSelector option:selected").val();
+        if (selected == "none") {
+            return 5;
+        }
+
+        return state[d.name][selected];
+    }
+
     /**
      * Gives the title for this visualization
      */
@@ -59,9 +68,7 @@ function TreeMapVisualization(structure, state) {
 
     var color = d3.scale.category20c();
     var treemap = d3.layout.treemap()
-        .value(function (d) {
-            return 5;
-        });
+        .value(value);
 
     /**
      * Updates the graph so that it is up to date with it's associated data
@@ -78,7 +85,7 @@ function TreeMapVisualization(structure, state) {
             .style("height", height + "px");
 
         div.data([structure]).selectAll("div")
-            .data(treemap.nodes)
+            .data(treemap.nodes, function(d) { return d.name;})
             .enter().append("div")
             .attr("class", "cell")
             .style("background", function (d) {
@@ -89,13 +96,8 @@ function TreeMapVisualization(structure, state) {
                 return d.name;
             });
 
-        var map = d3.select(".visualization").select("div")
-            .style("position", "relative")
-            .style("width", width + "px")
-            .style("height", height + "px");
-
-        map.selectAll("div")
-            .data(treemap.nodes)
+        d3.select(".visualization").select("div").selectAll("div")
+            .data(treemap.nodes, function(d) { return d.name;})
             .style("background", background)
             .transition()
             .duration(1500)
