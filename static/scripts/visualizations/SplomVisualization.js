@@ -20,13 +20,11 @@ function SplomVisualization(structure, state) {
                 for (var j in rack2) {
                     if (rack['children'].hasOwnProperty(j)) {
                         var machineName = rack['children'][j]['name'];
-                        state[machineName]['rackName'] = rackName;
+                        state[machineName]['rack'] = rack['name'];
                     }
                 }
             }
         }
-    } else {
-        racks.push('default');
     }
 
     // Build the traits to use for visualizing
@@ -48,10 +46,20 @@ function SplomVisualization(structure, state) {
 
     var data = {
         traits: traits,
-        racks: racks,
+        rack: racks,
         values: values
     };
-    console.log(data);
+
+
+    this.initialize = function() {
+        matrixPlot(data, getCompoundKeyFromDict);
+    };
+
+    this.update = function() {
+        $('svg').remove();
+        matrixPlot(data, getCompoundKeyFromDict);
+    };
+
 
     // Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
     var getCompoundKeyFromDict = function(dictionary, key) {
@@ -65,15 +73,16 @@ function SplomVisualization(structure, state) {
             return dictionary[keys[0]];
         }
     };
+}
 
-    var cross = function(a, b) {
-        var c = [], n = a.length, m = b.length, i, j;
-        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
-        return c;
-    };
+/**
+ * Adapted from d3's online example
+ * @param data  The data to plot
+ */
+function matrixPlot(data, getCompoundKeyFromDict) {
 
     // Size parameters.
-    var size = 150,
+    var size = 200,
         padding = 19.5,
         n = data.traits.length;
 
@@ -101,9 +110,9 @@ function SplomVisualization(structure, state) {
 
     // Brush.
     var brush = d3.svg.brush()
-        .on("brushstart", onBrushStart)
-        .on("brush", onBrush)
-        .on("brushend", onBrushEnd);
+        .on("brushstart", brushstart)
+        .on("brush", brush)
+        .on("brushend", brushend);
 
     // Root panel.
     var svg = d3.select(".visualization").append("svg")
@@ -126,42 +135,6 @@ function SplomVisualization(structure, state) {
         .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
         .each(function(d) { d3.select(this).call(axis.scale(y[d]).orient("right")); });
 
-    // Actually plots a single plot
-    var plot = function(p) {
-
-        if (p.hasOwnProperty('i')) {
-            var cell = d3.select(this);
-
-            // Plot frame.
-            cell.append("rect")
-                .attr("class", "frame")
-                .attr("x", padding / 2)
-                .attr("y", padding / 2)
-                .attr("width", size - padding)
-                .attr("height", size - padding);
-
-            // Plot dots.
-            cell.selectAll("circle")
-                .data(data.values)
-                .enter().append("circle")
-                .attr("class", "splomCircle")
-                .attr("class", function(machine) { return machine.rackName; })
-                .attr("cx", function(d) {
-                    return x[p.x](getCompoundKeyFromDict(d, p.x));
-                })
-                .attr("cy", function(d) {
-                    return y[p.y](getCompoundKeyFromDict(d, p.y));
-                })
-                .attr("r", 3);
-
-            // Plot brush.
-            cell.call(brush.x(x[p.x]).y(y[p.y]));
-        } else {
-            console.log('Failed to render "p":');
-            console.log(p);
-        }
-    };
-
     // Cell and plot.
     var cell = svg.selectAll("g.cell")
         .data(cross(data.traits, data.traits))
@@ -177,37 +150,67 @@ function SplomVisualization(structure, state) {
         .attr("dy", ".71em")
         .text(function(d) { return d.x; });
 
+    function plot(p) {
+        var cell = d3.select(this);
+
+        // Plot frame.
+        cell.append("rect")
+            .attr("class", "frame")
+            .attr("x", padding / 2)
+            .attr("y", padding / 2)
+            .attr("width", size - padding)
+            .attr("height", size - padding);
+
+        // Plot dots.
+        cell.selectAll("circle")
+            .data(data.values)
+            .enter().append("circle")
+            .attr("class", function(d) { return d.rack + ' splomCircle'; })
+            .attr("cx", function(d) {
+                return x[p.x](getCompoundKeyFromDict(d, p.x));
+            })
+            .attr("cy", function(d) {
+                return y[p.y](getCompoundKeyFromDict(d, p.y));
+            })
+            .attr("r", 3);
+
+        // Plot brush.
+        cell.call(brush.x(x[p.x]).y(y[p.y]));
+    }
+
     // Clear the previously-active brush, if any.
-    var onBrushStart = function(p) {
+    function brushstart(p) {
         if (brush.data !== p) {
             cell.call(brush.clear());
             brush.x(x[p.x]).y(y[p.y]).data = p;
         }
-    };
+    }
 
     // Highlight the selected circles.
-    var onBrush = function(p) {
+    function brush(p) {
         var e = brush.extent();
-        svg.selectAll("circle").attr("class", function(machine) {
-            return e[0][0] <= machine[p.x] && machine[p.x] <= e[1][0]
-                && e[0][1] <= machine[p.y] && machine[p.y] <= e[1][1]
-                ? machine.rackName : null;
+        svg.selectAll("circle").attr("class", function(d) {
+
+            var xVal = getCompoundKeyFromDict(d, p.x);
+            var yVal = getCompoundKeyFromDict(d, p.y);
+
+            return e[0][0] <= xVal && xVal <= e[1][0]
+                && e[0][1] <= yVal && yVal <= e[1][1]
+                ? d.rack + ' splomCircle': 'splomCircle';
         });
-    };
+    }
 
     // If the brush is empty, select all circles.
-    var onBrushEnd = function() {
-        if (brush.empty()) svg.selectAll("circle").attr("class", function(machine) {
-            return machine.rackName;
+    function brushend() {
+        if (brush.empty()) svg.selectAll("circle").attr("class", function(d) {
+            console.log(d);
+            return d.rack + ' splomCircle';
         });
-    };
+    }
 
-    /**
-     * Expose the function to initialize the viz
-     */
-    this.initialize = function() {
-        return plot(data);
-    };
-
-    this.update = function() {console.log('updating')};
+    function cross(a, b) {
+        var c = [], n = a.length, m = b.length, i, j;
+        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
+        return c;
+    }
 }
