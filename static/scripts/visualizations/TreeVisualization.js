@@ -120,7 +120,7 @@ function TreeVisualization(structure, state) {
             .data(tree.links(nodes), function(d) { return d.target.name; });
 
         // add new links, with animation starting from parent's old position
-        link.enter().append("path")
+        link.enter().insert("path", "g")
             .attr("class", "treeVisualizationLink")
             .attr("d", function(d) {
                 var o = {x: source.x0, y: source.y0};
