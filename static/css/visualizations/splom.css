@@ -36,14 +36,14 @@ rect.frame {
     pointer-events: none;
 }
 
-.setosa {
+.rack1 {
     fill: #800;
 }
 
-.versicolor {
+.rack2 {
     fill: #080;
 }
 
-.virginica {
+.rack3 {
     fill: #008;
 }
