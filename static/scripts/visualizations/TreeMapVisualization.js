@@ -100,7 +100,7 @@ function TreeMapVisualization(structure, state) {
             .data(treemap.nodes, function(d) { return d.name;})
             .style("background", background)
             .transition()
-            .duration(1500)
+            .duration(300)
             .call(cell);
     }
 
