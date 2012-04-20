@@ -50,7 +50,7 @@ function TreeVisualization(structure, state) {
                 return 20;
             }
 
-            return state[node.name][selected] * 15 + 5; //radius between 5 and 20
+            return (1-state[node.name][selected]) * 15 + 5; //radius between 5 and 20
         }
     };
 
