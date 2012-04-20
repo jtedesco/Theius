@@ -1,4 +1,13 @@
-#visualizationWrapper, #leftSidebar, #rightSidebar{
+#leftSidebar, #rightSidebar{
+    height: 880px;
+}
+
+#visualizationTitle {
+    height: 20px;
+    text-align: center;
+}
+
+#visualizationWrapper {
     height: 800px;
 }
 
@@ -8,4 +17,9 @@
 
 footer {
     text-align: center;
+}
+
+#visualization {
+    width: 100%;
+    height: 100%;
 }

@@ -75,17 +75,19 @@ function TreeVisualization(structure, state) {
             .attr("transform", "translate(0,40)");
 
         // add links
-        var link = graph.selectAll("path.link")
+        var link = graph.selectAll("path.treeVisualizationLink")
             .data(links)
             .enter().append("path")
             .attr("class", "link")
+            .attr("class", "treeVisualizationLink")
             .attr("d", diagonal);
 
         // add nodes (just the container)
-        var node = graph.selectAll("g.node")
+        var node = graph.selectAll("g.treeVisualizationNode")
             .data(nodes)
             .enter().append("g")
             .attr("class", "node")
+            .attr("class", "treeVisualizationNode")
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
         // add circles representing nodes
@@ -107,6 +109,12 @@ function TreeVisualization(structure, state) {
         redrawGraph();
     };
 
+    /**
+     * Gives the title for this visualization
+     */
+    this.title = function() {
+        return "Topology Graph Showing Node Health";
+    };
 
     /**
      * Redraws the graph so that it is up to date with it's associated data
@@ -133,12 +141,12 @@ function TreeVisualization(structure, state) {
             .select("g");
 
         // update links
-        var link = graph.selectAll("path.link")
+        var link = graph.selectAll("path.treeVisualizationLink")
             .data(links)
             .attr("d", diagonal);
 
         // update nodes (containers)
-        var node = graph.selectAll("g.node")
+        var node = graph.selectAll("g.treeVisualizationNode")
             .data(nodes)
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 

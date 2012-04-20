@@ -11,8 +11,9 @@ function changeVisualization(newVisualization, liId) {
     $('#' + liId).addClass('active');
 
     // Remove the current content of the visualization
+    $('.visualization').find('svg').remove();
     $('.visualization').hide();
-    $('.visualization').children().remove();
+    $('#visualizationTitle').hide();
     $('#visualizationWrapper .hero-unit').remove();
 
     // Show a loading message temporarily
@@ -22,6 +23,13 @@ function changeVisualization(newVisualization, liId) {
     visualization = newVisualization;
     if(visualization != null) {
         visualization.initialize();
+        visualization.update([]);
+
+        // Show the title for the visualization
+        var visualizationTitle = $('#visualizationTitle');
+        visualizationTitle.html("<h3>" + visualization.title() + "</h3>");
+        visualizationTitle.show();
+
     } else {
         $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
     }
