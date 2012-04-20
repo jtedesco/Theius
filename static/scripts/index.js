@@ -23,6 +23,7 @@ function changeVisualization(newVisualization, liId) {
     visualization = newVisualization;
     if(visualization != null) {
         visualization.initialize();
+        visualization.update([]);
 
         // Show the title for the visualization
         var visualizationTitle = $('#visualizationTitle');
