@@ -52,6 +52,7 @@ function SplomVisualization(structure, state) {
 
 
     this.initialize = function() {
+        d3.select(".visualization").selectAll("div").remove();
         matrixPlot(data, getCompoundKeyFromDict);
     };
 
