@@ -45,7 +45,12 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 15;
         } else {
-            return state[node.name]['cpuUsage'] * 15 + 5; //radius between 5 and 20
+            var selected = $("#dataSetSelector option:selected").val();
+            if (selected == "none") {
+                return 20;
+            }
+
+            return state[node.name][selected] * 15 + 5; //radius between 5 and 20
         }
     };
 

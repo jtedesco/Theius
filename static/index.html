@@ -101,11 +101,11 @@
                                     <label class="control-label" for="dataSetSelector">Data set</label>
                                     <div class="controls">
                                         <select id="dataSetSelector" style="width:100%;">
-                                            <option>something</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
-                                            <option>5</option>
+                                            <option value="none">None</option>
+                                            <option value="cpuUsage">CPU Usage</option>
+                                            <option value="memoryUsage">Memory Usage</option>
+                                            <option value="contextSwitchRate">Context Switch Rate</option>
+                                            <option value="health">Health</option>
                                         </select>
                                     </div>
                                 </div>
@@ -163,6 +163,9 @@
 <script type='text/javascript'>
     $(document).ready(function () {
         subscribe();
+        $("#dataSetSelector").change( function() {
+           visualization.update();
+        });
     })
 </script>
 </html>
