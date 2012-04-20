@@ -45,7 +45,7 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 15;
         } else {
-            return 20;
+            return state[node.name]['cpuUsage'] * 15 + 5; //radius between 5 and 20
         }
     };
 
