@@ -90,7 +90,7 @@ function TreeVisualization(structure, state) {
             .enter().append("g")
             .attr("class", "treeVisualizationNode")
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-            .on("click", function(d) { toggle(d); update();});
+            .on("click", function(d) { toggle(d); draw();});
 
         // add circles representing nodes
         node.append("circle")
