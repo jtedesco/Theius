@@ -76,31 +76,39 @@
             <div class="row-fluid">
                 <div id="leftSidebar" class="span2">
                     <div class="well">
-                        <h3>Some options</h3><br/>
-                        <form class="form-vertical" style="width: 100%;">
+                        <h3>Controls</h3><br/>
+                        <div class='form-vertical'>
                             <fieldset>
                                 <div class="control-group">
                                     <div class="controls">
-                                        <input type="text" class="input-medium" id="input01">
-                                        <p class="help-block">Type something...</p>
+                                        <button class="btn" style="width:100%" id="playPauseBtn"><div class="icon-pause"></div> Pause Data</button>
                                     </div>
                                 </div>
                                 <br/>
+
+
                                 <div class="control-group">
-                                    <label class="control-label" for="optionsCheckbox">Checkbox</label>
+                                    <label class="control-label" for="dataSetSelector">Data set</label>
                                     <div class="controls">
-                                        <label class="checkbox">
-                                            <input type="checkbox" id="optionsCheckbox" value="option1">
-                                            Some option
-                                        </label>
+                                        <select id="dataSetSelector" style="width:100%;">
+                                            <option>something</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="form-actions">
-                                    <button type="submit" class="btn btn-primary">Save</button>
-                                    <button class="btn">Cancel</button>
+                                <br/>
+
+                                <h4>Legend</h4><br/>
+                                <div class="well">
+                                    <div id="legend">
+                                        
+                                    </div>
                                 </div>
                             </fieldset>
-                        </form>
+                        </div>
                     </div>
                 </div>
 
