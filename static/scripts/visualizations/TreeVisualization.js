@@ -65,7 +65,8 @@ function TreeVisualization(structure, state) {
      * Construct the visualization for the first time
      */
     this.initialize = function() {
-
+        d3.select(".visualization").select("div").remove();
+        d3.select(".visualization").select("svg").remove();
         var width = $(".visualization").width();
         var height = $(".visualization").height();
 
@@ -89,6 +90,7 @@ function TreeVisualization(structure, state) {
      * Process the set of new log entries
      */
     this.update = function(logEvents) {
+        console.log
         redrawGraph(structure);
     };
 
