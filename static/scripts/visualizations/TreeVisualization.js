@@ -190,12 +190,14 @@ function TreeVisualization(structure, state) {
      * @param d the node
      */
     function toggle(d) {
-        if (d.children) {
-            d._children = d.children;
-            d.children = null;
-        } else {
-            d.children = d._children;
-            d._children = null;
+        if (d.hasOwnProperty('children')) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
         }
     }
 }
