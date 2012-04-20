@@ -76,12 +76,15 @@
             <div class="row-fluid">
                 <div id="leftSidebar" class="span2">
                     <div class="well">
-                        <h3>Controls</h3><br/>
+                        <h3>Visualization Controls</h3><br/>
                         <div class='form-vertical'>
                             <fieldset>
                                 <div class="control-group">
                                     <div class="controls">
-                                        <button class="btn" style="width:100%" id="playPauseBtn"><div class="icon-pause"></div> Pause Data</button>
+                                        <button class="btn" style="width:100%" id="playPauseBtn" onclick="togglePlayPause()">
+                                            <div class="icon-pause"></div> &nbsp; &nbsp;
+                                            <span id="playPauseStatus">Pause Viz</span>
+                                        </button>
                                     </div>
                                 </div>
                                 <br/>

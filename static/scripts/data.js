@@ -10,6 +10,9 @@ var clusterStructure;
 // The visualization to call (initialized on subscribe success)
 var visualization = null;
 
+// Holds whether the visualization is currently planing
+var playing = true;
+
 
 /**
  * Receive updates from the server
@@ -36,7 +39,11 @@ function update(data) {
 
         // Update the visualization
         if(visualization && visualization!=null) {
-            visualization.update(logEvents);
+            if(playing) {
+                visualization.update(logEvents);
+            } else {
+                console.log('Skipping viz update, viz is paused');
+            }
         } else {
             console.log('Skipping update, invalid visualization');
         }
@@ -55,6 +62,33 @@ function update(data) {
     } else {
         logError('Update failed: ' + data['message']);
     }
+}
+
+
+/**
+ * Toggle play/pause of visualization
+ */
+function togglePlayPause() {
+
+    var playPauseBtn = $('#playPauseBtn');
+    var playPauseDiv = playPauseBtn.children('div');
+    var playPauseStatus = $('#playPauseStatus');
+    if(playing) {
+
+        // Update UI
+        playPauseDiv.removeClass('icon-pause');
+        playPauseDiv.addClass('icon-play');
+        playPauseStatus.text('Resume Viz')
+
+    } else {
+
+        // Update UI
+        playPauseDiv.removeClass('icon-play');
+        playPauseDiv.addClass('icon-pause');
+        playPauseStatus.text('Pause Viz')
+    }
+
+    playing = !playing;
 }
 
 
