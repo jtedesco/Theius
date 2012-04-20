@@ -11,6 +11,26 @@
 */
 function TreeMapVisualization(structure, state) {
 
+    var background = function (d) {
+        if (d.children)
+            return d.children;
+
+        if (d){
+            var health = state[d['name']]['health'];
+            if (health > 0.7) {
+                return 'green';
+            } else if (health > 0.6) {
+                return 'yellow';
+            } else if (health > 0.3) {
+                return 'orange';
+            } else {
+                return 'red';
+            }
+        }
+
+        return "lightblue";
+    };
+
     /**
      * Gives the title for this visualization
      */
@@ -23,100 +43,37 @@ function TreeMapVisualization(structure, state) {
      */
     function cell() {
 
-
-        this
-            .style("left", function (d) {
-
+        this.style("left", function (d) {
             return d.x + "px";
         })
             .style("top", function (d) {
-
                 return d.y + "px";
             })
             .style("width", function (d) {
-
                 return Math.max(0, d.dx - 1) + "px";
             })
             .style("height", function (d) {
-
                 return Math.max(0, d.dy - 1) + "px";
             });
     }
 
+    var color = d3.scale.category20c();
+    var treemap = d3.layout.treemap()
+        .value(function (d) {
+            return 5;
+        });
+
     /**
      * Updates the graph so that it is up to date with it's associated data
      */
-    this.update = function(data) {
-
-
+    function redraw(data) {
         var width = $(".visualization").width();
         var height = $(".visualization").height();
-        color = d3.scale.category20c();
 
-        var treemap = d3.layout.treemap()
-            .size([width, height])
-            .sticky(true)
-            .value(
-            function (d) {
-              //  console.log("value: " + d.value);
-               // if (d.value)
-               //     return d.value;
-                return 5;
-            });
+        treemap.size([width, height])
+            .sticky(true);
 
-
-        var map = d3.select(".visualization").select("div")
-            .style("position", "relative")
-            .style("width", width + "px")
-            .style("height", height + "px");
-
-        map.selectAll("div")
-            .data(treemap.nodes)
-            .style("background",
-            function (d) {
-                if (d.children)
-                    return d.children;
-
-                if (d){
-                    var health = state[d['name']]['health'];
-                    if (health > 0.7) {
-                        return 'green';
-                    } else if (health > 0.6) {
-                        return 'yellow';
-                    } else if (health > 0.3) {
-                        return 'orange';
-                    } else {
-                        return 'red';
-                    }
-                }
-
-                return "lightblue";
-            })
-            .transition()
-            .duration(1500)
-            .call(cell);
-    }
-
-    /**
-     * Construct the visualization for the first time
-     */
-    this.initialize = function() {
-
-        var width = 868;//HardCoded for now.Bug need to fix later.$(".visualization").width();
-        var height = $(".visualization").height();
-        color = d3.scale.category20c();
-
-        var treemap = d3.layout.treemap()
-            .size([width, height])
-            .sticky(true)
-            .value(function (d) {
-                return 5;
-            });
-
-        d3.select(".visualization").select("div").remove();
-
-        var div = d3.select(".visualization").append("div")
-            .style("position", "relative")
+        var div = d3.select(".visualization").select("div")
             .style("width", width + "px")
             .style("height", height + "px");
 
@@ -132,6 +89,40 @@ function TreeMapVisualization(structure, state) {
                 return d.name;
             });
 
+        var map = d3.select(".visualization").select("div")
+            .style("position", "relative")
+            .style("width", width + "px")
+            .style("height", height + "px");
+
+        map.selectAll("div")
+            .data(treemap.nodes)
+            .style("background", background)
+            .transition()
+            .duration(1500)
+            .call(cell);
+    }
+
+    this.update = redraw;
+
+    /**
+     * Construct the visualization for the first time
+     */
+    this.initialize = function() {
+
+        var width = $(".visualization").width();
+        var height = $(".visualization").height();
+
+        treemap.size([width, height])
+            .sticky(true);
+
+        d3.select(".visualization").select("div").remove();
+
+        var div = d3.select(".visualization").append("div")
+            .style("position", "relative")
+            .style("width", width + "px")
+            .style("height", height + "px");
+
+        redraw([]);
     }
 }
 
