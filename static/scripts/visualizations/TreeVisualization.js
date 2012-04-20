@@ -109,6 +109,12 @@ function TreeVisualization(structure, state) {
         redrawGraph();
     };
 
+    /**
+     * Gives the title for this visualization
+     */
+    this.title = function() {
+        return "Topology Graph Showing Node Health";
+    };
 
     /**
      * Redraws the graph so that it is up to date with it's associated data

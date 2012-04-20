@@ -60,6 +60,9 @@ function SplomVisualization(structure, state) {
         matrixPlot(data, getCompoundKeyFromDict);
     };
 
+    this.title = function() {
+        return "Scatterplot Matrix Showing Probabilities of Event Types by Rack"
+    };
 
     // Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
     var getCompoundKeyFromDict = function(dictionary, key) {
