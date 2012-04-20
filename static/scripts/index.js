@@ -11,8 +11,8 @@ function changeVisualization(newVisualization, liId) {
     $('#' + liId).addClass('active');
 
     // Remove the current content of the visualization
+    $('.visualization').find('svg').remove();
     $('.visualization').hide();
-//    $('.visualization').find('svg').remove();
     $('#visualizationWrapper .hero-unit').remove();
 
     // Show a loading message temporarily

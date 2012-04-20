@@ -129,35 +129,37 @@ function SplomVisualization(structure, state) {
     // Actually plots a single plot
     var plot = function(p) {
 
-        var cell = d3.select(this);
+        if (p.hasOwnProperty('i')) {
+            var cell = d3.select(this);
 
-//        console.log(p);
-//        console.log(cell);
+            // Plot frame.
+            cell.append("rect")
+                .attr("class", "frame")
+                .attr("x", padding / 2)
+                .attr("y", padding / 2)
+                .attr("width", size - padding)
+                .attr("height", size - padding);
 
-        // Plot frame.
-        cell.append("rect")
-            .attr("class", "frame")
-            .attr("x", padding / 2)
-            .attr("y", padding / 2)
-            .attr("width", size - padding)
-            .attr("height", size - padding);
+            // Plot dots.
+            cell.selectAll("circle")
+                .data(data.values)
+                .enter().append("circle")
+                .attr("class", "splomCircle")
+                .attr("class", function(machine) { return machine.rackName; })
+                .attr("cx", function(d) {
+                    return x[p.x](getCompoundKeyFromDict(d, p.x));
+                })
+                .attr("cy", function(d) {
+                    return y[p.y](getCompoundKeyFromDict(d, p.y));
+                })
+                .attr("r", 3);
 
-        // Plot dots.
-        cell.selectAll("circle")
-            .data(data.values)
-            .enter().append("circle")
-            .attr("class", "splomCircle")
-            .attr("class", function(machine) { return machine.rackName; })
-            .attr("cx", function(d) {
-                return x[p.x](getCompoundKeyFromDict(d, p.x));
-            })
-            .attr("cy", function(d) {
-                return y[p.y](getCompoundKeyFromDict(d, p.y));
-            })
-            .attr("r", 3);
-
-        // Plot brush.
-        cell.call(brush.x(x[p.x]).y(y[p.y]));
+            // Plot brush.
+            cell.call(brush.x(x[p.x]).y(y[p.y]));
+        } else {
+            console.log('Failed to render "p":');
+            console.log(p);
+        }
     };
 
     // Cell and plot.
@@ -203,6 +205,9 @@ function SplomVisualization(structure, state) {
     /**
      * Expose the function to initialize the viz
      */
-    this.initialize = function() { return plot(data); }
+    this.initialize = function() {
+        return plot(data);
+    };
 
+    this.update = function() {console.log('updating')};
 }
