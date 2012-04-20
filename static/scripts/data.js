@@ -28,6 +28,7 @@ function update(data) {
         var logEvents = [];
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
+                console.log(updateData[i]);
                 var logEvent = updateData[i];
                 logEvents.push(logEvent);
             }

@@ -1,29 +1,56 @@
-function TreeVisualization(structure, state) {
+/**
+* Encapsulates the treeMap visualization to expose the 'redraw'/
+    *
+* Given some retrieved JSON data of the node structure, displays the information
+    *  in a treeMap using the D3 library. The data is to be structured so that the key
+*  "name" corresponds to a node's name, and the key "children" is an array of its
+    *  children.
+    *
+*  @param  structure     The structure of the cluster
+*  @param  state         The state of the cluster (node by node)
+*/
+function TreeMapVisualization(structure, state) {
 
-    function updateGraphData(obj, node) {
-        if (node == undefined) return;
-        if (obj.name == node.name) {
-            for (var key in obj) {
-                node[key] = obj[key];
-            }
-            return;
-        } else {
-            for (var i in node.children) {
-                updateGraphData(obj, node.children[i]);
-            }
-        }
+    /**
+     * Gives the title for this visualization
+     */
+    this.title = function() {
+        return "Tree Map Showing Node Health";
+    };
+
+    /**
+     * Function that styles the cell i.e. each box in the treeMap
+     */
+    function cell() {
+
+
+        this
+            .style("left", function (d) {
+
+            return d.x + "px";
+        })
+            .style("top", function (d) {
+
+                return d.y + "px";
+            })
+            .style("width", function (d) {
+
+                return Math.max(0, d.dx - 1) + "px";
+            })
+            .style("height", function (d) {
+
+                return Math.max(0, d.dy - 1) + "px";
+            });
     }
 
-    function redrawMap(data) {
+    /**
+     * Updates the graph so that it is up to date with it's associated data
+     */
+    this.update = function(data) {
 
-        var dataChange = $.parseJSON(data['updates']);
-        for (var i in dataChange) {
-            updateGraphData(dataChange[i], window.graphData);
-        }
-        console.log(dataChange);
-        console.log(window.graphData);
-        var width = document.documentElement.clientWidth - 100,
-            height = document.documentElement.clientHeight - 100;
+
+        var width = $(".visualization").width();
+        var height = $(".visualization").height();
         color = d3.scale.category20c();
 
         var treemap = d3.layout.treemap()
@@ -31,12 +58,14 @@ function TreeVisualization(structure, state) {
             .sticky(true)
             .value(
             function (d) {
-                if (d.value) return d.value;
+              //  console.log("value: " + d.value);
+               // if (d.value)
+               //     return d.value;
                 return 5;
             });
 
 
-        var map = d3.select("#chart").select("div")
+        var map = d3.select(".visualization").select("div")
             .style("position", "relative")
             .style("width", width + "px")
             .style("height", height + "px");
@@ -47,47 +76,34 @@ function TreeVisualization(structure, state) {
             function (d) {
                 if (d.children)
                     return d.children;
-                if (d.color)
-                    return d.color;
+
+                if (d){
+                    var health = state[d['name']]['health'];
+                    if (health > 0.7) {
+                        return 'green';
+                    } else if (health > 0.6) {
+                        return 'yellow';
+                    } else if (health > 0.3) {
+                        return 'orange';
+                    } else {
+                        return 'red';
+                    }
+                }
+
                 return "lightblue";
             })
             .transition()
             .duration(1500)
             .call(cell);
-
-        /*
-         var node = map.data([window.graphData]).selectAll("div")
-         .data(treemap.nodes)
-         .enter().select("div")
-         .attr("class","cell")
-         .style("background", function(d) { return d.children ? color(d.name) : null; })
-         .call(cell)
-         .text(function(d){return d.name;});
-         */
-        function cell() {
-            this
-                .style("left", function (d) {
-                return d.x + "px";
-            })
-                .style("top", function (d) {
-                    return d.y + "px";
-                })
-                .style("width", function (d) {
-                    return Math.max(0, d.dx - 1) + "px";
-                })
-                .style("height", function (d) {
-                    return Math.max(0, d.dy - 1) + "px";
-                });
-        }
-
     }
 
-    function initMap(data) {
+    /**
+     * Construct the visualization for the first time
+     */
+    this.initialize = function() {
 
-        window.graphData = data;
-        console.log(data);
-        var width = document.documentElement.clientWidth - 100,
-            height = document.documentElement.clientHeight - 100;
+        var width = 868;//HardCoded for now.Bug need to fix later.$(".visualization").width();
+        var height = $(".visualization").height();
         color = d3.scale.category20c();
 
         var treemap = d3.layout.treemap()
@@ -97,12 +113,12 @@ function TreeVisualization(structure, state) {
                 return 5;
             });
 
-        var div = d3.select("#chart").append("div")
+        var div = d3.select(".visualization").append("div")
             .style("position", "relative")
             .style("width", width + "px")
             .style("height", height + "px");
 
-        div.data([window.graphData]).selectAll("div")
+        div.data([structure]).selectAll("div")
             .data(treemap.nodes)
             .enter().append("div")
             .attr("class", "cell")
@@ -114,21 +130,6 @@ function TreeVisualization(structure, state) {
                 return d.name;
             });
 
-        function cell() {
-            this
-                .style("left", function (d) {
-                return d.x + "px";
-            })
-                .style("top", function (d) {
-                    return d.y + "px";
-                })
-                .style("width", function (d) {
-                    return Math.max(0, d.dx - 1) + "px";
-                })
-                .style("height", function (d) {
-                    return Math.max(0, d.dy - 1) + "px";
-                });
-        }
     }
 }
 

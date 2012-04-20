@@ -122,9 +122,11 @@ function TreeVisualization(structure, state) {
     var redrawGraph = function() {
 
         // get new width and height
+        console.log(structure);
         var width = $(".visualization").width();
         var height = $(".visualization").height();
-
+       // console.log("width: " + width);
+       // console.log("height: " + height);
         var cluster = d3.layout.cluster()
             .size([width, height-100]);
 
