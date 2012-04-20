@@ -56,6 +56,7 @@ function TreeVisualization(structure, state) {
     var draw = function() {
 
         d3.select(".visualization").selectAll("svg").remove();
+        d3.select(".visualization").selectAll("div").remove();
         var width = $(".visualization").width();
         var height = $(".visualization").height();
 
@@ -128,7 +129,6 @@ function TreeVisualization(structure, state) {
         return;
 
         // get new width and height
-        console.log(structure);
         var width = $(".visualization").width();
         var height = $(".visualization").height();
        // console.log("width: " + width);

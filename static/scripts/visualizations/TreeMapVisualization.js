@@ -113,6 +113,8 @@ function TreeMapVisualization(structure, state) {
                 return 5;
             });
 
+        d3.select(".visualization").select("div").remove();
+
         var div = d3.select(".visualization").append("div")
             .style("position", "relative")
             .style("width", width + "px")
