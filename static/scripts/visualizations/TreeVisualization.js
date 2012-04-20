@@ -6,8 +6,8 @@
  *  "name" corresponds to a node's name, and the key "children" is an array of its
  *  children.
  *
- *  @param  structure     The structure of the cluster
- *  @param  state         The state of the cluster (node by node)
+ *  @param  structure     The structure of the tree
+ *  @param  state         The state of the tree (node by node)
  */
 function TreeVisualization(structure, state) {
 
@@ -50,7 +50,7 @@ function TreeVisualization(structure, state) {
     };
 
     // layout
-    var cluster = d3.layout.cluster();
+    var tree = d3.layout.tree();
 
     // helper function for links
     var diagonal = d3.svg.diagonal()
@@ -72,7 +72,7 @@ function TreeVisualization(structure, state) {
             .attr("transform", "translate(0,40)");
 
         // stash positions for future use
-        cluster.nodes(structure).forEach(function(d) {
+        tree.nodes(structure).forEach(function(d) {
             d.x0 = d.x;
             d.y0 = d.y;
         });
@@ -104,7 +104,7 @@ function TreeVisualization(structure, state) {
         //update width and height
         var width = $(".visualization").width();
         var height = $(".visualization").height();
-        cluster.size([width, height-100]);
+        tree.size([width, height-100]);
 
         var graph = d3.select(".visualization").select("svg")
             .attr("width", width)
@@ -112,12 +112,12 @@ function TreeVisualization(structure, state) {
             .select("g");
 
         // fix node depths
-        var nodes = cluster.nodes(structure);
+        var nodes = tree.nodes(structure);
         nodes.forEach(function(d) { d.y = d.depth * 200; });
 
         // update links
         var link = graph.selectAll("path")
-            .data(cluster.links(nodes), function(d) { return d.target.name; });
+            .data(tree.links(nodes), function(d) { return d.target.name; });
 
         // add new links, with animation starting from parent's old position
         link.enter().append("path")
