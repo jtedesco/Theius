@@ -30,11 +30,13 @@ function changeVisualization(newVisualization, liId) {
         visualizationTitle.html("<h3>" + visualization.title() + "</h3>");
         visualizationTitle.show();
 
+        // Show the visualization if it was successfully loaded
+        $('.visualization').fadeIn('fast');
+
     } else {
         $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
     }
 
     // Find the loading message
     $('#loadingMessage').remove();
-    $('.visualization').fadeIn('fast');
 }
