@@ -15,24 +15,6 @@ function TreeMapVisualization(structure, state) {
 
     var background = function (d) {
         return d.children ? color(d.name) : null;
-
-        /*if (d.children)
-            return d.children;
-
-        if (d){
-            var health = state[d['name']]['health'];
-            if (health > 0.7) {
-                return 'green';
-            } else if (health > 0.6) {
-                return 'yellow';
-            } else if (health > 0.3) {
-                return 'orange';
-            } else {
-                return 'red';
-            }
-        }
-
-        return "lightblue";*/
     };
 
     var value = function (d) {
@@ -42,7 +24,7 @@ function TreeMapVisualization(structure, state) {
         }
 
         return state[d.name][selected];
-    }
+    };
 
     /**
      * Gives the title for this visualization
