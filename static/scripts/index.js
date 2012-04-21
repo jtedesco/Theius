@@ -73,6 +73,9 @@ function changeVisualization(newVisualization, liId) {
         visualizationTitle.html("<h3>" + visualization.title() + "</h3>");
         visualizationTitle.show();
 
+        // Show the legend for the visualization
+        $('#legend').html(visualization.getLegendContent());
+
         // Attach mouse over listeners
         attachPopovers();
 
@@ -196,6 +199,7 @@ function populateDataSetMenu(optionMenu, possibleDataSets) {
 function chooseColorDataSet(colorDataSet) {
     visualization.setColorDataSet(colorDataSet);
     visualization.update();
+    $('#legend').html(visualization.getLegendContent());
 }
 
 
@@ -205,4 +209,5 @@ function chooseColorDataSet(colorDataSet) {
 function chooseSizeDataSet(sizeDataSet) {
     visualization.setSizeDataSet(sizeDataSet);
     visualization.update();
+    $('#legend').html(visualization.getLegendContent());
 }

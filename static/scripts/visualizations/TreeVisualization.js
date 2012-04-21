@@ -92,6 +92,34 @@ function TreeVisualization(structure, state) {
         }
     };
 
+    /**
+     * Gives the title for this visualization
+     */
+    this.title = function() {
+        return "Topology Graph Showing Node Health";
+    };
+
+
+    /**
+     * Return the content to put in the 'legend' div
+     */
+    this.getLegendContent = function() {
+        return "<table>" +
+            "<tr>" +
+                "<td>" +
+                    "<svg style='width:10px; height:10px;'><circle fill='" + interpolateUnitValueToColor(1.0) + "' cx=5 cy=5 r=5></svg>" +
+                "</td>" +
+                "<td style='padding-left:10px;'>" + This.getColorDataSets()[This.colorDataSet] + " of 1.0</td>" +
+            "</tr>" +
+            "<tr>" +
+                "<td>" +
+                    "<svg style='width:10px; height:10px;'><circle fill='" + interpolateUnitValueToColor(0.0) + "' cx=5 cy=5 r=5></svg>" +
+                "</td>" +
+                "<td style='padding-left:10px;'>" + This.getColorDataSets()[This.colorDataSet] + " of 0.0</td>" +
+            "</tr>" +
+        "</table>"
+    };
+
 
     /**
      * Construct the visualization for the first time
@@ -120,21 +148,15 @@ function TreeVisualization(structure, state) {
     /**
      * Process the set of new log entries
      */
-    this.update = function(logEvents) {
+    this.update = function() {
         redrawGraph(structure);
     };
 
-    /**
-     * Gives the title for this visualization
-     */
-    this.title = function() {
-        return "Topology Graph Showing Node Health";
-    };
 
     /**
      * Redraws the graph so that it is up to date with it's associated data
      */
-    function redrawGraph(source) {
+    var redrawGraph = function(source) {
 
         // duration of animations
         var duration = 200;
@@ -221,7 +243,7 @@ function TreeVisualization(structure, state) {
             d.x0 = d.x;
             d.y0 = d.y;
         });
-    }
+    };
 
     /**
      * Toggles whether the given node's children are visible or not
