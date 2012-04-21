@@ -3,30 +3,6 @@
  */
 function SplomVisualization(structure, state) {
 
-
-    // Get the racks to build the categories list of points
-    var racks = [];
-    if(structure.hasOwnProperty('children')) {
-        for(var i in structure['children']) {
-            if (structure['children'].hasOwnProperty(i)) {
-                var rack = structure['children'][i];
-                var rackName = rack['name'];
-
-                if($.inArray(rackName, racks) < 0) {
-                    racks.push(rackName);
-                }
-
-                var rack2 = rack['children'];
-                for (var j in rack2) {
-                    if (rack['children'].hasOwnProperty(j)) {
-                        var machineName = rack['children'][j]['name'];
-                        state[machineName]['rack'] = rack['name'];
-                    }
-                }
-            }
-        }
-    }
-
     // Build the traits to use for visualizing
     var traits = [
         'predictedSeverityProbabilities.INFO',

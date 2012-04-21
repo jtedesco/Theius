@@ -71,9 +71,11 @@ function update(data) {
  */
 function togglePlayPause() {
 
+    // Get handles on UI elements
     var playPauseBtn = $('#playPauseBtn');
     var playPauseDiv = playPauseBtn.children('div');
     var playPauseStatus = $('#playPauseStatus');
+
     if(playing) {
 
         // Update UI
@@ -136,6 +138,29 @@ function subscribeSuccess(data) {
     clientId = data['clientId'];
     clusterState = data['currentState'];
     clusterStructure = data['structure'];
+
+    // Get the racks to build the categories list of points
+    var racks = [];
+    if(clusterStructure.hasOwnProperty('children')) {
+        for(var i in clusterStructure['children']) {
+            if (clusterStructure['children'].hasOwnProperty(i)) {
+                var rack = clusterStructure['children'][i];
+                var rackName = rack['name'];
+
+                if($.inArray(rackName, racks) < 0) {
+                    racks.push(rackName);
+                }
+
+                var rack2 = rack['children'];
+                for (var j in rack2) {
+                    if (rack['children'].hasOwnProperty(j)) {
+                        var machineName = rack['children'][j]['name'];
+                        clusterState[machineName]['rack'] = rack['name'];
+                    }
+                }
+            }
+        }
+    }
 
     // Build the default visualization
     changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')  ;
