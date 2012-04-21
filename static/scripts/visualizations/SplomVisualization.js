@@ -50,16 +50,65 @@ function SplomVisualization(structure, state) {
         values: values
     };
 
+    // Size parameters.
+    var verticalSize = $('.visualization').height()/data.traits.length - 10,
+        horizontalSize = $('.visualization').width()/data.traits.length - 10,
+        padding = 20;
+
 
     this.initialize = function() {
         d3.select(".visualization").selectAll("div").remove();
-        matrixPlot(data, getCompoundKeyFromDict);
+        matrixPlot(data, getCompoundKeyFromDict, horizontalSize, verticalSize, padding);
         showVisualization();
     };
 
     this.update = function() {
-        $('svg').remove();
-        matrixPlot(data, getCompoundKeyFromDict);
+
+        // Position scales.
+        var x = {}, y = {};
+        data.traits.forEach(function(trait) {
+            var value = function(machineData) {
+                return getCompoundKeyFromDict(machineData, trait);
+            },
+                domain = [d3.min(data.values, value), d3.max(data.values, value)],
+                xRange = [padding / 2, horizontalSize - padding / 2],
+                yRange = [padding / 2, verticalSize - padding / 2];
+            x[trait] = d3.scale.linear()
+                .domain(domain)
+                .range(xRange);
+
+            y[trait] = d3.scale.linear()
+                .domain(domain)
+                .range(yRange.slice().reverse());
+        });
+
+        function replot(p) {
+
+            var cell = d3.select(this);
+
+            // Plot dots.
+            cell.selectAll("circle")
+                .attr("cx", function(d) {
+                    return x[p.x](getCompoundKeyFromDict(d, p.x));
+                })
+                .transition()
+                .duration(300)
+                .attr("cy", function(d) {
+                    return y[p.y](getCompoundKeyFromDict(d, p.y));
+                })
+                .transition()
+                .duration(300)
+                .attr("r", 3)
+                .transition()
+                .duration(300);
+        }
+
+
+        // Cell and plot
+        var svg = d3.select("svg");
+        var cell = svg.selectAll("g.cell")
+            .each(replot);
+
     };
 
     this.title = function() {
@@ -84,13 +133,10 @@ function SplomVisualization(structure, state) {
  * Adapted from d3's online example
  * @param data  The data to plot
  */
-function matrixPlot(data, getCompoundKeyFromDict) {
+function matrixPlot(data, getCompoundKeyFromDict, horizontalSize, verticalSize, padding) {
 
     // Size parameters.
-    var verticalSize = $('.visualization').height()/data.traits.length - 10,
-        horizontalSize = $('.visualization').width()/data.traits.length - 10,
-        padding = 20,
-        n = data.traits.length;
+    var n = data.traits.length;
 
     // Position scales.
     var x = {}, y = {};
