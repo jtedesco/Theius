@@ -78,14 +78,6 @@ function SplomVisualization(structure, state, predictions) {
 
 
     /**
-     * Colors a point by attaching the appropriate class
-     */
-    var colorPoint = function() {
-
-    };
-
-
-    /**
      * Sizes a point by looking at the size data set
      */
     var sizePoint = function(node) {
