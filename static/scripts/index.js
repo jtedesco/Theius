@@ -179,7 +179,7 @@ function populateDataSetMenu(optionMenu, possibleDataSets) {
  * Change the color data set for the current visualization from the option pane's value
  */
 function chooseColorDataSet(colorDataSet) {
-    visualization.colorDataSet = colorDataSet;
+    visualization.setColorDataSet(colorDataSet);
     visualization.update();
 }
 
@@ -188,6 +188,6 @@ function chooseColorDataSet(colorDataSet) {
  * Change the size data set for the current visualization from the option pane's value
  */
 function chooseSizeDataSet(sizeDataSet) {
-    visualization.sizeDataSet = sizeDataSet;
+    visualization.setSizeDataSet(sizeDataSet);
     visualization.update();
 }

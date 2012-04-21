@@ -20,8 +20,13 @@ function TreeVisualization(structure, state) {
 
 
     // Selected data sets to use for color & size (respectively)
-    this.colorDataSet = null;
-    this.sizeDataSet = null;
+    var This = this;
+    this.setColorDataSet = function(dataSet) {
+        This.colorDataSet = dataSet;
+    };
+    this.setSizeDataSet = function(dataSet) {
+        This.sizeDataSet = dataSet;
+    };
 
 
     // The data sets possible (same for both color & size)
@@ -53,7 +58,6 @@ function TreeVisualization(structure, state) {
      * Function called on a node to get its fill color
      * @param node  The node to fill with color
      */
-    var This = this;
     var fillColor = function(node) {
         if (node.hasOwnProperty('_children') && node['_children'] != null) {
             return "lightsteelblue";
