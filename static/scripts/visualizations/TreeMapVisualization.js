@@ -114,13 +114,13 @@ function TreeMapVisualization(structure, state) {
      * Updates the graph so that it is up to date with it's associated data
      */
     function redraw(data) {
-        var width = $(".visualization").width();
-        var height = $(".visualization").height();
+        var width = $("#visualization").width();
+        var height = $("#visualization").height();
 
         treemap.size([width, height])
             .sticky(true);
 
-        var div = d3.select(".visualization").select("div")
+        var div = d3.select("#visualization").select("div")
             .style("width", width + "px")
             .style("height", height + "px");
 
@@ -136,7 +136,7 @@ function TreeMapVisualization(structure, state) {
                 return d.children ? '' : d.name;
             });
 
-        d3.select(".visualization").select("div").selectAll("div")
+        d3.select("#visualization").select("div").selectAll("div")
             .data(treemap.nodes, function(d) { return d.name;})
             .style("background", background)
             .transition()
@@ -151,15 +151,15 @@ function TreeMapVisualization(structure, state) {
      */
     this.initialize = function() {
 
-        var width = $(".visualization").width();
-        var height = $(".visualization").height();
+        var width = $("#visualization").width();
+        var height = $("#visualization").height();
 
         treemap.size([width, height])
             .sticky(true);
 
-        d3.select(".visualization").select("div").remove();
+        d3.select("#visualization").select("div").remove();
 
-        var div = d3.select(".visualization").append("div")
+        var div = d3.select("#visualization").append("div")
             .style("position", "relative")
             .style("width", width + "px")
             .style("height", height + "px");

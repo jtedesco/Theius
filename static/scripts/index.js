@@ -53,8 +53,8 @@ function changeVisualization(newVisualization, liId) {
     $('#' + liId).addClass('active');
 
     // Remove the current content of the visualization
-    $('.visualization').find('svg').remove();
-    $('.visualization').hide();
+    $('#visualization').children().remove();
+    coverVisualization();
     $('#visualizationTitle').hide();
     $('#visualizationWrapper .hero-unit').remove();
 
@@ -86,10 +86,24 @@ function changeVisualization(newVisualization, liId) {
 
 
 /**
- * Show the visualization
+ * Cover the visualization
+ */
+function coverVisualization() {
+    $('#cover').show();
+    var viz = $('#visualization');
+    $('#cover').css({
+        top:viz.position().top,
+        left:viz.position().left
+    });
+    $('#cover').width(viz.width());
+    $('#cover').height(viz.height());
+}
+
+/**
+ * Uncover/reveal
  */
 function showVisualization() {
-    $('.visualization').fadeIn('fast');
+    $('#cover').fadeOut('fast');
 }
 
 

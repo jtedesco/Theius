@@ -99,13 +99,11 @@ function TreeVisualization(structure, state) {
      * Construct the visualization for the first time
      */
     this.initialize = function() {
-        d3.select(".visualization").select("div").remove();
-        d3.select(".visualization").select("svg").remove();
-        var width = $(".visualization").width();
-        var height = $(".visualization").height();
+        var width = $("#visualization").width();
+        var height = $("#visualization").height();
 
         // add main svg element
-        var graph = d3.select(".visualization").append("svg")
+        var graph = d3.select("#visualization").append("svg")
             .attr("width", width)
             .attr("height", height)
             .append("g")
@@ -144,11 +142,11 @@ function TreeVisualization(structure, state) {
         var duration = 200;
 
         //update width and height
-        var width = $(".visualization").width();
-        var height = $(".visualization").height();
+        var width = $("#visualization").width();
+        var height = $("#visualization").height();
         tree.size([width, height-100]);
 
-        var graph = d3.select(".visualization").select("svg")
+        var graph = d3.select("#visualization").select("svg")
             .attr("width", width)
             .attr("height", height)
             .select("g");
