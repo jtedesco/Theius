@@ -314,6 +314,27 @@ function SplomVisualization(structure, state, predictions) {
 
 
     /**
+     * Return the content to put in the 'legend' div
+     */
+    this.getLegendContent = function() {
+        var content = "<table>";
+        for(var i in racks) {
+            if(racks.hasOwnProperty(i)) {
+                var rackName = racks[i];
+                content += "<tr>" +
+                        "<td>" +
+                            "<svg style='width:10px; height:10px;'><circle class='" + rackName + "' cx=5 cy=5 r=5></svg>" +
+                        "</td>" +
+                        "<td style='padding-left:10px;'>Belongs to " + rackName + "</td>" +
+                    "</tr>"
+            }
+        }
+        content += "</table>";
+        return content;
+    };
+
+
+    /**
      * Plot this visualization for the first time
      */
     this.initialize = function() {
