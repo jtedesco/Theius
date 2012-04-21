@@ -1,5 +1,5 @@
 #leftSidebar, #rightSidebar{
-    height: 880px;
+    height: 100%;
 }
 
 #visualizationTitle {
@@ -8,16 +8,18 @@
 }
 
 #visualizationWrapper {
-    height: 800px;
+    height: 600px;
+    text-align: center;
 }
 
-#leftSidebar .well, #rightSidebar .well, .visualization {
+.visualization {
     height: 100%;
 }
 
 footer {
     text-align: center;
 }
+
 
 #visualization {
     width: 100%;

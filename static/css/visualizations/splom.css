@@ -37,13 +37,17 @@ rect.frame {
 }
 
 .rack1 {
-    fill: #800;
+    fill: #ff7f0e;
 }
 
 .rack2 {
-    fill: #080;
+    fill: #d62728;
 }
 
 .rack3 {
-    fill: #008;
+    fill: #2ca02c;
+}
+
+.rack4 {
+    fill: #1f77b4;
 }

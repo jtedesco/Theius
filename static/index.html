@@ -79,8 +79,8 @@
 </div>
 
 <div class="container-fluid">
-
-    <div id="wrapper" class="row-fluid">
+    
+    <div class="row-fluid">
         <div class="span12">
             <div class="row-fluid">
                 <div id="leftSidebar" class="span2">
@@ -116,7 +116,7 @@
                                 <h4>Legend</h4><br/>
                                 <div class="well">
                                     <div id="legend">
-                                        
+
                                     </div>
                                 </div>
                             </fieldset>
@@ -168,6 +168,19 @@
         $("#dataSetSelector").change( function() {
            visualization.update();
         });
-    })
+
+        var leftSidebar = $('#leftSidebar');
+        var rightSidebar = $('#rightSidebar');
+        var mainSpan = $('.span8');
+
+        // Programmatically set the sidebars to be the same height as the center div if it's not a tablet or phone
+        if(mainSpan.position().top <= (leftSidebar.position().top + 100)) {
+            leftSidebar.height(mainSpan.height());
+            leftSidebar.children().height(mainSpan.height()-60);
+        }
+        if(rightSidebar.position().top <= (mainSpan.position().top + 100)) {
+            rightSidebar.height(mainSpan.height());
+            rightSidebar.children().height(mainSpan.height()-60);
+        }    })
 </script>
 </html>
