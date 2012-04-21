@@ -77,6 +77,22 @@ function SplomVisualization(structure, state, predictions) {
     };
 
 
+    /**
+     * Colors a point by attaching the appropriate class
+     */
+    var colorPoint = function() {
+
+    };
+
+
+    /**
+     * Sizes a point by looking at the size data set
+     */
+    var sizePoint = function(node) {
+        return getCompoundKeyFromDict(node, This.sizeDataSet) * 5;
+    };
+
+
     // Build the list form of data entries
     var values = [];
     for (var name in state) {
@@ -217,7 +233,7 @@ function SplomVisualization(structure, state, predictions) {
                 .attr("cy", function (d) {
                     return y[p.y](getCompoundKeyFromDict(d, p.y));
                 })
-                .attr("r", 3);
+                .attr("r", sizePoint);
 
             // Plot brush.
             cell.call(brush.x(x[p.x]).y(y[p.y]));
@@ -375,7 +391,7 @@ function SplomVisualization(structure, state, predictions) {
                     return y[p.y](getCompoundKeyFromDict(d, p.y));
                 })
                 .transition()
-                .attr("r", 3)
+                .attr("r", sizePoint)
                 .transition()
         };
 
