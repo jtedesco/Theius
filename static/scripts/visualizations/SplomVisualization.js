@@ -170,16 +170,16 @@ function matrixPlot(data, getCompoundKeyFromDict) {
             .data(data.values)
             .enter().append("circle")
             .attr("class", function(d) { return d.rack + ' splomCircle'; })
+            .attr("id", function(node) {
+                return node.name;
+            })
             .attr("cx", function(d) {
                 return x[p.x](getCompoundKeyFromDict(d, p.x));
             })
             .attr("cy", function(d) {
                 return y[p.y](getCompoundKeyFromDict(d, p.y));
             })
-            .attr("r", 3)
-            .attr("id", function(node) {
-                return node.name;
-            });
+            .attr("r", 3);
 
         // Plot brush.
         cell.call(brush.x(x[p.x]).y(y[p.y]));
@@ -210,7 +210,6 @@ function matrixPlot(data, getCompoundKeyFromDict) {
     // If the brush is empty, select all circles.
     function brushend() {
         if (brush.empty()) svg.selectAll("circle").attr("class", function(d) {
-            console.log(d);
             return d.rack + ' splomCircle';
         });
     }

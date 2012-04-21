@@ -50,6 +50,7 @@ class SimulatorThread(threading.Thread):
         nodeIndex = 0
         for name in machineNames:
             self.nodeInfo[name] = {
+                'name': name,
                 'cpuUsage': 0.2,
                 'memoryUsage': 0.3,
                 'contextSwitchRate': 0.1, # What is this???
