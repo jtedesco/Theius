@@ -81,7 +81,7 @@ function SplomVisualization(structure, state, predictions) {
      * Sizes a point by looking at the size data set
      */
     var sizePoint = function(node) {
-        return getCompoundKeyFromDict(node, This.sizeDataSet) * 5;
+        return getCompoundKeyFromDict(node, This.sizeDataSet) * 5 + 2;
     };
 
 
