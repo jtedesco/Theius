@@ -57,6 +57,12 @@ function TreeVisualization(structure, state) {
 
 
     /**
+     * Helper function to interpolate linearly between red and green (to give a health color, or anything else between 0 and 1)
+     */
+    var interpolateUnitValueToColor = d3.scale.linear().domain([0, 1]).interpolate(d3.interpolateRgb).range(["rgb(255,0,0)", "rgb(0,255,0)"]);
+
+
+    /**
      * Function called on a node to get its fill color
      * @param node  The node to fill with color
      */
@@ -68,15 +74,7 @@ function TreeVisualization(structure, state) {
             return 'white';
         } else {
             var value = (This.colorDataSet === 'health' ? state[node.name][This.colorDataSet] : (1-state[node.name][This.colorDataSet]));
-            if (value > 0.7) {
-                return 'green';
-            } else if (value > 0.6) {
-                return 'yellow';
-            } else if (value > 0.3) {
-                return 'orange';
-            } else {
-                return 'red';
-            }
+            return interpolateUnitValueToColor(value);
         }
     };
 

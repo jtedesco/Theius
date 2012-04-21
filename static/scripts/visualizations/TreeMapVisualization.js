@@ -54,6 +54,12 @@ function TreeMapVisualization(structure, state) {
 
 
     /**
+     * Helper function to interpolate linearly between red and green (to give a health color, or anything else between 0 and 1)
+     */
+    var interpolateUnitValueToColor = d3.scale.linear().domain([0, 1]).interpolate(d3.interpolateRgb).range(["rgb(255,0,0)", "rgb(0,255,0)"]);
+
+
+    /**
      * Colors the rectangle
      */
     var background = function (node) {
@@ -62,15 +68,7 @@ function TreeMapVisualization(structure, state) {
                 return color(state[node.name][This.colorDataSet]);
             } else {
                 var value = This.colorDataSet === 'health' ? state[node.name][This.colorDataSet] : (1-state[node.name][This.colorDataSet]);
-                if (value > 0.7) {
-                    return 'green';
-                } else if (value > 0.6) {
-                    return 'yellow';
-                } else if (value > 0.3) {
-                    return 'orange';
-                } else {
-                    return 'red';
-                }
+                return interpolateUnitValueToColor(value);
             }
         } else {
             return 'white';
@@ -140,7 +138,6 @@ function TreeMapVisualization(structure, state) {
             .data(treemap.nodes, function(d) { return d.name;})
             .style("background", background)
             .transition()
-            .duration(300)
             .call(cell);
     }
 
