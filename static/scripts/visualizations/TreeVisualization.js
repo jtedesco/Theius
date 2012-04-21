@@ -84,6 +84,7 @@ function TreeVisualization(structure, state) {
         });
 
         redrawGraph(structure);
+        showVisualization();
     };
 
     /**

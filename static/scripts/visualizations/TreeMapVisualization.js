@@ -128,5 +128,6 @@ function TreeMapVisualization(structure, state) {
             .style("height", height + "px");
 
         redraw([]);
+        showVisualization();
     }
 }

@@ -33,9 +33,6 @@ function changeVisualization(newVisualization, liId) {
         // Attach mouse over listeners
         attachPopovers();
 
-        // Show the visualization if it was successfully loaded
-        $('.visualization').fadeIn('fast');
-
     } else {
         $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
     }
@@ -44,6 +41,10 @@ function changeVisualization(newVisualization, liId) {
     $('#loadingMessage').remove();
 }
 
+// Show the visualization if it was successfully loaded
+function showVisualization() {
+    $('.visualization').fadeIn('fast');
+}
 
 /**
  * Generates the popover content for a node

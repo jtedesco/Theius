@@ -52,11 +52,9 @@ function SplomVisualization(structure, state) {
 
 
     this.initialize = function() {
-        $('svg').remove();
-
         d3.select(".visualization").selectAll("div").remove();
         matrixPlot(data, getCompoundKeyFromDict);
-
+        showVisualization();
     };
 
     this.update = function() {
