@@ -87,7 +87,8 @@ function SplomVisualization(structure, state) {
 function matrixPlot(data, getCompoundKeyFromDict) {
 
     // Size parameters.
-    var size = $('.visualization').height()/data.traits.length - 10,
+    var verticalSize = $('.visualization').height()/data.traits.length - 10,
+        horizontalSize = $('.visualization').width()/data.traits.length - 10,
         padding = 20,
         n = data.traits.length;
 
@@ -98,20 +99,22 @@ function matrixPlot(data, getCompoundKeyFromDict) {
             return getCompoundKeyFromDict(machineData, trait);
         },
             domain = [d3.min(data.values, value), d3.max(data.values, value)],
-            range = [padding / 2, size - padding / 2];
+            xRange = [padding / 2, horizontalSize - padding / 2],
+            yRange = [padding / 2, verticalSize - padding / 2];
         x[trait] = d3.scale.linear()
             .domain(domain)
-            .range(range);
+            .range(xRange);
 
         y[trait] = d3.scale.linear()
             .domain(domain)
-            .range(range.slice().reverse());
+            .range(yRange.slice().reverse());
     });
 
     // Axes.
-    var axis = d3.svg.axis()
-        .ticks(5)
-        .tickSize(size * n);
+    var xAxis = d3.svg.axis()
+        .tickSize(horizontalSize * n);
+    var yAxis = d3.svg.axis()
+        .tickSize(verticalSize * n);
 
     // Brush.
     var brush = d3.svg.brush()
@@ -121,31 +124,31 @@ function matrixPlot(data, getCompoundKeyFromDict) {
 
     // Root panel.
     var svg = d3.select(".visualization").append("svg")
-        .attr("width", size * n + padding)
-        .attr("height", size * n + padding);
+        .attr("width", horizontalSize * n + padding)
+        .attr("height", verticalSize * n + padding);
 
     // X-axis.
     svg.selectAll("g.x.axis")
         .data(data.traits)
         .enter().append("g")
         .attr("class", "x axis")
-        .attr("transform", function(d, i) { return "translate(" + i * size + ",0)"; })
-        .each(function(d) { d3.select(this).call(axis.scale(x[d]).orient("bottom")); });
+        .attr("transform", function(d, i) { return "translate(" + i * horizontalSize + ",0)"; })
+        .each(function(d) { d3.select(this).call(yAxis.scale(x[d]).orient("bottom")); });
 
     // Y-axis.
     svg.selectAll("g.y.axis")
         .data(data.traits)
         .enter().append("g")
         .attr("class", "y axis")
-        .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
-        .each(function(d) { d3.select(this).call(axis.scale(y[d]).orient("right")); });
+        .attr("transform", function(d, i) { return "translate(0," + i * verticalSize + ")"; })
+        .each(function(d) { d3.select(this).call(xAxis.scale(y[d]).orient("right")); });
 
     // Cell and plot.
     var cell = svg.selectAll("g.cell")
         .data(cross(data.traits, data.traits))
         .enter().append("g")
         .attr("class", "cell")
-        .attr("transform", function(d) { return "translate(" + d.i * size + "," + d.j * size + ")"; })
+        .attr("transform", function(d) { return "translate(" + d.i * horizontalSize + "," + d.j * verticalSize + ")"; })
         .each(plot);
 
     // Titles for the diagonal.
@@ -153,7 +156,15 @@ function matrixPlot(data, getCompoundKeyFromDict) {
         .attr("x", padding)
         .attr("y", padding)
         .attr("dy", ".71em")
-        .text(function(d) { return d.x; });
+        .text(function(d) {
+            var key = d.x;
+            var keys = key.split('.');
+            if (keys.length >= 2) {
+                return keys[1];
+            } else {
+                return keys[0];
+            }
+        });
 
     function plot(p) {
         var cell = d3.select(this);
@@ -163,8 +174,8 @@ function matrixPlot(data, getCompoundKeyFromDict) {
             .attr("class", "frame")
             .attr("x", padding / 2)
             .attr("y", padding / 2)
-            .attr("width", size - padding)
-            .attr("height", size - padding);
+            .attr("width", horizontalSize - padding)
+            .attr("height", verticalSize - padding);
 
         // Plot dots.
         cell.selectAll("circle")
