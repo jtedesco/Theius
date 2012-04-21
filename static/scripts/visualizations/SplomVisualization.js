@@ -112,8 +112,10 @@ function matrixPlot(data, getCompoundKeyFromDict) {
 
     // Axes.
     var xAxis = d3.svg.axis()
+        .ticks(5)
         .tickSize(horizontalSize * n);
     var yAxis = d3.svg.axis()
+        .ticks(5)
         .tickSize(verticalSize * n);
 
     // Brush.
