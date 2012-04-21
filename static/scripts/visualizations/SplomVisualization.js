@@ -52,8 +52,11 @@ function SplomVisualization(structure, state) {
 
 
     this.initialize = function() {
+        $('svg').remove();
+
         d3.select(".visualization").selectAll("div").remove();
         matrixPlot(data, getCompoundKeyFromDict);
+
     };
 
     this.update = function() {
@@ -86,7 +89,7 @@ function SplomVisualization(structure, state) {
 function matrixPlot(data, getCompoundKeyFromDict) {
 
     // Size parameters.
-    var size = $('#visualizationWrapper').width()/data.traits.length - 10,
+    var size = $('.visualization').width()/data.traits.length - 10,
         padding = 20,
         n = data.traits.length;
 
@@ -179,7 +182,10 @@ function matrixPlot(data, getCompoundKeyFromDict) {
             .attr("cy", function(d) {
                 return y[p.y](getCompoundKeyFromDict(d, p.y));
             })
-            .attr("r", 3);
+            .attr("r", 3)
+            .on('mouseover', function() {
+                console.log('hover');
+            });
 
         // Plot brush.
         cell.call(brush.x(x[p.x]).y(y[p.y]));
