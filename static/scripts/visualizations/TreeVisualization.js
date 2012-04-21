@@ -11,11 +11,49 @@
  */
 function TreeVisualization(structure, state) {
 
+    // layout
+    var tree = d3.layout.tree();
+
+    // helper function for links
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.x, d.y]; });
+
+
+    // Selected data sets to use for color & size (respectively)
+    this.colorDataSet = null;
+    this.sizeDataSet = null;
+
+
+    // The data sets possible (same for both color & size)
+    var dataSets = {
+        health : 'Node Health (%)',
+        cpuUsage : 'Node CPU Usage (%)',
+        memoryUsage : 'Node Memory Usage (%)',
+        contextSwitchRate : 'Node Context Switch Rate (%)'
+    };
+
+
+    /**
+     * Returns the list of possible metrics on which to the node colors for this visualization
+     */
+    this.getColorDataSets = function() {
+        return dataSets;
+    };
+
+
+    /**
+     * Returns the list of possible metrics on which to the node sizes for this visualization
+     */
+    this.getSizeDataSets = function() {
+        return dataSets;
+    };
+
 
     /**
      * Function called on a node to get its fill color
      * @param node  The node to fill with color
      */
+    var This = this;
     var fillColor = function(node) {
         if (node.hasOwnProperty('_children') && node['_children'] != null) {
             return "lightsteelblue";
@@ -23,7 +61,7 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 'white';
         } else {
-            var health = state[node['name']]['health'];
+            var health = state[node['name']][This.colorDataSet];
             if (health > 0.7) {
                 return 'green';
             } else if (health > 0.6) {
@@ -45,21 +83,10 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 15;
         } else {
-            var selected = $("#dataSetSelector option:selected").val();
-            if (selected == "none") {
-                return 20;
-            }
-
-            return (1-state[node.name][selected]) * 15 + 5; //radius between 5 and 20
+            return state[node.name][This.sizeDataSet] * 15 + 5; //radius between 5 and 20
         }
     };
 
-    // layout
-    var tree = d3.layout.tree();
-
-    // helper function for links
-    var diagonal = d3.svg.diagonal()
-        .projection(function(d) { return [d.x, d.y]; });
 
     /**
      * Construct the visualization for the first time

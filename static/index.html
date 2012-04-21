@@ -100,15 +100,13 @@
 
 
                                 <div class="control-group">
-                                    <label class="control-label" for="dataSetSelector">Data set</label>
+                                    <label class="control-label" for="colorDataSetSelector">Color</label>
                                     <div class="controls">
-                                        <select id="dataSetSelector" style="width:100%;">
-                                            <option value="none">None</option>
-                                            <option value="cpuUsage">CPU Usage</option>
-                                            <option value="memoryUsage">Memory Usage</option>
-                                            <option value="contextSwitchRate">Context Switch Rate</option>
-                                            <option value="health">Health</option>
-                                        </select>
+                                        <select id="colorDataSetSelector"></select>
+                                    </div>
+                                    <label class="control-label" for="sizeDataSetSelector">Size</label>
+                                    <div class="controls">
+                                        <select id="sizeDataSetSelector"></select>
                                     </div>
                                 </div>
                                 <br/>
@@ -164,11 +162,14 @@
 </body>
 <script type='text/javascript'>
     $(document).ready(function () {
-        subscribe();
-        $("#dataSetSelector").change( function() {
-           visualization.update();
-        });
 
+        // Star the visualization
+        subscribe();
+
+        // Disable option menus until loaded
+        $("select").attr('disabled', true);
+
+        // Get primary UI elements
         var leftSidebar = $('#leftSidebar');
         var rightSidebar = $('#rightSidebar');
         var mainSpan = $('.span8');

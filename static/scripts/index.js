@@ -1,3 +1,45 @@
+var initialized = false;
+
+/**
+ * Initialize the data sets by populating the option menu & setting the data sets on the visualizations
+ */
+function initializeDataSets() {
+
+    // Attach change listeners to the option menus if we haven't done so
+    if (!initialized) {
+        $("#colorDataSetSelector").change(function () {
+            chooseColorDataSet($("#colorDataSetSelector option:selected").val());
+        });
+        $("#sizeDataSetSelector").change(function () {
+            chooseSizeDataSet($("#sizeDataSetSelector option:selected").val());
+        });
+        $("select").removeAttr('disabled');
+        initialized = true;
+    }
+
+    // Populate the menus
+    var colorDataSets = visualization.getColorDataSets();
+    var sizeDataSets = visualization.getSizeDataSets();
+    populateDataSetMenu($("#colorDataSetSelector"), colorDataSets);
+    populateDataSetMenu($("#sizeDataSetSelector"), sizeDataSets);
+
+    // Choose the first entries for data sets
+    var i;
+    for (i in colorDataSets) {
+        if (colorDataSets.hasOwnProperty(i)) {
+            chooseColorDataSet(i);
+            break;
+        }
+    }
+    for (i in sizeDataSets) {
+        if (sizeDataSets.hasOwnProperty(i)) {
+            chooseSizeDataSet(i);
+            break;
+        }
+    }
+}
+
+
 /**
  * Smoothly transitions to a new visualization
  *
@@ -22,8 +64,9 @@ function changeVisualization(newVisualization, liId) {
     // Update the visualization variable
     visualization = newVisualization;
     if(visualization != null) {
+        initializeDataSets();
+        // Initialize the visualization it self
         visualization.initialize();
-        visualization.update([]);
 
         // Show the title for the visualization
         var visualizationTitle = $('#visualizationTitle');
@@ -41,16 +84,20 @@ function changeVisualization(newVisualization, liId) {
     $('#loadingMessage').remove();
 }
 
-// Show the visualization if it was successfully loaded
+
+/**
+ * Show the visualization
+ */
 function showVisualization() {
     $('.visualization').fadeIn('fast');
 }
+
 
 /**
  * Generates the popover content for a node
  *  @param node The node for which to generate the popover data
  */
-function generateNodeContent(node) {
+function generateNodePopoverContent(node) {
 
     function formatNum(num) {
         return num.toFixed(2);
@@ -83,7 +130,7 @@ function attachPopovers() {
             nodeElement.attr('data-content', function() {
 
                 var node = clusterState[nodeName];
-                return generateNodeContent(node);
+                return generateNodePopoverContent(node);
             });
             nodeElement.popover({ delay: {
                 show: 100,
@@ -93,6 +140,7 @@ function attachPopovers() {
     }
 }
 
+
 /**
  * Update the information in the node popup, given the updated state
  *  @param stateChange  The state that has changed from the update
@@ -100,7 +148,46 @@ function attachPopovers() {
 function updateNodePopovers(stateChange) {
     for(var nodeName in stateChange) {
         if(stateChange.hasOwnProperty(nodeName)) {
-            $('.popover-content').html(generateNodeContent(clusterState[nodeName]));
+            $('.popover-content').html(generateNodePopoverContent(clusterState[nodeName]));
         }
     }
+}
+
+
+/**
+ * Populate the color or size data set option menu
+ *  @param  optionMenu          The jQuery selection of the corresponding option menu
+ *  @param  possibleDataSets    The possible data sets of the option menu
+ */
+function populateDataSetMenu(optionMenu, possibleDataSets) {
+
+    // Drop all element currently in menu
+    optionMenu.children().remove();
+
+    // Add each item to the menu
+    for (var dataSetKey in possibleDataSets) {
+        if (possibleDataSets.hasOwnProperty(dataSetKey)) {
+            var label = possibleDataSets[dataSetKey];
+            var newOption = $('<option value="' + dataSetKey + '">' + label + '</option>');
+            optionMenu.append(newOption);
+        }
+    }
+}
+
+
+/**
+ * Change the color data set for the current visualization from the option pane's value
+ */
+function chooseColorDataSet(colorDataSet) {
+    visualization.colorDataSet = colorDataSet;
+    visualization.update();
+}
+
+
+/**
+ * Change the size data set for the current visualization from the option pane's value
+ */
+function chooseSizeDataSet(sizeDataSet) {
+    visualization.sizeDataSet = sizeDataSet;
+    visualization.update();
 }
