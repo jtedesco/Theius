@@ -87,7 +87,7 @@ function SplomVisualization(structure, state) {
 function matrixPlot(data, getCompoundKeyFromDict) {
 
     // Size parameters.
-    var size = $('.visualization').width()/data.traits.length - 10,
+    var size = $('.visualization').height()/data.traits.length - 10,
         padding = 20,
         n = data.traits.length;
 
