@@ -60,14 +60,19 @@
                             Tree Visualization
                         </a>
                     </li>
-                    <li id="matrixLink">
-                        <a href="javascript:changeVisualization(new SplomVisualization(clusterStructure, clusterState), 'matrixLink')">
-                            Scatterplot Matrix
-                        </a>
-                    </li>
                     <li id="treemapLink">
                         <a href="javascript:changeVisualization(new TreeMapVisualization(clusterStructure, clusterState), 'treemapLink')">
                             TreeMap Visualization
+                        </a>
+                    </li>
+                    <li id="usageMatrixLink">
+                        <a href="javascript:changeVisualization(new SplomVisualization(clusterStructure, clusterState, false), 'usageMatrixLink')">
+                            Resource Usage Scatterplot Matrix
+                        </a>
+                    </li>
+                    <li id="predictionMatrixLink">
+                        <a href="javascript:changeVisualization(new SplomVisualization(clusterStructure, clusterState, true), 'predictionMatrixLink')">
+                            Prediction Scatterplot Matrix
                         </a>
                     </li>
                     <li id="circlePackingLink"><a href="javascript:changeVisualization(null, 'circlePackingLink')">Circle Packing</a></li>
