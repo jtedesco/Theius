@@ -165,10 +165,7 @@ function TreeVisualization(structure, state) {
         // add circles representing computers
         nodeEnter.append("circle")
             .attr("r", 1e-6)
-            .style("fill", fillColor)
-            .attr("id", function(node) {
-                return node.name;
-            });
+            .style("fill", fillColor);
 
         // update existing nodes, with animation
         var nodeUpdate = node.transition()
