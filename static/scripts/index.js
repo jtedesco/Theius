@@ -78,6 +78,7 @@ function changeVisualization(newVisualization, liId) {
 
     } else {
         $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
+        showVisualization();
     }
 
     // Find the loading message
