@@ -409,7 +409,7 @@ function SplomVisualization(structure, state, predictions) {
         };
 
         // Cell and plot
-        var svg = d3.select("svg");
+        var svg = d3.select("#visualization svg");
         var cell = svg.selectAll("g.cell")
             .each(replot);
 
