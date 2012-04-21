@@ -89,7 +89,6 @@ function SplomVisualization(structure, state, predictions) {
     // Build the list of rack names
     var racks = buildRacksData();
 
-
     // The core data for the visualization
     var data = {
         traits: traits,
@@ -97,14 +96,28 @@ function SplomVisualization(structure, state, predictions) {
         values: values
     };
 
-
     // Size parameters.
     var verticalSize = $('#visualization').height()/data.traits.length - 10,
         horizontalSize = $('#visualization').width()/data.traits.length - 10,
         padding = 20;
 
-
     /**
+     * Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
+     */
+    var getCompoundKeyFromDict = function(dictionary, key) {
+        var keys = key.split('.');
+        if (keys.length > 2) {
+            console.log('Cannot use more than one level of nested keys!');
+            return null;
+        } else if (keys.length === 2) {
+            return dictionary[keys[0]][keys[1]];
+        } else {
+            return dictionary[keys[0]];
+        }
+    };
+
+
+   /**
      * Convert the node data (in 'data.values') into points for plotting
      */
     var convertDataToPoints = function() {
@@ -130,19 +143,117 @@ function SplomVisualization(structure, state, predictions) {
     };
 
 
+    // Helper function for computing the grid of cells
+    function cross(a, b) {
+        var c = [], n = a.length, m = b.length, i, j;
+        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x:a[i], i:i, y:b[j], j:j});
+        return c;
+    }
+
+
     /**
-     * Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
+     * Initialize the axises for the entire plot matrix
      */
-    var getCompoundKeyFromDict = function(dictionary, key) {
-        var keys = key.split('.');
-        if (keys.length > 2) {
-            console.log('Cannot use more than one level of nested keys!');
-            return null;
-        } else if (keys.length === 2) {
-            return dictionary[keys[0]][keys[1]];
-        } else {
-            return dictionary[keys[0]];
-        }
+    var initializeAxises = function(svg, yAxis, x, xAxis, y) {
+
+        // X-axis.
+        svg.selectAll("g.x.axis")
+            .data(data.traits)
+            .enter().append("g")
+            .attr("class", "x axis")
+            .attr("transform", function (d, i) {
+                return "translate(" + i * horizontalSize + ",0)";
+            })
+            .each(function (d) {
+                d3.select(this).call(yAxis.scale(x[d]).orient("bottom"));
+            });
+
+        // Y-axis.
+        svg.selectAll("g.y.axis")
+            .data(data.traits)
+            .enter().append("g")
+            .attr("class", "y axis")
+            .attr("transform", function (d, i) {
+                return "translate(0," + i * verticalSize + ")";
+            })
+            .each(function (d) {
+                d3.select(this).call(xAxis.scale(y[d]).orient("right"));
+            });
+    };
+
+
+    /**
+     * Helper function to initialize all cells
+     */
+    var plotCells = function(svg, x, y, brush) {
+
+        /**
+         * Helper function to plot all points for a cell
+         */
+        var plot = function (p) {
+            var cell = d3.select(this);
+
+            // Plot frame.
+            cell.append("rect")
+                .attr("class", "frame")
+                .attr("x", padding / 2)
+                .attr("y", padding / 2)
+                .attr("width", horizontalSize - padding)
+                .attr("height", verticalSize - padding);
+
+            // Plot dots.
+            cell.selectAll("circle")
+                .data(data.values)
+                .enter().append("circle")
+                .attr("class", function (d) {
+                    return d.rack + ' splomCircle';
+                })
+                .attr("id", function (node) {
+                    return node.name;
+                })
+                .attr("cx", function (d) {
+                    return x[p.x](getCompoundKeyFromDict(d, p.x));
+                })
+                .attr("cy", function (d) {
+                    return y[p.y](getCompoundKeyFromDict(d, p.y));
+                })
+                .attr("r", 3);
+
+            // Plot brush.
+            cell.call(brush.x(x[p.x]).y(y[p.y]));
+        };
+
+        // Cell and plot.
+        var cell = svg.selectAll("g.cell")
+            .data(cross(data.traits, data.traits))
+            .enter().append("g")
+            .attr("class", "cell")
+            .attr("transform", function (d) {
+                return "translate(" + d.i * horizontalSize + "," + d.j * verticalSize + ")";
+            })
+            .each(plot);
+
+        // Add titles for the diagonal cells
+        cell.filter(function (d) {
+                return d.i == d.j;
+            })
+            .append("text")
+            .attr("x", padding)
+            .attr("y", padding)
+            .attr("dy", ".71em")
+            .text(function (d) {
+                var key = d.x;
+
+                // Take only the second part of a compound key, or the full key for a non-compound one
+                var keys = key.split('.');
+                if (keys.length >= 2) {
+                    return keys[1];
+                } else {
+                    return keys[0];
+                }
+            });
+
+        return cell;
     };
 
 
@@ -186,12 +297,12 @@ function SplomVisualization(structure, state, predictions) {
     };
 
 
-    // Helper function for computing the grid of cells
-    function cross(a, b) {
-        var c = [], n = a.length, m = b.length, i, j;
-        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x:a[i], i:i, y:b[j], j:j});
-        return c;
-    }
+    /**
+     * Get the title of this visualization
+     */
+    this.title = function() {
+        return "Scatterplot Matrix Showing Probabilities of Event Types by Rack"
+    };
 
 
     /**
@@ -223,95 +334,11 @@ function SplomVisualization(structure, state, predictions) {
             .attr("width", horizontalSize * n + padding)
             .attr("height", verticalSize * n + padding);
 
-        // X-axis.
-        svg.selectAll("g.x.axis")
-            .data(data.traits)
-            .enter().append("g")
-            .attr("class", "x axis")
-            .attr("transform", function (d, i) {
-                return "translate(" + i * horizontalSize + ",0)";
-            })
-            .each(function (d) {
-                d3.select(this).call(yAxis.scale(x[d]).orient("bottom"));
-            });
+        // Initialize the axises for all cells
+        initializeAxises(svg, yAxis, x, xAxis, y);
 
-        // Y-axis.
-        svg.selectAll("g.y.axis")
-            .data(data.traits)
-            .enter().append("g")
-            .attr("class", "y axis")
-            .attr("transform", function (d, i) {
-                return "translate(0," + i * verticalSize + ")";
-            })
-            .each(function (d) {
-                d3.select(this).call(xAxis.scale(y[d]).orient("right"));
-            });
-
-        // Cell and plot.
-        var cell = svg.selectAll("g.cell")
-            .data(cross(data.traits, data.traits))
-            .enter().append("g")
-            .attr("class", "cell")
-            .attr("transform", function (d) {
-                return "translate(" + d.i * horizontalSize + "," + d.j * verticalSize + ")";
-            })
-            .each(plot);
-
-        // Add titles for the diagonal cells
-        cell.filter(
-            function (d) {
-                return d.i == d.j;
-            }).append("text")
-            .attr("x", padding)
-            .attr("y", padding)
-            .attr("dy", ".71em")
-            .text(function (d) {
-                var key = d.x;
-
-                // Take only the second part of a compound key, or the full key for a non-compound one
-                var keys = key.split('.');
-                if (keys.length >= 2) {
-                    return keys[1];
-                } else {
-                    return keys[0];
-                }
-            });
-
-        /**
-         * Plot the visualization for the first time, including all graphs in the matrix and points
-         */
-        function plot(p) {
-            var cell = d3.select(this);
-
-            // Plot frame.
-            cell.append("rect")
-                .attr("class", "frame")
-                .attr("x", padding / 2)
-                .attr("y", padding / 2)
-                .attr("width", horizontalSize - padding)
-                .attr("height", verticalSize - padding);
-
-            // Plot dots.
-            cell.selectAll("circle")
-                .data(data.values)
-                .enter().append("circle")
-                .attr("class", function (d) {
-                    return d.rack + ' splomCircle';
-                })
-                .attr("id", function (node) {
-                    return node.name;
-                })
-                .attr("cx", function (d) {
-                    return x[p.x](getCompoundKeyFromDict(d, p.x));
-                })
-                .attr("cy", function (d) {
-                    return y[p.y](getCompoundKeyFromDict(d, p.y));
-                })
-                .attr("r", 3);
-
-            // Plot brush.
-            cell.call(brush.x(x[p.x]).y(y[p.y]));
-        }
+        // Init
+        var cell = plotCells(svg, x, y, brush);
 
         // Setup the brush listeners (for clicking & selecting points)
         initializeBrushes(svg, brush, cell, x, y);
@@ -320,6 +347,10 @@ function SplomVisualization(structure, state, predictions) {
         showVisualization();
     };
 
+
+    /**
+     * Updates the splom visualization by looking at the newest cluster state
+     */
     this.update = function() {
 
         // Convert the data for nodes into points to be plotted
@@ -327,7 +358,10 @@ function SplomVisualization(structure, state, predictions) {
         var x = __ret.x;
         var y = __ret.y;
 
-        function replot(p) {
+        /**
+         * Helper function to replot a set of points on a cell (just moving points, not redrawing them)
+         */
+        var replot = function(p) {
 
             var cell = d3.select(this);
 
@@ -343,17 +377,12 @@ function SplomVisualization(structure, state, predictions) {
                 .transition()
                 .attr("r", 3)
                 .transition()
-        }
-
+        };
 
         // Cell and plot
         var svg = d3.select("svg");
         var cell = svg.selectAll("g.cell")
             .each(replot);
 
-    };
-
-    this.title = function() {
-        return "Scatterplot Matrix Showing Probabilities of Event Types by Rack"
     };
 }
