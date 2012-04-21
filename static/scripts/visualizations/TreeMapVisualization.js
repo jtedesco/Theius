@@ -79,6 +79,49 @@ function TreeMapVisualization(structure, state) {
         return state[node.name][This.sizeDataSet];
     };
 
+    // Build the list of rack names
+    var racks = buildRacksData();
+
+    /**
+     * Return the content to put in the 'legend' div
+     */
+    this.getLegendContent = function() {
+        if(This.colorDataSet === 'rack') {
+
+            // Create a divs
+            var content = "<table>";
+            for(var i in racks) {
+                if(racks.hasOwnProperty(i)) {
+                    var rackName = racks[i];
+                    content += "<tr>" +
+                            "<td>" +
+                                "<div style='width:10px; height:10px; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color:" + color(rackName) + "'></div>" +
+                            "</td>" +
+                            "<td style='padding-left:10px;'>Belongs to " + rackName + "</td>" +
+                        "</tr>"
+                }
+            }
+            content += "</table>";
+            return content;
+        } else {
+            return "<table>" +
+                "<tr>" +
+                    "<td>" +
+                        "<div style='width:10px; height:10px; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color:" + interpolateUnitValueToColor(1.0) + "'></div>" +                    "</td>" +
+                    "<td style='padding-left:10px;'>" + This.getColorDataSets()[This.colorDataSet] + " of 1.0</td>" +
+                "</tr>" +
+                "<tr>" +
+                    "<td>" +
+                        "<div style='width:10px; height:10px; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color:" + interpolateUnitValueToColor(0.0) + "'></div>" +
+                    "</td>" +
+                    "<td style='padding-left:10px;'>" + This.getColorDataSets()[This.colorDataSet] + " of 0.0</td>" +
+                "</tr>" +
+            "</table>"
+        }
+    };
+
+
+
     /**
      * Gives the title for this visualization
      */
