@@ -129,25 +129,19 @@ function subscribe() {
 
 
 /**
- * Handle a successful subscribe, record client id & log it
- *  @param data The successful subscribe data
+ * Build a list of the racks
  */
-function subscribeSuccess(data) {
-
-    // Get info returned from simulator on subscribe
-    clientId = data['clientId'];
-    clusterState = data['currentState'];
-    clusterStructure = data['structure'];
+function buildRacksData() {
 
     // Get the racks to build the categories list of points
     var racks = [];
-    if(clusterStructure.hasOwnProperty('children')) {
-        for(var i in clusterStructure['children']) {
+    if (clusterStructure.hasOwnProperty('children')) {
+        for (var i in clusterStructure['children']) {
             if (clusterStructure['children'].hasOwnProperty(i)) {
                 var rack = clusterStructure['children'][i];
                 var rackName = rack['name'];
 
-                if($.inArray(rackName, racks) < 0) {
+                if ($.inArray(rackName, racks) < 0) {
                     racks.push(rackName);
                 }
 
@@ -161,6 +155,23 @@ function subscribeSuccess(data) {
             }
         }
     }
+    return racks;
+}
+
+
+/**
+ * Handle a successful subscribe, record client id & log it
+ *  @param data The successful subscribe data
+ */
+function subscribeSuccess(data) {
+
+    // Get info returned from simulator on subscribe
+    clientId = data['clientId'];
+    clusterState = data['currentState'];
+    clusterStructure = data['structure'];
+
+    // Add the 'rack' to each node
+    buildRacksData();
 
     // Build the default visualization
     changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')  ;

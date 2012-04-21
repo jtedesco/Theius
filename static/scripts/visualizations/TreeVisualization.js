@@ -21,6 +21,8 @@ function TreeVisualization(structure, state) {
 
     // Selected data sets to use for color & size (respectively)
     var This = this;
+    this.sizeDataSet = null;
+    this.colorDataSet = null;
     this.setColorDataSet = function(dataSet) {
         This.colorDataSet = dataSet;
     };
@@ -65,12 +67,12 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 'white';
         } else {
-            var health = state[node['name']][This.colorDataSet];
-            if (health > 0.7) {
+            var value = (This.colorDataSet === 'health' ? state[node.name][This.colorDataSet] : (1-state[node.name][This.colorDataSet]));
+            if (value > 0.7) {
                 return 'green';
-            } else if (health > 0.6) {
+            } else if (value > 0.6) {
                 return 'yellow';
-            } else if (health > 0.3) {
+            } else if (value > 0.3) {
                 return 'orange';
             } else {
                 return 'red';
@@ -87,7 +89,8 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 15;
         } else {
-            return state[node.name][This.sizeDataSet] * 15 + 5; //radius between 5 and 20
+            var value = (This.sizeDataSet === 'health' ? (1-state[node.name][This.sizeDataSet]) : state[node.name][This.sizeDataSet]);
+            return value * 15 + 5; //radius between 5 and 20
         }
     };
 

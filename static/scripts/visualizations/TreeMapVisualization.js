@@ -11,19 +11,74 @@
 */
 function TreeMapVisualization(structure, state) {
 
-    var color = d3.scale.category20c();
+    var color = d3.scale.category20();
 
-    var background = function (d) {
-        return d.children ? color(d.name) : null;
+
+    // Selected data sets to use for color & size (respectively)
+    var This = this;
+    this.sizeDataSet = null;
+    this.colorDataSet = null;
+    this.setColorDataSet = function(dataSet) {
+        This.colorDataSet = dataSet;
+    };
+    this.setSizeDataSet = function(dataSet) {
+        This.sizeDataSet = dataSet;
     };
 
-    var value = function (d) {
-        var selected = $("#dataSetSelector option:selected").val();
-        if (selected == "none") {
-            return 5;
-        }
 
-        return state[d.name][selected];
+    /**
+     * Returns the list of possible metrics on which to the node colors for this visualization
+     */
+    this.getColorDataSets = function() {
+        return {
+            rack : 'By Rack',
+            health : 'Node Health (%)',
+            cpuUsage : 'Node CPU Usage (%)',
+            memoryUsage : 'Node Memory Usage (%)',
+            contextSwitchRate : 'Node Context Switch Rate (%)'
+        };
+    };
+
+
+    /**
+     * Returns the list of possible metrics on which to the node sizes for this visualization
+     */
+    this.getSizeDataSets = function() {
+        return {
+            health : 'Node Health (%)',
+            cpuUsage : 'Node CPU Usage (%)',
+            memoryUsage : 'Node Memory Usage (%)',
+            contextSwitchRate : 'Node Context Switch Rate (%)'
+        };
+    };
+
+
+    /**
+     * Colors the rectangle
+     */
+    var background = function (node) {
+        if(!node.children) {
+            if(This.colorDataSet === 'rack') {
+                return color(state[node.name][This.colorDataSet]);
+            } else {
+                var value = This.colorDataSet === 'health' ? state[node.name][This.colorDataSet] : (1-state[node.name][This.colorDataSet]);
+                if (value > 0.7) {
+                    return 'green';
+                } else if (value > 0.6) {
+                    return 'yellow';
+                } else if (value > 0.3) {
+                    return 'orange';
+                } else {
+                    return 'red';
+                }
+            }
+        } else {
+            return 'white';
+        }
+    };
+
+    var value = function (node) {
+        return state[node.name][This.sizeDataSet];
     };
 
     /**
@@ -78,7 +133,7 @@ function TreeMapVisualization(structure, state) {
                 return node.name;
             })
             .text(function (d) {
-                return d.name;
+                return d.children ? '' : d.name;
             });
 
         d3.select(".visualization").select("div").selectAll("div")
