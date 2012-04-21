@@ -30,6 +30,9 @@ function changeVisualization(newVisualization, liId) {
         visualizationTitle.html("<h3>" + visualization.title() + "</h3>");
         visualizationTitle.show();
 
+        // Attach mouse over listeners
+        attachPopovers();
+
         // Show the visualization if it was successfully loaded
         $('.visualization').fadeIn('fast');
 
@@ -39,4 +42,64 @@ function changeVisualization(newVisualization, liId) {
 
     // Find the loading message
     $('#loadingMessage').remove();
+}
+
+
+/**
+ * Generates the popover content for a node
+ *  @param node The node for which to generate the popover data
+ */
+function generateNodeContent(node) {
+
+    function formatNum(num) {
+        return num.toFixed(2);
+    }
+
+    return "<table>" +
+        "<tr><td style='width:220px;'><b>CPU Usage:&nbsp;&nbsp;</b></td><td style='width:90px;>" + formatNum(node['cpuUsage']) + "</td></tr>" +
+        "<tr><td><b>Memory Usage:&nbsp;&nbsp;</b></td><td>" + formatNum(node['memoryUsage']) + "</td></tr>" +
+        "<tr><td><b>Context Switch Rate:&nbsp;&nbsp;</b></td><td>" + formatNum(node['contextSwitchRate']) + "</td></tr>" +
+        "<tr><td><b>Last Failure Time:&nbsp;&nbsp;</b></td><td'>" + node['lastFailureTime'] + "</td></tr>" +
+        "<tr><td><b>Predicted Failure Time:&nbsp;&nbsp;</b></td><td>" + node['predictedFailureTime'] + "</td></tr>" +
+        "<tr><td><b>Prob of FATAL Event:&nbsp;&nbsp;</b></td><td>" + formatNum(node['predictedSeverityProbabilities']['FATAL']) + "</td></tr>" +
+        "<tr><td><b>Prob of ERROR Event:&nbsp;&nbsp;</b></td><td>" + formatNum(node['predictedSeverityProbabilities']['ERROR']) + "</td></tr>" +
+        "<tr><td><b>Prob of WARN Event:&nbsp;&nbsp;</b></td><td>" + formatNum(node['predictedSeverityProbabilities']['WARN']) + "</td></tr>" +
+        "<tr><td><b>Prob of INFO Event:&nbsp;&nbsp;</b></td><td>" + formatNum(node['predictedSeverityProbabilities']['INFO']) + "</td></tr>" +
+        "<tr><td><b>Estimated Health:&nbsp;&nbsp;</b></td><td>" + formatNum(node['health']) + "</td></tr>" +
+        "</table>";
+}
+
+
+/**
+ * Attach popovers for all nodes
+ */
+function attachPopovers() {
+    for(var nodeName in clusterState) {
+        if(clusterState.hasOwnProperty(nodeName)) {
+
+            var nodeElement = $('#' + nodeName);
+            nodeElement.attr('data-original-title', '<i>' + nodeName + '</i> information');
+            nodeElement.attr('data-content', function() {
+
+                var node = clusterState[nodeName];
+                return generateNodeContent(node);
+            });
+            nodeElement.popover({ delay: {
+                show: 100,
+                hide: 100
+            }});
+        }
+    }
+}
+
+/**
+ * Update the information in the node popup, given the updated state
+ *  @param stateChange  The state that has changed from the update
+ */
+function updateNodePopovers(stateChange) {
+    for(var nodeName in stateChange) {
+        if(stateChange.hasOwnProperty(nodeName)) {
+            $('.popover-content').html(generateNodeContent(clusterState[nodeName]));
+        }
+    }
 }

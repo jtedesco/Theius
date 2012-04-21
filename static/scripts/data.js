@@ -36,6 +36,7 @@ function update(data) {
         // Update the global cluster state
         var stateChange = data['stateChange'];
         updateClusterState(stateChange);
+        updateNodePopovers(stateChange);
 
         // Update the visualization
         if(visualization && visualization!=null) {
