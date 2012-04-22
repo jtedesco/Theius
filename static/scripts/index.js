@@ -160,6 +160,35 @@ function attachPopovers() {
 
 
 /**
+ * Toggle play/pause of visualization
+ */
+function togglePlayPause() {
+
+    // Get handles on UI elements
+    var playPauseBtn = $('#playPauseBtn');
+    var playPauseDiv = playPauseBtn.children('div');
+    var playPauseStatus = $('#playPauseStatus');
+
+    if(playing) {
+
+        // Update UI
+        playPauseDiv.removeClass('icon-pause');
+        playPauseDiv.addClass('icon-play');
+        playPauseStatus.text('Resume Viz')
+
+    } else {
+
+        // Update UI
+        playPauseDiv.removeClass('icon-play');
+        playPauseDiv.addClass('icon-pause');
+        playPauseStatus.text('Pause Viz')
+    }
+
+    playing = !playing;
+}
+
+
+/**
  * Update the information in the node popup, given the updated state
  *  @param stateChange  The state that has changed from the update
  */

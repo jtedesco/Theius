@@ -3,34 +3,14 @@
  */
 function ChordDiagramVisualization(structure, state) {
 
-
     // Selected data sets to use for color & size (respectively)
     var This = this;
-
-
-    /**
-     * Helper function to return the value of some dictionary or nested dictionary by splitting on '.' character
-     */
-    var getCompoundKeyFromDict = function(dictionary, key) {
-        var keys = key.split('.');
-        if (keys.length > 2) {
-            console.log('Cannot use more than one level of nested keys!');
-            return null;
-        } else if (keys.length === 2) {
-            return dictionary[keys[0]][keys[1]];
-        } else {
-            return dictionary[keys[0]];
-        }
-    };
-
 
     // Holds the list of machines (in the order in which they appear in the data matrix)
     var machines = null;
 
-
     // Holds the current matrix of data
     var matrix = null;
-
 
     // Build the list of rack names
     var racks = buildRacksData();

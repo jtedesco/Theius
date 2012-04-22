@@ -68,35 +68,6 @@ function update(data) {
 
 
 /**
- * Toggle play/pause of visualization
- */
-function togglePlayPause() {
-
-    // Get handles on UI elements
-    var playPauseBtn = $('#playPauseBtn');
-    var playPauseDiv = playPauseBtn.children('div');
-    var playPauseStatus = $('#playPauseStatus');
-
-    if(playing) {
-
-        // Update UI
-        playPauseDiv.removeClass('icon-pause');
-        playPauseDiv.addClass('icon-play');
-        playPauseStatus.text('Resume Viz')
-
-    } else {
-
-        // Update UI
-        playPauseDiv.removeClass('icon-play');
-        playPauseDiv.addClass('icon-pause');
-        playPauseStatus.text('Pause Viz')
-    }
-
-    playing = !playing;
-}
-
-
-/**
  * Update the cluster state based on the state change provided by the simulator
  */
 function updateClusterState(stateChange) {
