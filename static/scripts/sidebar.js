@@ -43,7 +43,8 @@ function updateRightSideBar(state) {
 
     // add new nodes, which should slide in from the left
     var healthEnter = health.enter().append("g")
-        .attr("transform", position(-100));
+        .attr("transform", position(-100))
+        .style("opacity", 1.0);
 
     healthEnter.append("text")
         .attr("class" , "sidebarText")
