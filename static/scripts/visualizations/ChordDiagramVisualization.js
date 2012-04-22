@@ -255,13 +255,6 @@ function ChordDiagramVisualization(structure, state) {
                     + "translate(" + outerRadius + ",0)";
             });
 
-        ticks.append("line")
-            .attr("x1", 1)
-            .attr("y1", 0)
-            .attr("x2", 5)
-            .attr("y2", 0)
-            .style("stroke", "#000");
-
         ticks.append("text")
             .attr("x", 8)
             .attr("dy", ".35em")
