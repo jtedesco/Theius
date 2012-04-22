@@ -90,6 +90,37 @@ function ChordDiagramVisualization(structure, state) {
     };
 
 
+    /**
+     * Returns an event handler for fading a given chord group to a specified opacity
+     *  @param  opacity The new opacity of the chord group
+     */
+    var fadeToOpacity = function(opacity) {
+        var svg = d3.select("#visualization");
+        return function(g, i) {
+            svg.selectAll("g.chord path")
+                .filter(function(d) {
+                    return d.source.index != i && d.target.index != i;
+                })
+                .transition()
+                .style("opacity", opacity);
+        };
+    };
+
+
+    /**
+     * Returns an array of tick angles and labels, given a group.
+     */
+    var groupTicks = function(d) {
+        var k = (d.endAngle - d.startAngle) / d.value;
+        return d3.range(0, d.value, 1000).map(function(v, i) {
+            return {
+                angle: v * k + d.startAngle,
+                label: i % 5 ? null : v / 1000 + "k"
+            };
+        });
+    };
+
+
     this.initialize = function() {
 
         // From http://mkweb.bcgsc.ca/circos/guide/tables/
@@ -126,8 +157,8 @@ function ChordDiagramVisualization(structure, state) {
             .style("fill", function(d) { return fill(d.index); })
             .style("stroke", function(d) { return fill(d.index); })
             .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-            .on("mouseover", fade(.1))
-            .on("mouseout", fade(1));
+            .on("mouseover", fadeToOpacity(.1))
+            .on("mouseout", fadeToOpacity(1));
 
         var ticks = svg.append("g")
             .selectAll("g")
@@ -168,28 +199,7 @@ function ChordDiagramVisualization(structure, state) {
             .attr("d", d3.svg.chord().radius(innerRadius))
             .style("opacity", 1);
 
-        /** Returns an array of tick angles and labels, given a group. */
-        function groupTicks(d) {
-            var k = (d.endAngle - d.startAngle) / d.value;
-            return d3.range(0, d.value, 1000).map(function(v, i) {
-                return {
-                    angle: v * k + d.startAngle,
-                    label: i % 5 ? null : v / 1000 + "k"
-                };
-            });
-        }
 
-        /** Returns an event handler for fading a given chord group. */
-        function fade(opacity) {
-            return function(g, i) {
-                svg.selectAll("g.chord path")
-                    .filter(function(d) {
-                        return d.source.index != i && d.target.index != i;
-                    })
-                    .transition()
-                    .style("opacity", opacity);
-            };
-        }
 
         showVisualization();
     };
