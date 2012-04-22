@@ -29,6 +29,9 @@ function ChordDiagramVisualization(structure, state) {
     // Holds the current matrix of data
     var matrix = null;
 
+    // Build the list of rack names
+    var racks = buildRacksData();
+
     /**
      * Build the matrix of node-node comparisons (that will represent the outer chords & arcs of the diagram). We use the
      *  sizeDataSet property of the visualization to generate this data (all data is assumed to be in the range [0,1].
@@ -156,7 +159,24 @@ function ChordDiagramVisualization(structure, state) {
 
 
     this.getLegendContent = function() {
-        return "Some legend";
+
+        var color = d3.scale.category20();
+
+        // Create a divs
+        var content = "<table>";
+        for(var i in racks) {
+            if(racks.hasOwnProperty(i)) {
+                var rackName = racks[i];
+                content += "<tr>" +
+                    "<td>" +
+                    "<div style='width:10px; height:10px; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color:" + color(rackName) + "'></div>" +
+                    "</td>" +
+                    "<td style='padding-left:10px;'>Belongs to " + rackName + "</td>" +
+                    "</tr>"
+            }
+        }
+        content += "</table>";
+        return content;
     };
 
 
