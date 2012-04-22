@@ -154,7 +154,7 @@ function ChordDiagramVisualization(structure, state) {
 
 
     this.title = function() {
-        return "Some title";
+        return "Chord Diagram of Similarity Between Nodes";
     };
 
 
@@ -201,13 +201,11 @@ function ChordDiagramVisualization(structure, state) {
      * Returns an array of tick angles and labels, given a group.
      */
     var groupTicks = function(d) {
-        var k = (d.endAngle - d.startAngle) / d.value;
-        return d3.range(0, d.value, 1000).map(function(v, i) {
-            return {
-                angle: v * k + d.startAngle,
-                label: i % 5 ? null : v / 1000 + "k"
-            };
-        });
+        var k = (d.endAngle - d.startAngle) / 2;
+        return [{
+            angle: k + d.startAngle,
+            label: machines[d.index].name
+        }];
     };
 
 
@@ -219,13 +217,13 @@ function ChordDiagramVisualization(structure, state) {
             .sortSubgroups(d3.descending)
             .matrix(buildMatrixData());
 
-        var width = 600,
-            height = 600,
-            innerRadius = Math.min(width, height) * .41,
-            outerRadius = innerRadius * 1.1;
+        var width = $("#visualization").width(),
+            height = $("#visualization").height(),
+            innerRadius = Math.min(width, height) * .35,
+            outerRadius = innerRadius * 1.11;
 
         var fill = d3.scale.ordinal()
-            .domain(d3.range(4))
+            .domain(d3.range(machines.length))
             .range(buildMatrixColors());
 
         var svg = d3.select("#visualization")
@@ -280,7 +278,8 @@ function ChordDiagramVisualization(structure, state) {
             .selectAll("path")
             .data(chord.chords)
             .enter().append("path")
-            .style("fill", function(d) { return fill(d.target.index); })
+            .style("fill", function(d) {return fill(d.target.index); })
+            .style("stroke", "rgba(0, 0, 0, 0.1)")
             .attr("d", d3.svg.chord().radius(innerRadius))
             .style("opacity", 1);
 
