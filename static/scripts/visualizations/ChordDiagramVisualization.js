@@ -23,14 +23,18 @@ function ChordDiagramVisualization(structure, state) {
         }
     };
 
+
     // Holds the list of machines (in the order in which they appear in the data matrix)
     var machines = null;
+
 
     // Holds the current matrix of data
     var matrix = null;
 
+
     // Build the list of rack names
     var racks = buildRacksData();
+
 
     /**
      * Build the matrix of node-node comparisons (that will represent the outer chords & arcs of the diagram). We use the
@@ -39,6 +43,8 @@ function ChordDiagramVisualization(structure, state) {
     var buildMatrixData = function() {
 
         machines = [];
+
+        // Collect a list of the machines (excluding racks)
         for(var machineName in clusterState) {
             if(clusterState.hasOwnProperty(machineName)) {
                 var machineState = clusterState[machineName];
@@ -50,7 +56,9 @@ function ChordDiagramVisualization(structure, state) {
             }
         }
 
+        // Will hold the matrix of data
         matrix = [];
+
         for(machineName in machines) {
             if(machines.hasOwnProperty(machineName)) {
 
@@ -61,11 +69,19 @@ function ChordDiagramVisualization(structure, state) {
                     if(machines.hasOwnProperty(otherMachineName)) {
                         var otherMachine = machines[otherMachineName];
 
+                        // Make the diagonal entries (this machine compared to itself) 0, otherwise, actual try to get
                         if(machineName != otherMachineName) {
 
                             var machineValue = getCompoundKeyFromDict(machine, This.sizeDataSet);
                             var otherMachineValue = getCompoundKeyFromDict(otherMachine, This.sizeDataSet);
-                            matrixRow.push(Math.abs(machineValue - otherMachineValue) * 1000);
+
+                            // Cube the 'correlation' to make large correlation dominate small ones, and remove very thin arcs for performances
+                            var machineCorrelation = Math.pow(Math.abs(machineValue - otherMachineValue),3) * 1000;
+                            if(machineCorrelation < 10) {
+                                machineCorrelation = 0;
+                            }
+
+                            matrixRow.push(machineCorrelation);
 
                         } else {
                             matrixRow.push(0);
@@ -81,6 +97,9 @@ function ChordDiagramVisualization(structure, state) {
     };
 
 
+    /**
+     * Helper function to build an array of colors, corresponding to machines (in the same order as the list of
+     */
     var buildMatrixColors = function() {
 
         var color = d3.scale.category20();
@@ -153,11 +172,17 @@ function ChordDiagramVisualization(structure, state) {
     };
 
 
+    /**
+     * Gets the title for this visualization
+     */
     this.title = function() {
         return "Chord Diagram of Similarity Between Nodes";
     };
 
 
+    /**
+     * Builds the legend content
+     */
     this.getLegendContent = function() {
 
         var color = d3.scale.category20();
@@ -168,10 +193,10 @@ function ChordDiagramVisualization(structure, state) {
             if(racks.hasOwnProperty(i)) {
                 var rackName = racks[i];
                 content += "<tr>" +
-                    "<td>" +
-                    "<div style='width:10px; height:10px; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color:" + color(rackName) + "'></div>" +
-                    "</td>" +
-                    "<td style='padding-left:10px;'>Belongs to " + rackName + "</td>" +
+                        "<td>" +
+                        "<div style='width:10px; height:10px; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color:" + color(rackName) + "'></div>" +
+                        "</td>" +
+                        "<td style='padding-left:10px;'>Belongs to " + rackName + "</td>" +
                     "</tr>"
             }
         }
@@ -211,7 +236,7 @@ function ChordDiagramVisualization(structure, state) {
 
     this.initialize = function() {
 
-        // From http://mkweb.bcgsc.ca/circos/guide/tables/
+        // Build the basic chord diagram
         var chord = d3.layout.chord()
             .padding(.05)
             .sortSubgroups(d3.descending)
@@ -222,10 +247,12 @@ function ChordDiagramVisualization(structure, state) {
             innerRadius = Math.min(width, height) * .35,
             outerRadius = innerRadius * 1.11;
 
+        // Define the color scheme for
         var fill = d3.scale.ordinal()
             .domain(d3.range(machines.length))
             .range(buildMatrixColors());
 
+        // Add the diagram
         var svg = d3.select("#visualization")
             .append("svg")
             .attr("width", width)
@@ -233,6 +260,7 @@ function ChordDiagramVisualization(structure, state) {
             .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+        // Add the paths
         svg.append("g")
             .selectAll("path")
             .data(chord.groups)
@@ -243,6 +271,7 @@ function ChordDiagramVisualization(structure, state) {
             .on("mouseover", fadeToOpacity(.1))
             .on("mouseout", fadeToOpacity(1));
 
+        // Add the tick elements in place around the arc (& blocks
         var ticks = svg.append("g")
             .selectAll("g")
             .data(chord.groups)
@@ -255,6 +284,7 @@ function ChordDiagramVisualization(structure, state) {
                     + "translate(" + outerRadius + ",0)";
             });
 
+        // Add the text labels for each node
         ticks.append("text")
             .attr("x", 8)
             .attr("dy", ".35em")
@@ -266,6 +296,8 @@ function ChordDiagramVisualization(structure, state) {
             })
             .text(function(d) { return d.label; });
 
+
+        // Add the arcs for the chord diagram
         svg.append("g")
             .attr("class", "chord")
             .selectAll("path")
