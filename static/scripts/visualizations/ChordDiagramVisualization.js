@@ -23,6 +23,76 @@ function ChordDiagramVisualization(structure, state) {
         }
     };
 
+    // Holds the list of machines (in the order in which they appear in the data matrix)
+    var machines = null;
+
+    // Holds the current matrix of data
+    var matrix = null;
+
+    /**
+     * Build the matrix of node-node comparisons (that will represent the outer chords & arcs of the diagram). We use the
+     *  sizeDataSet property of the visualization to generate this data (all data is assumed to be in the range [0,1].
+     */
+    var buildMatrixData = function() {
+
+        machines = [];
+        for(var machineName in clusterState) {
+            if(clusterState.hasOwnProperty(machineName)) {
+                var machineState = clusterState[machineName];
+
+                // Only look at machines that are actually machines (not racks or the master node)
+                if(machineState.hasOwnProperty('rack')) {
+                    machines.push(machineState);
+                }
+            }
+        }
+
+        matrix = [];
+        for(machineName in machines) {
+            if(machines.hasOwnProperty(machineName)) {
+
+                var machine = machines[machineName];
+                var matrixRow = [];
+
+                for(var otherMachineName in machines) {
+                    if(machines.hasOwnProperty(otherMachineName)) {
+                        var otherMachine = machines[otherMachineName];
+
+                        if(machineName != otherMachineName) {
+
+                            var machineValue = getCompoundKeyFromDict(machine, This.sizeDataSet);
+                            var otherMachineValue = getCompoundKeyFromDict(otherMachine, This.sizeDataSet);
+                            matrixRow.push(Math.abs(machineValue - otherMachineValue) * 1000);
+
+                        } else {
+                            matrixRow.push(0);
+                        }
+                    }
+                }
+
+                matrix.push(matrixRow);
+            }
+        }
+
+        return matrix;
+    };
+
+
+    var buildMatrixColors = function() {
+
+        var color = d3.scale.category20();
+
+        var colors = [];
+
+        for(var machineName in machines) {
+            if(machines.hasOwnProperty(machineName)) {
+                colors.push(color(state[machines[machineName].name][This.colorDataSet]));
+            }
+        }
+
+        return colors;
+    };
+
 
     /**
      * Set the data set that will determine the color of arcs
@@ -86,7 +156,7 @@ function ChordDiagramVisualization(structure, state) {
 
 
     this.getLegendContent = function() {
-        return "";
+        return "Some legend";
     };
 
 
@@ -127,12 +197,7 @@ function ChordDiagramVisualization(structure, state) {
         var chord = d3.layout.chord()
             .padding(.05)
             .sortSubgroups(d3.descending)
-            .matrix([
-            [11975,  5871, 8916, 2868],
-            [ 1951, 10048, 2060, 6171],
-            [ 8010, 16145, 8090, 8045],
-            [ 1013,   990,  940, 6907]
-        ]);
+            .matrix(buildMatrixData());
 
         var width = 600,
             height = 600,
@@ -141,7 +206,7 @@ function ChordDiagramVisualization(structure, state) {
 
         var fill = d3.scale.ordinal()
             .domain(d3.range(4))
-            .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
+            .range(buildMatrixColors());
 
         var svg = d3.select("#visualization")
             .append("svg")
