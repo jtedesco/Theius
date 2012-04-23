@@ -26,7 +26,7 @@ function updateRightSideBar() {
 }
 
 /**
- * Updates rankings tab
+ * Updates Rankings tab in right sidebar
  * @param state the current state of all nodes
  */
 function updateRankings(state) {
@@ -99,6 +99,10 @@ function updateRankings(state) {
         .remove();
 }
 
+/**
+ * Updates Events Tab in right sidebar
+ * @param logs all logs in the cluster
+ */
 function updateEvents(logs) {
     // grab last ten logs
     var lastLogs = logs.slice(-10).reverse();
@@ -108,6 +112,7 @@ function updateEvents(logs) {
     var height = function(i) { return i*25 + 40};
     var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
 
+    // update svg width + height, and bind data to the elements
     var events = d3.select("#events").select("svg")
         .attr("width", $('#events').width())
         .attr("height", 600)
@@ -115,6 +120,7 @@ function updateEvents(logs) {
         .data(lastLogs, function(d) { return d.id; })
         .order();
 
+    // add new logs, which should slide in and fade in from the top
     var eventsEnter = events.enter().append("g")
         .attr("transform", function(d,i) { return "translate(0," + height(-1) + ")"; })
         .style("opacity", 0);
@@ -123,11 +129,13 @@ function updateEvents(logs) {
         .attr("class", "sidebarText")
         .text(text);
 
+    // move existing (older) logs down the list as new ones come in
     events.transition()
         .duration(500)
         .attr("transform", position(0))
         .style("opacity", 1.0);
 
+    // old logs slide off the bottom and disappear
     events.exit()
         .transition()
         .duration(500)
@@ -136,6 +144,11 @@ function updateEvents(logs) {
         .remove();
 }
 
+/**
+ * Updates the General Tab in the right sidebar
+ * @param state the current state of all nodes
+ * @param logs all logs in the cluster
+ */
 function updateGeneralTab(state, logs) {
     var avgHealth = 0,
         worstHealth = 1.0,
