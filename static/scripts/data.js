@@ -42,7 +42,7 @@ function update(data) {
         if(visualization && visualization!=null) {
             if(playing) {
                 visualization.update(logEvents);
-                updateRightSideBar(clusterState);
+                updateRightSideBar();
             } else {
                 console.log('Skipping viz update, viz is paused');
             }
@@ -145,7 +145,7 @@ function subscribeSuccess(data) {
     // Add the 'rack' to each node
     buildRacksData();
 
-    updateRightSideBar(clusterState);
+    updateRightSideBar();
 
     // Build the default visualization
     changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')  ;

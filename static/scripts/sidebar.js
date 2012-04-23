@@ -10,59 +10,78 @@
  * Updates the right side bar
  * @param state the current state of all nodes
  */
-function updateRightSideBar(state) {
+function updateRightSideBar() {
     // the current active tab
     var tab = $("#rightSidebar div.tab-content div.active").attr('id');
 
+    if (tab === "rankings") {
+        updateRankings(clusterState);
+    }
+}
+
+function updateRankings(state) {
+    // selected options
+    var key = $("#rankings-data li.active").attr("name");
+    var ascending = $("#rankings-order li.active").text() === "Ascending";
+
     // put state into array first, and sort
     var stateArray = [];
-    for (var key in state) {
-        if (state.hasOwnProperty(key) && key.search("machine") != -1) {
-            stateArray.push(state[key]);
+    for (var i in state) {
+        if (state.hasOwnProperty(i) && i.search("machine") != -1) {
+            stateArray.push(state[i]);
         }
     }
     stateArray.sort(function(a,b) {
-        return a['health'] - b['health'];
+        if (a[key] === b[key]) {
+            return a.name < b.name ? -1 : 1;
+        }
+        else if (ascending) {
+            return a[key] - b[key];
+        }
+        else {
+            return b[key] - a[key];
+        }
     });
 
     //only take first 10 sorted elements
     stateArray = stateArray.slice(0,10);
 
     //helper functions for D3
-    var text = function(d) { return d.name + ": " + d.health.toFixed(2)};
+    var text = function(d) { return d.name + ": " + d[key].toFixed(2)};
     var height = function(i) { return i*25 + 20};
     var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
 
     // update svg width + height, and bind data to the elements
-    var health = d3.select("#health").select("svg")
-        .attr("width", $('#health').width())
+    var rankings = d3.select("#rankings").select("svg")
+        .attr("width", $('#rankings').width())
         .attr("height", 600)
         .selectAll("g")
         .data(stateArray, function(d) {return d.name;})
         .order();
 
     // add new nodes, which should slide in from the left
-    var healthEnter = health.enter().append("g")
+    var rankingsEnter = rankings.enter().append("g")
         .attr("transform", position(-100))
         .style("opacity", 1.0);
 
-    healthEnter.append("text")
+    rankingsEnter.append("text")
         .attr("class" , "sidebarText")
         .text(text);
 
-    healthEnter.transition()
+    rankingsEnter.transition()
         .duration(500)
         .attr("transform", position(0));
 
     // update current nodes, which slide to their new position
-    health.transition()
+    rankings.transition()
         .duration(500)
         .attr("transform", position(0))
+        .style("opacity", 1.0)
         .select("text")
         .text(text);
 
     // exiting nodes slide to the bottom and fade off screen
-    health.exit()
+    rankings.exit()
         .transition()
         .duration(500)
         .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })
