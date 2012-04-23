@@ -301,16 +301,8 @@ function ChordDiagramVisualization(structure, state) {
     this.update = function() {
 
         if(This.sizeDataSet) {
-            console.log('updating');
-
-            var oldViz = $('#visualization svg');
-            $('#visualization svg').css({
-                position: 'absolute',
-                'z-index': 10,
-                opacity: 1.0
-            });
+            $('#visualization svg').remove();
             drawChordDiagram();
-            oldViz.remove();
         }
     }
 }
