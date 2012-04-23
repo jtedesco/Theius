@@ -20,6 +20,9 @@ function updateRightSideBar() {
     else if (tab === "events") {
         updateEvents(clusterLogs);
     }
+    else if (tab === "general") {
+        updateGeneralTab(clusterState, clusterLogs);
+    }
 }
 
 /**
@@ -99,7 +102,6 @@ function updateRankings(state) {
 function updateEvents(logs) {
     // grab last ten logs
     var lastLogs = logs.slice(-10).reverse();
-    console.log(lastLogs);
 
     //helper functions for D3
     var text = function(d) { return d.facility; };
@@ -132,4 +134,38 @@ function updateEvents(logs) {
         .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })
         .style("opacity", 0)
         .remove();
+}
+
+function updateGeneralTab(state, logs) {
+    var avgHealth = 0,
+        worstHealth = 1.0,
+        bestHealth = 0.0,
+        cpu = 0,
+        memory = 0;
+
+    // needed to compute averages
+    var count = 0;
+
+    for (var key in state){
+        if (state.hasOwnProperty(key)) {
+            var node = state[key];
+            avgHealth += node.health;
+            worstHealth = Math.min(worstHealth, node.health);
+            bestHealth = Math.max(bestHealth, node.health);
+            cpu += node.cpuUsage;
+            memory += node.memoryUsage;
+            count += 1;
+        }
+    }
+
+    avgHealth /= count;
+    cpu /= count;
+    memory /= count;
+
+    $("#general-avg-health").text((avgHealth * 100).toFixed(2));
+    $("#general-worst-health").text((worstHealth * 100).toFixed(0));
+    $("#general-best-health").text((bestHealth * 100).toFixed(0));
+    $("#general-cpu").text((cpu * 100).toFixed(2));
+    $("#general-memory").text((memory * 100).toFixed(2));
+    $("#general-total-logs").text(logs.length);
 }
