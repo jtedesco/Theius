@@ -47,11 +47,13 @@ class SimulatorInterface(object):
         nextClientId += 1
 
         # Assign this client the default simulator
-        clientSimulatorMap[clientId] = defaultSimulator
-        defaultSimulator.addClient(clientId)
+        simulator = defaultSimulator
+        clientSimulatorMap[clientId] = simulator
+        simulator.addClient(clientId)
 
         # Get the current system state
-        currentState = deepcopy(defaultSimulator.currentState())
+        currentState = deepcopy(simulator.currentState())
+        currentStructure = deepcopy(simulator.getStructure())
 
         serverLock.release()
 
@@ -60,7 +62,7 @@ class SimulatorInterface(object):
         return dumps({
             'clientId': clientId,
             'currentState': currentState,
-            'structure': networkTopology['structure']
+            'structure': currentStructure
         })
 
     @cherrypy.expose
@@ -158,10 +160,10 @@ cherrypy.engine.start()
 networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
 
 # Start the default simulator
-defaultSimulator = DefaultSimulator(networkTopology['machines'])
+defaultSimulator = DefaultSimulator(networkTopology['machines'], networkTopology['structure'])
 defaultSimulator.start()
 
 # Start the heterogeneous cluster simulator
 heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
-heterogeneousSimulator = DefaultSimulator(heterogeneousNetworkTopology['machines'])
+heterogeneousSimulator = DefaultSimulator(heterogeneousNetworkTopology['machines'], heterogeneousNetworkTopology['structure'])
 heterogeneousSimulator.start()

@@ -13,7 +13,7 @@ __author__ = 'jon'
 
 
 class DefaultSimulator(BaseSimulator):
-    def __init__(self, machineNames):
+    def __init__(self, machineNames, structure):
         """
           Initialize the simulator
         """
@@ -22,6 +22,7 @@ class DefaultSimulator(BaseSimulator):
 
         # names of all nodes
         self.machineNames = machineNames
+        self.structure = structure
 
         # Possible severities, categories, error codes, and error locations of log events (error code denoted by index of list)
         self.severities =  ['FATAL', 'WARN', 'INFO', 'ERROR']
@@ -72,6 +73,12 @@ class DefaultSimulator(BaseSimulator):
             returns the current state of the cluster
         """
         return self.nodeInfo
+
+    def getStructure(self):
+        """
+            Returns the current structure of the cluster
+        """
+        return self.structure
 
     def run(self):
         """

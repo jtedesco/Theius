@@ -126,3 +126,10 @@ class BaseSimulator(threading.Thread):
             Returns the current state of the cluster
         """
         raise NotImplementedError("Must override method 'currentState' first")
+
+    def getStructure(self):
+        """
+            Abstract method
+            Returns the current structure of the cluster
+        """
+        raise NotImplementedError("Must override method 'getStructure' first")
