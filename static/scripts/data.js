@@ -88,6 +88,33 @@ function updateClusterState(stateChange) {
     }
 }
 
+function changeDataCharacteristics(simulatorName) {
+
+    // Trigger an ajax call to the simulator server
+    $.ajax({
+        url: '/changeSimulator',
+        data: {
+            clientId: clientId,
+            simulator: simulatorName
+        },
+        data: {},
+        success: changeDataCharacteristicsSuccess,
+        error: logError,
+        dataType: 'json'
+    });
+}
+
+function changeDataCharacteristicsSuccess(data) {
+
+    if (data.hasOwnProperty("successful") && data['successful']) {
+        data['clientId'] = clientId;
+        subscribeSuccess(data);
+    }
+    else {
+        logError(data);
+    }
+}
+
 
 /**
  * Subscribe this client to log updates from the simulator
@@ -146,6 +173,7 @@ function subscribeSuccess(data) {
     clientId = data['clientId'];
     clusterState = data['currentState'];
     clusterStructure = data['structure'];
+    clusterLogs = [];
 
     // Add the 'rack' to each node
     buildRacksData();

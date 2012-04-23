@@ -242,6 +242,11 @@
             rightSidebar.height(mainSpan.height());
             rightSidebar.children().height(mainSpan.height()-60);
         }
+
+        //add listener for Data Characteristics Menu
+        $("#dataCharacteristicSelector").change(function() {
+            changeDataCharacteristics($("#dataCharacteristicSelector option:selected").val());
+        });
     })
 </script>
 </html>

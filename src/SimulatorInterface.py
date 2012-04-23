@@ -100,9 +100,15 @@ class SimulatorInterface(object):
                 'successful': False
             })
 
+        # Get the current system state
+        currentState = deepcopy(clientSimulatorMap[clientId].currentState())
+        currentStructure = deepcopy(clientSimulatorMap[clientId].getStructure())
+
         serverLock.release()
         return  dumps({
-            'successful': True
+            'successful': True,
+            'currentState': currentState,
+            'structure': currentStructure
         })
 
     @cherrypy.expose
