@@ -104,45 +104,6 @@ class SimulatorInterface(object):
         })
 
     @cherrypy.expose
-    def unsubscribe(self, clientId):
-        """
-          Removes a client from the log stream
-        """
-        clientId = int(clientId)
-
-        serverLock.acquire()
-
-        try:
-            clientSimulatorMap[clientId].removeClient(clientId)
-            del clientSimulatorMap[clientId]
-
-            # Send back the status of the unsubscribe request
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            returnMessage = dumps({
-                'successful': True
-            })
-
-        except ValueError:
-            # Send back the status of the unsubscribe request
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            returnMessage = dumps({
-                'message': 'clientId should be a valid integer client id',
-                'successful': False
-            })
-
-        except KeyError:
-            # Send back the status of the unsubscribe request
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            returnMessage = dumps({
-                'message': 'Not subscribed',
-                'successful': False
-            })
-
-        serverLock.release()
-        return returnMessage
-
-
-    @cherrypy.expose
     def update(self, clientId):
         """
           Updates the client with the latest set of messages added by the log simulator
