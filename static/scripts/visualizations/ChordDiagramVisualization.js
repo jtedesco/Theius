@@ -303,6 +303,6 @@ function ChordDiagramVisualization(structure, state) {
         if(This.sizeDataSet) {
             $('#visualization svg').remove();
             drawChordDiagram();
-        }
+       }
     }
 }
