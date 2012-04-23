@@ -57,7 +57,7 @@ function updateRankings(state) {
     stateArray = stateArray.slice(0,10);
 
     //helper functions for D3
-    var text = function(d) { return d.name + ": " + d[key].toFixed(2)};
+    var text = function(d) { return d.name + ": " + (d[key] * 100).toFixed(0) + "%"};
     var height = function(i) { return i*25 + 20};
     var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
 
