@@ -56,7 +56,7 @@ function ChordDiagramVisualization(structure, state) {
                             var otherMachineValue = getCompoundKeyFromDict(otherMachine, This.sizeDataSet);
 
                             // Cube the 'correlation' to make large correlation dominate small ones, and remove very thin arcs for performances
-                            var machineCorrelation = Math.pow(Math.abs(machineValue - otherMachineValue),3) * 1000;
+                            var machineCorrelation = Math.abs(machineValue - otherMachineValue)*Math.abs(machineValue - otherMachineValue) * 1000;
                             if(machineCorrelation < 10) {
                                 machineCorrelation = 0;
                             }
@@ -213,8 +213,13 @@ function ChordDiagramVisualization(structure, state) {
         }];
     };
 
+    // Compute the visualization size
+    var width = $("#visualization").width(),
+        height = $("#visualization").height(),
+        innerRadius = Math.min(width, height) * .35,
+        outerRadius = innerRadius * 1.11;
 
-    this.initialize = function() {
+    function drawChordDiagram() {
 
         // Build the basic chord diagram
         var chord = d3.layout.chord()
@@ -222,10 +227,6 @@ function ChordDiagramVisualization(structure, state) {
             .sortSubgroups(d3.descending)
             .matrix(buildMatrixData());
 
-        var width = $("#visualization").width(),
-            height = $("#visualization").height(),
-            innerRadius = Math.min(width, height) * .35,
-            outerRadius = innerRadius * 1.11;
 
         // Define the color scheme for
         var fill = d3.scale.ordinal()
@@ -287,13 +288,29 @@ function ChordDiagramVisualization(structure, state) {
             .style("stroke", "rgba(0, 0, 0, 0.1)")
             .attr("d", d3.svg.chord().radius(innerRadius))
             .style("opacity", 1);
+    }
 
-
-
+    /**
+     * Initialize visualization for the first time
+     */
+    this.initialize = function() {
+        drawChordDiagram();
         showVisualization();
     };
 
     this.update = function() {
 
+        if(This.sizeDataSet) {
+            console.log('updating');
+
+            var oldViz = $('#visualization svg');
+            $('#visualization svg').css({
+                position: 'absolute',
+                'z-index': 10,
+                opacity: 1.0
+            });
+            drawChordDiagram();
+            oldViz.remove();
+        }
     }
 }
