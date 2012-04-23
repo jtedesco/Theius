@@ -4,22 +4,21 @@ import string
 import threading
 from time import sleep
 import numpy
+from BaseSimulator import BaseSimulator
 
 TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
 
 
 __author__ = 'jon'
 
-class SimulatorThread(threading.Thread):
-    def __init__(self, logMessages, serverLock, machineNames):
+
+class SimulatorThread(BaseSimulator):
+    def __init__(self, machineNames):
         """
           Initialize the simulator thread, given the <code>logMessages</code> map and a lock to access it
         """
 
-        threading.Thread.__init__(self)
-
-        self.logMessages = logMessages
-        self.serverLock = serverLock
+        BaseSimulator.__init__(self)
 
         # names of all nodes
         self.machineNames = machineNames
@@ -68,6 +67,8 @@ class SimulatorThread(threading.Thread):
             }
             nodeIndex += 1
 
+    def currentState(self):
+        return self.nodeInfo
 
     def run(self):
         """
@@ -88,22 +89,12 @@ class SimulatorThread(threading.Thread):
             # Gather updated node info based on each log event
             nodeInfoUpdates = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
 
-            # update the logMessages structure
-            self.serverLock.acquire()
+            log = {
+                'events' : logEvents,
+                'stateChange' : nodeInfoUpdates
+            }
 
-            for clientId in self.logMessages:
-
-                # Add the new log event to the client's queue
-                for logEvent in logEvents:
-                    self.logMessages[clientId]['events'].put(logEvent)
-
-                # Add the node info deltas
-                self.logMessages[clientId]['stateChange'] = nodeInfoUpdates
-
-                # Notify client that a message has arrived
-                self.logMessages[clientId]['trigger'].release()
-
-            self.serverLock.release()
+            self.addLog(log)
 
             # Apply the node info updates to the simulator's state
             self.applyNodeInfoUpdates(nodeInfoUpdates)

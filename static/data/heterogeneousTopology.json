@@ -1,0 +1,252 @@
+{
+    "machines":[
+        "master",
+        "rack1",
+        "rack2",
+        "rack3",
+        "machine1-1",
+        "machine1-2",
+        "machine1-3",
+        "machine1-4",
+        "machine1-5",
+        "machine1-6",
+        "machine1-7",
+        "machine1-8",
+        "machine1-9",
+        "machine1-10",
+        "machine1-11",
+        "machine1-12",
+        "machine1-13",
+        "machine1-14",
+        "machine1-15",
+        "machine1-16",
+        "machine2-1",
+        "machine2-2",
+        "machine2-3",
+        "machine2-4",
+        "machine2-5",
+        "machine2-6",
+        "machine2-7",
+        "machine2-8",
+        "machine3-1",
+        "machine3-2",
+        "machine3-3",
+        "machine3-4",
+        "machine3-5",
+        "machine3-6",
+        "machine3-7",
+        "machine3-8",
+        "machine3-9",
+        "machine3-10",
+        "machine3-11",
+        "machine3-12",
+        "machine3-13",
+        "machine3-14",
+        "machine3-15",
+        "machine3-16",
+        "machine3-17",
+        "machine3-18",
+        "machine3-19",
+        "machine3-20",
+        "machine3-21",
+        "machine3-22",
+        "machine3-23",
+        "machine3-24",
+        "machine3-25",
+        "machine3-26",
+        "machine3-27",
+        "machine3-28",
+        "machine3-29",
+        "machine3-30",
+        "machine3-31",
+        "machine3-32"
+    ],
+    "structure":{
+        "name":"master",
+        "children":[
+            {
+                "name":"rack1",
+                "children":[
+                    {
+                        "name":"machine1-1"
+                    } ,
+                    {
+                        "name":"machine1-2"
+                    } ,
+                    {
+                        "name":"machine1-3"
+                    } ,
+                    {
+                        "name":"machine1-4"
+                    } ,
+                    {
+                        "name":"machine1-5"
+                    } ,
+                    {
+                        "name":"machine1-6"
+                    } ,
+                    {
+                        "name":"machine1-7"
+                    } ,
+                    {
+                        "name":"machine1-8"
+                    },
+                    {
+                        "name":"machine1-9"
+                    } ,
+                    {
+                        "name":"machine1-10"
+                    } ,
+                    {
+                        "name":"machine1-11"
+                    } ,
+                    {
+                        "name":"machine1-12"
+                    } ,
+                    {
+                        "name":"machine1-13"
+                    } ,
+                    {
+                        "name":"machine1-14"
+                    } ,
+                    {
+                        "name":"machine1-15"
+                    } ,
+                    {
+                        "name":"machine1-16"
+                    }
+                ]
+            },
+            {
+                "name":"rack2",
+                "children":[
+                    {
+                        "name":"machine2-1"
+                    } ,
+                    {
+                        "name":"machine2-2"
+                    } ,
+                    {
+                        "name":"machine2-3"
+                    } ,
+                    {
+                        "name":"machine2-4"
+                    } ,
+                    {
+                        "name":"machine2-5"
+                    } ,
+                    {
+                        "name":"machine2-6"
+                    } ,
+                    {
+                        "name":"machine2-7"
+                    } ,
+                    {
+                        "name":"machine2-8"
+                    }
+                ]
+            },
+            {
+                "name":"rack3",
+                "children":[
+                    {
+                        "name":"machine3-1"
+                    } ,
+                    {
+                        "name":"machine3-2"
+                    } ,
+                    {
+                        "name":"machine3-3"
+                    } ,
+                    {
+                        "name":"machine3-4"
+                    } ,
+                    {
+                        "name":"machine3-5"
+                    } ,
+                    {
+                        "name":"machine3-6"
+                    } ,
+                    {
+                        "name":"machine3-7"
+                    } ,
+                    {
+                        "name":"machine3-8"
+                    },
+                    {
+                        "name":"machine3-9"
+                    } ,
+                    {
+                        "name":"machine3-10"
+                    } ,
+                    {
+                        "name":"machine3-11"
+                    } ,
+                    {
+                        "name":"machine3-12"
+                    } ,
+                    {
+                        "name":"machine3-13"
+                    } ,
+                    {
+                        "name":"machine3-14"
+                    } ,
+                    {
+                        "name":"machine3-15"
+                    } ,
+                    {
+                        "name":"machine3-16"
+                    },
+                    {
+                        "name":"machine3-17"
+                    } ,
+                    {
+                        "name":"machine3-18"
+                    } ,
+                    {
+                        "name":"machine3-19"
+                    } ,
+                    {
+                        "name":"machine3-20"
+                    } ,
+                    {
+                        "name":"machine3-21"
+                    } ,
+                    {
+                        "name":"machine3-22"
+                    } ,
+                    {
+                        "name":"machine3-23"
+                    } ,
+                    {
+                        "name":"machine3-24"
+                    },
+                    {
+                        "name":"machine3-25"
+                    } ,
+                    {
+                        "name":"machine3-26"
+                    } ,
+                    {
+                        "name":"machine3-27"
+                    } ,
+                    {
+                        "name":"machine3-28"
+                    } ,
+                    {
+                        "name":"machine3-29"
+                    } ,
+                    {
+                        "name":"machine3-30"
+                    } ,
+                    {
+                        "name":"machine3-31"
+                    } ,
+                    {
+                        "name":"machine3-32"
+                    }
+                ]
+            }
+        ]
+    }
+}

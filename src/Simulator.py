@@ -11,12 +11,12 @@ __author__ = 'jon'
 
 
 # Index of log messages for each thread
-logMessages = {}
 serverLock = threading.Lock()
 
 # Global counter to allow us to assign unique ids to new clients
 nextClientId = 1
 
+clientSimulatorMap = {}
 
 class Simulator(object):
     """
@@ -46,17 +46,11 @@ class Simulator(object):
         clientId = nextClientId
         nextClientId += 1
 
-        logMessages[clientId] = {
-            'events' : Queue(),
-            'stateChange': {},
-            'trigger' : threading.Semaphore()
-        }
-
-        # acquire the client lock immediately, indicating no messages are ready to be processed
-        logMessages[clientId]['trigger'].acquire()
+        clientSimulatorMap[clientId] = simulatorThread
+        simulatorThread.addClient(clientId)
 
         # Get the current system state
-        currentState = deepcopy(simulatorThread.nodeInfo)
+        currentState = deepcopy(simulatorThread.currentState())
 
         serverLock.release()
 
@@ -68,18 +62,51 @@ class Simulator(object):
             'structure': networkTopology['structure']
         })
 
+    @cherrypy.expose
+    def changeSimulator(self, clientId, simulator):
+        clientId = int(clientId)
+
+        serverLock.acquire()
+
+        if clientId not in clientSimulatorMap:
+            serverLock.release()
+            return dumps({
+                'message': 'clientId should be a valid integer client id',
+                'successful': False
+            })
+
+        if simulator == "random":
+            clientSimulatorMap[clientId].removeClient(clientId)
+            clientSimulatorMap[clientId] = simulatorThread
+            clientSimulatorMap[clientId].addClient(clientId)
+        elif simulator == "heterogeneous":
+            clientSimulatorMap[clientId].removeClient(clientId)
+            clientSimulatorMap[clientId] = heterogeneousSimulatorThread
+            clientSimulatorMap[clientId].addClient(clientId)
+        else:
+            serverLock.release()
+            return dumps({
+                'message': 'unknown simulator',
+                'successful': False
+            })
+
+        serverLock.release()
+        return  dumps({
+            'successful': True
+        })
 
     @cherrypy.expose
     def unsubscribe(self, clientId):
         """
           Removes a client from the log stream
         """
+        clientId = int(clientId)
 
         serverLock.acquire()
 
         try:
-            logMessages[int(clientId)]['trigger'].release()
-            del logMessages[int(clientId)]
+            clientSimulatorMap[clientId].removeClient(clientId)
+            del clientSimulatorMap[clientId]
 
             # Send back the status of the unsubscribe request
             cherrypy.response.headers['Content-Type'] = 'application/json'
@@ -117,7 +144,7 @@ class Simulator(object):
 
         serverLock.acquire()
 
-        if clientId not in logMessages:
+        if clientId not in clientSimulatorMap:
             serverLock.release()
             return dumps({
                 'message': 'Not subscribed',
@@ -125,31 +152,24 @@ class Simulator(object):
             })
 
         # obtain client lock
-        clientLock = logMessages[clientId]['trigger']
+        simulator = clientSimulatorMap[clientId]
         serverLock.release()
 
         # wait for data to be available
-        clientLock.acquire()
+        logData = simulator.getNextLog(clientId)
 
-        serverLock.acquire()
-
-        if clientId not in logMessages:
-            serverLock.release()
+        if logData is None:
             return dumps({
                 'message': 'Not subscribed',
                 'successful': False
             })
 
         # take off one log entry off the queue
-        logData = logMessages[clientId]
-        logEntries = []
-        logEntry = logData['events'].get()
-        logEntries.append(logEntry)
+        logEntries = logData['events']
+        print logEntries
 
         # get the state change of the cluster
         stateChange = logData['stateChange']
-
-        serverLock.release()
 
         return dumps({
             'events' : logEntries,
@@ -174,7 +194,10 @@ cherrypy.engine.start()
 # Load the network topology
 networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
 
-
 # Start the simulator thread
-simulatorThread = SimulatorThread(logMessages, serverLock,  networkTopology['machines'])
+simulatorThread = SimulatorThread(networkTopology['machines'])
 simulatorThread.start()
+
+heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
+heterogeneousSimulatorThread = SimulatorThread(heterogeneousNetworkTopology['machines'])
+heterogeneousSimulatorThread.start()
