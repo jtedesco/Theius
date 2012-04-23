@@ -115,7 +115,7 @@ function updateEvents(logs) {
     // update svg width + height, and bind data to the elements
     var events = d3.select("#events").select("svg")
         .attr("width", $('#events').width())
-        .attr("height", 600)
+        .attr("height", $('#rightSidebar').find('.well').height() - 50)
         .selectAll("g")
         .data(lastLogs, function(d) { return d.id; })
         .order();
