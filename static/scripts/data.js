@@ -88,6 +88,11 @@ function updateClusterState(stateChange) {
     }
 }
 
+/**
+ * Changes the data characteristics represented by using a different simulator.
+ * This requires a call to the server to ask to switch.
+ * @param simulatorName the name of the simulator to be switched to
+ */
 function changeDataCharacteristics(simulatorName) {
 
     // Trigger an ajax call to the simulator server
@@ -104,9 +109,16 @@ function changeDataCharacteristics(simulatorName) {
     });
 }
 
+/**
+ * Called after successfully changing the simulator.
+ * @param data the data sent back from the server
+ */
 function changeDataCharacteristicsSuccess(data) {
 
     if (data.hasOwnProperty("successful") && data['successful']) {
+
+        // call subscribeSuccess, since it is like we are starting from scratch
+        // the only thing that stays the same is the clientId
         data['clientId'] = clientId;
         subscribeSuccess(data);
     }
