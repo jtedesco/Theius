@@ -17,6 +17,9 @@ function updateRightSideBar() {
     if (tab === "rankings") {
         updateRankings(clusterState);
     }
+    else if (tab === "events") {
+        updateEvents(clusterLogs);
+    }
 }
 
 /**
@@ -86,6 +89,44 @@ function updateRankings(state) {
 
     // exiting nodes slide to the bottom and fade off screen
     rankings.exit()
+        .transition()
+        .duration(500)
+        .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })
+        .style("opacity", 0)
+        .remove();
+}
+
+function updateEvents(logs) {
+    // grab last ten logs
+    var lastLogs = logs.slice(-10).reverse();
+    console.log(lastLogs);
+
+    //helper functions for D3
+    var text = function(d) { return d.facility; };
+    var height = function(i) { return i*25 + 40};
+    var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
+
+    var events = d3.select("#events").select("svg")
+        .attr("width", $('#events').width())
+        .attr("height", 600)
+        .selectAll("g")
+        .data(lastLogs, function(d) { return d.id; })
+        .order();
+
+    var eventsEnter = events.enter().append("g")
+        .attr("transform", function(d,i) { return "translate(0," + height(-1) + ")"; })
+        .style("opacity", 0);
+
+    eventsEnter.append("text")
+        .attr("class", "sidebarText")
+        .text(text);
+
+    events.transition()
+        .duration(500)
+        .attr("transform", position(0))
+        .style("opacity", 1.0);
+
+    events.exit()
         .transition()
         .duration(500)
         .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })

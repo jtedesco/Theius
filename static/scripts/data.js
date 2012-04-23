@@ -7,6 +7,9 @@ var clusterState;
 // The structure of the cluster
 var clusterStructure;
 
+// the cumulative logs of the cluster
+var clusterLogs = [];
+
 // The visualization to call (initialized on subscribe success)
 var visualization = null;
 
@@ -29,7 +32,9 @@ function update(data) {
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
                 var logEvent = updateData[i];
+                logEvent.id = clusterLogs.length;
                 logEvents.push(logEvent);
+                clusterLogs.push(logEvent);
             }
         }
 
