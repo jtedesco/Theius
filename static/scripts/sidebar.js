@@ -19,6 +19,10 @@ function updateRightSideBar() {
     }
 }
 
+/**
+ * Updates rankings tab
+ * @param state the current state of all nodes
+ */
 function updateRankings(state) {
     // selected options
     var key = $("#rankings-data li.active").attr("name");

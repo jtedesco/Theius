@@ -145,6 +145,7 @@ function subscribeSuccess(data) {
     // Add the 'rack' to each node
     buildRacksData();
 
+    // initialize right sidebar
     updateRightSideBar();
 
     // Build the default visualization
