@@ -4,11 +4,11 @@ import cherrypy
 import os
 from Queue import Queue
 from json import dumps, load
-from SimulatorThread import SimulatorThread
+from DefaultSimulator import DefaultSimulator
 
 
 __author__ = 'jon'
-
+__author__ = 'roman'
 
 # Index of log messages for each thread
 serverLock = threading.Lock()
@@ -16,9 +16,10 @@ serverLock = threading.Lock()
 # Global counter to allow us to assign unique ids to new clients
 nextClientId = 1
 
+# Global map from clientId to the simulator they are currently using
 clientSimulatorMap = {}
 
-class Simulator(object):
+class SimulatorInterface(object):
     """
       Provides a web interface for log trace simulations
     """
@@ -34,9 +35,8 @@ class Simulator(object):
     @cherrypy.expose
     def subscribe(self):
         """
-          Subscribes a client to subscribe for log updates, returning the client's assigned id
-
-            @return the client id
+          Subscribes a client to subscribe for log updates, returning the client's assigned id,
+          and information about the current state of the cluster
         """
 
         serverLock.acquire()
@@ -46,15 +46,16 @@ class Simulator(object):
         clientId = nextClientId
         nextClientId += 1
 
-        clientSimulatorMap[clientId] = simulatorThread
-        simulatorThread.addClient(clientId)
+        # Assign this client the default simulator
+        clientSimulatorMap[clientId] = defaultSimulator
+        defaultSimulator.addClient(clientId)
 
         # Get the current system state
-        currentState = deepcopy(simulatorThread.currentState())
+        currentState = deepcopy(defaultSimulator.currentState())
 
         serverLock.release()
 
-        # Respond to the client's id
+        # Respond with client's id
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return dumps({
             'clientId': clientId,
@@ -64,10 +65,14 @@ class Simulator(object):
 
     @cherrypy.expose
     def changeSimulator(self, clientId, simulator):
+        """
+            Changes the client to use a different simulator
+        """
         clientId = int(clientId)
 
         serverLock.acquire()
 
+        # client not subscribed, error
         if clientId not in clientSimulatorMap:
             serverLock.release()
             return dumps({
@@ -77,12 +82,15 @@ class Simulator(object):
 
         if simulator == "random":
             clientSimulatorMap[clientId].removeClient(clientId)
-            clientSimulatorMap[clientId] = simulatorThread
+            clientSimulatorMap[clientId] = defaultSimulator
             clientSimulatorMap[clientId].addClient(clientId)
+
         elif simulator == "heterogeneous":
             clientSimulatorMap[clientId].removeClient(clientId)
-            clientSimulatorMap[clientId] = heterogeneousSimulatorThread
+            clientSimulatorMap[clientId] = heterogeneousSimulator
             clientSimulatorMap[clientId].addClient(clientId)
+
+        # could not find name of simulator
         else:
             serverLock.release()
             return dumps({
@@ -144,6 +152,7 @@ class Simulator(object):
 
         serverLock.acquire()
 
+        # client not subscribed, error
         if clientId not in clientSimulatorMap:
             serverLock.release()
             return dumps({
@@ -151,7 +160,7 @@ class Simulator(object):
                 'successful': False
             })
 
-        # obtain client lock
+        # obtain client's simulator
         simulator = clientSimulatorMap[clientId]
         serverLock.release()
 
@@ -164,16 +173,9 @@ class Simulator(object):
                 'successful': False
             })
 
-        # take off one log entry off the queue
-        logEntries = logData['events']
-        print logEntries
-
-        # get the state change of the cluster
-        stateChange = logData['stateChange']
-
         return dumps({
-            'events' : logEntries,
-            'stateChange': stateChange,
+            'events' : logData['events'],
+            'stateChange': logData['stateChange'],
             'successful': True
         })
 
@@ -188,16 +190,17 @@ config = {
 }
 
 # Start the server
-cherrypy.tree.mount(Simulator(), '/', config=config)
+cherrypy.tree.mount(SimulatorInterface(), '/', config=config)
 cherrypy.engine.start()
 
 # Load the network topology
 networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
 
-# Start the simulator thread
-simulatorThread = SimulatorThread(networkTopology['machines'])
-simulatorThread.start()
+# Start the default simulator
+defaultSimulator = DefaultSimulator(networkTopology['machines'])
+defaultSimulator.start()
 
+# Start the heterogeneous cluster simulator
 heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
-heterogeneousSimulatorThread = SimulatorThread(heterogeneousNetworkTopology['machines'])
-heterogeneousSimulatorThread.start()
+heterogeneousSimulator = DefaultSimulator(heterogeneousNetworkTopology['machines'])
+heterogeneousSimulator.start()

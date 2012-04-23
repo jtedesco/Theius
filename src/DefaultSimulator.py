@@ -12,10 +12,10 @@ TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
 __author__ = 'jon'
 
 
-class SimulatorThread(BaseSimulator):
+class DefaultSimulator(BaseSimulator):
     def __init__(self, machineNames):
         """
-          Initialize the simulator thread, given the <code>logMessages</code> map and a lock to access it
+          Initialize the simulator
         """
 
         BaseSimulator.__init__(self)
@@ -68,6 +68,9 @@ class SimulatorThread(BaseSimulator):
             nodeIndex += 1
 
     def currentState(self):
+        """
+            returns the current state of the cluster
+        """
         return self.nodeInfo
 
     def run(self):
@@ -89,11 +92,11 @@ class SimulatorThread(BaseSimulator):
             # Gather updated node info based on each log event
             nodeInfoUpdates = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
 
+            # Add log to simulator
             log = {
                 'events' : logEvents,
                 'stateChange' : nodeInfoUpdates
             }
-
             self.addLog(log)
 
             # Apply the node info updates to the simulator's state
