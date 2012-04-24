@@ -56,7 +56,8 @@ function ChordDiagramVisualization(structure, state) {
                             var otherMachineValue = getCompoundKeyFromDict(otherMachine, This.sizeDataSet);
 
                             // Cube the 'correlation' to make large correlation dominate small ones, and remove very thin arcs for performances
-                            var machineCorrelation = Math.abs(machineValue - otherMachineValue)*Math.abs(machineValue - otherMachineValue) * 1000;
+                            var diff = Math.abs(machineValue - otherMachineValue);
+                            var machineCorrelation = diff*diff*diff * 1000;
                             if(machineCorrelation < 10) {
                                 machineCorrelation = 0;
                             }
