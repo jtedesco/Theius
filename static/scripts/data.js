@@ -90,7 +90,9 @@ function updateClusterState(stateChange) {
                     clusterState[nodeName][nodeProperty] = stateChange[nodeName][nodeProperty];
                 }
             }
-            clusterState[nodeName]['events'] = [];
+            if(!clusterState[nodeName].hasOwnProperty('events')) {
+                clusterState[nodeName]['events'] = [];
+            }
         }
     }
 }
@@ -101,7 +103,9 @@ function updateClusterState(stateChange) {
  */
 function updateNodeEvents(events) {
     for (var i in events) {
-        clusterState[events[i].location]['events'].push(events[i]);
+        if(events.hasOwnProperty(i)) {
+            clusterState[events[i].location]['events'].push(events[i]);
+        }
     }
 }
 
