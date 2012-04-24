@@ -67,6 +67,7 @@ function TreeVisualization(structure, state) {
      * @param node  The node to fill with color
      */
     var fillColor = function(node) {
+        console.log("hello");
         if (node.hasOwnProperty('_children') && node['_children'] != null) {
             return "lightsteelblue";
         }
@@ -205,9 +206,9 @@ function TreeVisualization(structure, state) {
             .remove();
 
         // update nodes
+
         var node = graph.selectAll("g")
             .data(nodes, function(d) { return d.name; });
-
         // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
             .attr("class", "treeVisualizationNode")
@@ -225,6 +226,7 @@ function TreeVisualization(structure, state) {
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
         // update circle radius and color
+       // console.log(nodeUpdate.select("circle"));
         nodeUpdate.select("circle")
             .attr("r", radius)
             .style("fill", fillColor);
