@@ -52,8 +52,6 @@ function PieChartNodeVisualization(nodeState) {
 
                 var event = nodeState.events[index];
                 var eventLevel = event.severity;
-
-                console.log(eventsByLevel, event, eventLevel);
                 eventsByLevel[eventLevel].push(event);
                 totalEventCount++;
             }
@@ -82,9 +80,9 @@ function PieChartNodeVisualization(nodeState) {
         var nodeVisualizationDiv = $('#nodeVisualization');
 
         if(eventsByLevel['totalCount'] > 0) {
-            var width = nodeVisualizationDiv.width(),
-                height = nodeVisualizationDiv.height()-50,
-                outerRadius = Math.min(width, height) / 2,
+
+            var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height()-150),
+                outerRadius = Math.min(dim) / 2,
                 innerRadius = outerRadius * .6,
                 data = d3.range(4).map(function(i) {
                     return eventsByLevel[getEventLevel(i)].length / eventsByLevel['totalCount'];
@@ -96,8 +94,8 @@ function PieChartNodeVisualization(nodeState) {
             var vis = d3.select("#nodeVisualization")
                 .append("svg")
                 .data([data])
-                .attr("width", width)
-                .attr("height", height);
+                .attr("width", dim)
+                .attr("height", dim);
 
             var arcs = vis.selectAll("g.arc")
                 .data(donut)
@@ -133,6 +131,11 @@ function PieChartNodeVisualization(nodeState) {
 
         This.nodeState = newNodeState;
 
+        var eventsByLevel = getLogsByLevel();
+
+        var data = d3.range(4).map(function(i) {
+            return eventsByLevel[getEventLevel(i)].length / eventsByLevel['totalCount'];
+        });
 
     };
 
