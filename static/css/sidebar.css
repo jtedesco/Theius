@@ -5,3 +5,8 @@
 #colorDataSetSelector, #sizeDataSetSelector, #dataCharacteristicSelector {
     width: 100%;
 }
+
+#rankings-data li a, #rankings-order li a, #rightSidebar li a {
+    padding-right: 4px;;
+    padding-left: 4px;;
+}
