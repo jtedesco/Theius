@@ -56,7 +56,8 @@ function ChordDiagramVisualization(structure, state) {
                             var otherMachineValue = getCompoundKeyFromDict(otherMachine, This.sizeDataSet);
 
                             // Cube the 'correlation' to make large correlation dominate small ones, and remove very thin arcs for performances
-                            var machineCorrelation = Math.abs(machineValue - otherMachineValue)*Math.abs(machineValue - otherMachineValue) * 1000;
+                            var diff = Math.abs(machineValue - otherMachineValue);
+                            var machineCorrelation = diff*diff*diff * 1000;
                             if(machineCorrelation < 10) {
                                 machineCorrelation = 0;
                             }
@@ -250,7 +251,10 @@ function ChordDiagramVisualization(structure, state) {
             .style("stroke", function(d) { return fill(d.index); })
             .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
             .on("mouseover", fadeToOpacity(.1))
-            .on("mouseout", fadeToOpacity(1));
+            .on("mouseout", fadeToOpacity(1))
+            .on('click', function(d) {
+                createNodeVisualization(machines[d.index].name);
+            });
 
         // Add the tick elements in place around the arc (& blocks
         var ticks = svg.append("g")
@@ -301,16 +305,8 @@ function ChordDiagramVisualization(structure, state) {
     this.update = function() {
 
         if(This.sizeDataSet) {
-            console.log('updating');
-
-            var oldViz = $('#visualization svg');
-            $('#visualization svg').css({
-                position: 'absolute',
-                'z-index': 10,
-                opacity: 1.0
-            });
+            $('#visualization svg').remove();
             drawChordDiagram();
-            oldViz.remove();
-        }
+       }
     }
 }

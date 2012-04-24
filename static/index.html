@@ -7,8 +7,8 @@
     <script type="text/javascript" src="/static/scripts/data.js"></script>
 
     <!-- Jquery & d3 includes -->
-    <script type="text/javascript" src="/static/scripts/d3.v2.js"></script>
-    <script type="text/javascript" src="/static/scripts/jquery-1.7.2.pack.js"></script>
+    <script type="text/javascript" src="/static/scripts/vendor/d3.v2.js"></script>
+    <script type="text/javascript" src="/static/scripts/vendor/jquery-1.7.2.pack.js"></script>
 
     <!-- Bootstrap includes -->
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
@@ -27,24 +27,28 @@
     <script type="text/javascript" src="/static/scripts/util.js"></script>
 
     <!-- Tree viz -->
-    <script type="text/javascript" src="/static/scripts/visualizations/TreeVisualization.js"></script>
+    <script type="text/javascript" src="/static/scripts/visualizations/cluster/TreeVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/tree.css">
 
     <!-- Splom viz -->
-    <script type="text/javascript" src="/static/scripts/visualizations/SplomVisualization.js"></script>
+    <script type="text/javascript" src="/static/scripts/visualizations/cluster/SplomVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/splom.css">
 
     <!-- Treemap viz -->
-    <script type="text/javascript" src="/static/scripts/visualizations/TreeMapVisualization.js"></script>
+    <script type="text/javascript" src="/static/scripts/visualizations/cluster/TreeMapVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/treeMap.css">
 
     <!-- Chord viz -->
-    <script type="text/javascript" src="/static/scripts/visualizations/ChordDiagramVisualization.js"></script>
+    <script type="text/javascript" src="/static/scripts/visualizations/cluster/ChordDiagramVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/chordDiagram.css">
 
-    <!--CirclePacking viz-->
-    <script type="text/javascript" src="/static/scripts/visualizations/CirclePackingVisualization.js"></script>
+    <!-- Circle Packing viz -->
+    <script type="text/javascript" src="/static/scripts/visualizations/cluster/CirclePackingVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/circlePacking.css">
+
+    <!-- Node visualizations -->
+    <script type="text/javascript" src="/static/scripts/visualizations/node/PieChartNodeVisualization.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/nodeVisualizations.css">
 
     <!-- Global style & scripts -->
     <link rel="stylesheet" type="text/css" href="/static/css/index.css">
@@ -72,12 +76,12 @@
                 <ul class="nav">
                     <li id="treeLink" class="active">
                         <a href="javascript:changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')">
-                            Tree Visualization
+                            Tree
                         </a>
                     </li>
                     <li id="treemapLink">
                         <a href="javascript:changeVisualization(new TreeMapVisualization(clusterStructure, clusterState), 'treemapLink')">
-                            TreeMap Visualization
+                            TreeMap
                         </a>
                     </li>
                     <li id="usageMatrixLink">
@@ -101,81 +105,115 @@
 <div class="container-fluid">
     
     <div class="row-fluid">
-        <div class="span12">
-            <div class="row-fluid">
-                <div id="leftSidebar" class="span2">
-                    <div class="well">
-                        <h3>Controls</h3><br/>
-                        <div class='form-vertical'>
-                            <fieldset>
-                                <div class="control-group">
-                                    <div class="controls">
-                                        <button class="btn" style="width:100%" id="playPauseBtn" onclick="togglePlayPause()">
-                                            <div class="icon-pause"></div> &nbsp; &nbsp;
-                                            <span id="playPauseStatus">Pause Viz</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <br/>
-
-                                <h4>Visualization</h4><br/>
-                                <div class="control-group">
-                                    <label class="control-label" for="colorDataSetSelector">Color</label>
-                                    <div class="controls">
-                                        <select id="colorDataSetSelector"></select>
-                                    </div>
-                                    <label class="control-label" for="sizeDataSetSelector">Size</label>
-                                    <div class="controls">
-                                        <select id="sizeDataSetSelector"></select>
-                                    </div>
-                                </div>
-                                <br/>
-
-                                <h4>Legend</h4><br/>
-                                <div class="well">
-                                    <div id="legend">
-
-                                    </div>
-                                </div>
-                            </fieldset>
+        <div id="leftSidebar" class="span2">
+            <div class="well">
+                <h3>Controls</h3><br/>
+                <div class='form-vertical'>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn" style="width:100%" id="playPauseBtn" onclick="togglePlayPause()">
+                                <div class="icon-pause"></div> &nbsp; &nbsp;
+                                <span id="playPauseStatus">Pause Viz</span>
+                            </button>
                         </div>
                     </div>
-                </div>
+                    <br/>
 
-                <div class="span8">
-                    <div id="visualizationTitle" class="well"></div>
-                    <div class="well">
-                        <div id="visualizationWrapper">
-                            <div id="visualization"></div>
+                    <h4>Visualization</h4><br/>
+                    <div class="control-group">
+                        <label class="control-label" for="colorDataSetSelector">Color</label>
+                        <div class="controls">
+                            <select id="colorDataSetSelector"></select>
                         </div>
-                        <div id="cover"></div>
+                        <label class="control-label" for="sizeDataSetSelector">Size</label>
+                        <div class="controls">
+                            <select id="sizeDataSetSelector"></select>
+                        </div>
+                    </div>
+                    <br/>
+
+                    <h4>Legend</h4><br/>
+                    <div class="well">
+                        <div id="legend"></div>
+                    </div>
+                    <br/>
+
+                    <h4>Data Characteristics</h4><br/>
+                    <select id="dataCharacteristicSelector">
+                        <option value="random">Random Cluster</option>
+                        <option value="heterogeneous">Heterogeneous Cluster</option>
+                        <option value="uneven">Uneven Load/Failure Distribution</option>
+                        <option value="individual">Individual machine failure</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="span8">
+            <div class="well"><div id="visualizationTitle"></div></div>
+            <div class="well">
+                <div id="visualizationWrapper">
+                    <div id="visualization"></div>
+                    <div id="nodeVisualizationWrapper">
+                        <center>
+                            <a href="javascript:hideNodeVisualization()" style='float:left'>&lt; back</a>
+                            <h3 id="nodeVisualizationTitle"></h3>
+                            <div id="nodeVisualization"></div>
+                        </center>
                     </div>
                 </div>
+                <div id="cover"></div>
 
-                <div id="rightSidebar" class="span2">
-                    <div class="well">
+            </div>
+        </div>
 
-                        <h3>Some ranked data</h3><br/>
+        <div id="rightSidebar" class="span2">
+            <div class="well">
 
-                        <ul id="tab" class="nav nav-tabs">
-                            <li class="active"><a href="#health" data-toggle="tab">Nodes</a></li>
-                            <li><a href="#events" data-toggle="tab">Events</a></li>
-                            <li><a href="#resources" data-toggle="tab">Resources</a></li>
+                <h3>Some ranked data</h3><br/>
+
+                <ul id="tab" class="nav nav-tabs">
+                    <li class="active"><a href="#rankings" data-toggle="tab">Nodes</a></li>
+                    <li><a href="#events" data-toggle="tab">Events</a></li>
+                    <li><a href="#general" data-toggle="tab">General</a></li>
+                </ul>
+                <div class="tab-content">
+
+                    <div class="tab-pane fade in active" id="rankings">
+                        <ul class="nav nav-pills" id="rankings-data">
+                            <li class="active" name="health"><a href="#" data-toggle="tab">Health</a></li>
+                            <li name="cpuUsage"><a href="#" data-toggle="tab">CPU</a></li>
+                            <li name="memoryUsage"><a href="#" data-toggle="tab">Memory</a></li>
                         </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane fade in active" id="health">
-                                <svg></svg>
-                            </div>
-                            <div class="tab-pane fade" id="events">
-                                <svg></svg>
-                            </div>
-                            <div class="tab-pane fade" id="resources">
-                                <svg></svg>
-                            </div>
-                        </div>
+                        <ul class="nav nav-pills" id="rankings-order">
+                            <li class="active"><a href="#" data-toggle="tab">Ascending</a></li>
+                            <li><a href="#" data-toggle="tab">Descending</a></li>
+                        </ul>
+                        <svg></svg>
+                    </div>
 
+                    <div class="tab-pane fade" id="events">
+                        <svg></svg>
+                    </div>
+
+                    <div class="tab-pane fade" id="general">
+                        <h4>Cluster Health</h4>
+                        <br>
+                        <div>Average Health: <span id="general-avg-health">50</span>%</div>
+                        <div>Worst Health: <span id="general-worst-health">0</span>%</div>
+                        <div>Best Health: <span id="general-best-health">100</span>%</div>
+                        <br>
+                        <h4>Resources</h4>
+                        <br>
+                        <div>Total CPU usage: <span id="general-cpu">0</span>%</div>
+                        <div>Total Memory usage: <span id="general-memory">0</span>%</div>
+                        <br>
+                        <h4>Logs</h4>
+                        <br>
+                        <div>Total logs collected: <span id="general-total-logs">0</span></div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -210,6 +248,13 @@
             rightSidebar.height(mainSpan.height());
             rightSidebar.children().height(mainSpan.height()-60);
         }
+
+        //add listener for Data Characteristics Menu
+        $("#dataCharacteristicSelector").change(function() {
+            changeDataCharacteristics($("#dataCharacteristicSelector option:selected").val());
+        });
+
+        $('#rankings, #tab').find('li').click(updateRightSideBar);
     })
 </script>
 </html>

@@ -67,7 +67,7 @@ function TreeVisualization(structure, state) {
      * @param node  The node to fill with color
      */
     var fillColor = function(node) {
-        console.log("hello");
+
         if (node.hasOwnProperty('_children') && node['_children'] != null) {
             return "lightsteelblue";
         }
@@ -213,7 +213,14 @@ function TreeVisualization(structure, state) {
         var nodeEnter = node.enter().append("g")
             .attr("class", "treeVisualizationNode")
             .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
-            .on("click", function(d) { toggle(d); redrawGraph(d); });
+            .on("click", function(d) {
+                if(d.hasOwnProperty('children')) {
+                    toggle(d);
+                    redrawGraph(d);
+                } else {
+                    createNodeVisualization(d.name);
+                }
+            });
 
         // add circles representing computers
         nodeEnter.append("circle")

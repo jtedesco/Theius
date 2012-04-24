@@ -4,25 +4,25 @@ import string
 import threading
 from time import sleep
 import numpy
+from BaseSimulator import BaseSimulator
 
 TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
 
 
 __author__ = 'jon'
 
-class SimulatorThread(threading.Thread):
-    def __init__(self, logMessages, serverLock, machineNames):
+
+class DefaultSimulator(BaseSimulator):
+    def __init__(self, machineNames, structure):
         """
-          Initialize the simulator thread, given the <code>logMessages</code> map and a lock to access it
+          Initialize the simulator
         """
 
-        threading.Thread.__init__(self)
-
-        self.logMessages = logMessages
-        self.serverLock = serverLock
+        BaseSimulator.__init__(self)
 
         # names of all nodes
         self.machineNames = machineNames
+        self.structure = structure
 
         # Possible severities, categories, error codes, and error locations of log events (error code denoted by index of list)
         self.severities =  ['FATAL', 'WARN', 'INFO', 'ERROR']
@@ -54,6 +54,7 @@ class SimulatorThread(threading.Thread):
                 'cpuUsage': 0.2,
                 'memoryUsage': 0.3,
                 'contextSwitchRate': 0.1, # What is this???
+                'events': [],
                 'lastFailureTime': None,
                 'predictedFailureTime': datetime.strftime(datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]), TIMESTAMP_FORMAT),
                 'predictedSeverityProbabilities': {
@@ -68,6 +69,17 @@ class SimulatorThread(threading.Thread):
             }
             nodeIndex += 1
 
+    def currentState(self):
+        """
+            returns the current state of the cluster
+        """
+        return self.nodeInfo
+
+    def getStructure(self):
+        """
+            Returns the current structure of the cluster
+        """
+        return self.structure
 
     def run(self):
         """
@@ -88,22 +100,14 @@ class SimulatorThread(threading.Thread):
             # Gather updated node info based on each log event
             nodeInfoUpdates = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
 
-            # update the logMessages structure
-            self.serverLock.acquire()
+            # Add log to simulator
+            log = {
+                'events' : logEvents,
+                'stateChange' : nodeInfoUpdates
+            }
 
-            for clientId in self.logMessages:
-
-                # Add the new log event to the client's queue
-                for logEvent in logEvents:
-                    self.logMessages[clientId]['events'].put(logEvent)
-
-                # Add the node info deltas
-                self.logMessages[clientId]['stateChange'] = nodeInfoUpdates
-
-                # Notify client that a message has arrived
-                self.logMessages[clientId]['trigger'].release()
-
-            self.serverLock.release()
+            # Add to the global list of logs
+            self.addLog(log)
 
             # Apply the node info updates to the simulator's state
             self.applyNodeInfoUpdates(nodeInfoUpdates)
@@ -117,7 +121,10 @@ class SimulatorThread(threading.Thread):
         for nodeName in updates:
             nodeDataToUpdate = updates[nodeName]
             for entryName in nodeDataToUpdate:
-                self.nodeInfo[nodeName][entryName] = nodeDataToUpdate[entryName]
+                if entryName is 'events':
+                    self.nodeInfo[nodeName][entryName].extend(nodeDataToUpdate[entryName])
+                else:
+                    self.nodeInfo[nodeName][entryName] = nodeDataToUpdate[entryName]
 
 
     def getUpdatedNodeInfoBasedOnEvents(self, logEvents):
@@ -144,7 +151,10 @@ class SimulatorThread(threading.Thread):
             # Add an entry if there isn't one already
             nodeName = logEvent['location']
             if nodeName not in updatedNodeInfo:
-                updatedNodeInfo[nodeName] = {}
+                updatedNodeInfo[nodeName] = {
+                    'events': []
+                }
+            updatedNodeInfo[nodeName]['events'].append(logEvent)
             nodeInfo = updatedNodeInfo[nodeName]
 
             # Update failure data if this log event was FATAL

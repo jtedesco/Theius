@@ -7,8 +7,12 @@ var clusterState;
 // The structure of the cluster
 var clusterStructure;
 
-// The visualization to call (initialized on subscribe success)
+// the cumulative logs of the cluster
+var clusterLogs = [];
+
+// The macro & micro visualizations (cluster & node)
 var visualization = null;
+var nodeVisualization = null;
 
 // Holds whether the visualization is currently planing
 var playing = true;
@@ -29,7 +33,9 @@ function update(data) {
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
                 var logEvent = updateData[i];
+                logEvent.id = clusterLogs.length;
                 logEvents.push(logEvent);
+                clusterLogs.push(logEvent);
             }
         }
 
@@ -42,7 +48,10 @@ function update(data) {
         if(visualization && visualization!=null) {
             if(playing) {
                 visualization.update(logEvents);
-                updateRightSideBar(clusterState);
+                if(nodeVisualization && nodeVisualization != null) {
+                    nodeVisualization.update(clusterState[nodeVisualization.getNodeName()]);
+                }
+                updateRightSideBar();
             } else {
                 console.log('Skipping viz update, viz is paused');
             }
@@ -76,10 +85,48 @@ function updateClusterState(stateChange) {
             for(var nodeProperty in stateChange[nodeName]) {
                 if(stateChange[nodeName].hasOwnProperty(nodeProperty)) {
                     clusterState[nodeName][nodeProperty] = stateChange[nodeName][nodeProperty];
-
                 }
             }
         }
+    }
+}
+
+
+/**
+ * Changes the data characteristics represented by using a different simulator.
+ * This requires a call to the server to ask to switch.
+ * @param simulatorName the name of the simulator to be switched to
+ */
+function changeDataCharacteristics(simulatorName) {
+
+    // Trigger an ajax call to the simulator server
+    $.ajax({
+        url: '/changeSimulator',
+        data: {
+            clientId: clientId,
+            simulator: simulatorName
+        },
+        success: changeDataCharacteristicsSuccess,
+        error: logError,
+        dataType: 'json'
+    });
+}
+
+/**
+ * Called after successfully changing the simulator.
+ * @param data the data sent back from the server
+ */
+function changeDataCharacteristicsSuccess(data) {
+
+    if (data.hasOwnProperty("successful") && data['successful']) {
+
+        // call subscribeSuccess, since it is like we are starting from scratch
+        // the only thing that stays the same is the clientId
+        data['clientId'] = clientId;
+        subscribeSuccess(data);
+    }
+    else {
+        logError(data);
     }
 }
 
@@ -141,11 +188,13 @@ function subscribeSuccess(data) {
     clientId = data['clientId'];
     clusterState = data['currentState'];
     clusterStructure = data['structure'];
+    clusterLogs = [];
 
     // Add the 'rack' to each node
     buildRacksData();
 
-    updateRightSideBar(clusterState);
+    // initialize right sidebar
+    updateRightSideBar();
 
     // Build the default visualization
     changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')  ;
@@ -162,35 +211,6 @@ function subscribeSuccess(data) {
     });
 }
 
-
-/**
- * Subscribe this client to log updates from the simulator
- */
-function unsubscribe() {
-
-    // Trigger an ajax call to the simulator server
-    $.ajax({
-        url: '/unsubscribe',
-        data: {
-            clientId: clientId
-        },
-        success: unsubscribeSuccess,
-        error: logError,
-        dataType: 'json'
-    });
-}
-
-
-/**
- * Handle a successful unsubscribe, record client id & log it
- */
-function unsubscribeSuccess(data) {
-    if(data['successful']) {
-        console.log('Successfully unsubscribed');
-    } else {
-        console.log('Failed to unsubscribe: ' + data['Successfully unsubscribed']);
-    }
-}
 
 function logError(errorText) {
     console.log('ERROR: ' + errorText);

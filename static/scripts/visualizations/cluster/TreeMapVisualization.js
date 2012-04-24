@@ -176,7 +176,11 @@ function TreeMapVisualization(structure, state) {
             })
             .text(function (d) {
                 return d.children ? '' : d.name;
+            })
+            .on('click', function (d) {
+                return d.children ? null : createNodeVisualization(d.name);
             });
+
 
         d3.select("#visualization").select("div").selectAll("div")
             .data(treemap.nodes, function(d) { return d.name;})

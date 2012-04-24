@@ -61,6 +61,9 @@ function changeVisualization(newVisualization, liId) {
     // Show a loading message temporarily
     $('#visualizationWrapper').prepend($('<div id="loadingMessage" class="hero-unit"><h3>Loading...</h3><br/><p>Please be patient</p></div>'));
 
+    // Hide the node visualization window if it's up
+    hideNodeVisualization();
+
     // Update the visualization variable
     visualization = newVisualization;
     if(visualization != null) {
@@ -78,6 +81,7 @@ function changeVisualization(newVisualization, liId) {
 
         // Attach mouse over listeners
         attachPopovers();
+
 
     } else {
         $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
@@ -239,4 +243,59 @@ function chooseSizeDataSet(sizeDataSet) {
     visualization.setSizeDataSet(sizeDataSet);
     visualization.update();
     $('#legend').html(visualization.getLegendContent());
+}
+
+/**
+ * Create the node visualization
+ */
+function createNodeVisualization(nodeName) {
+
+    var viz = $('#visualization');
+    var nodeVisualizationWrapper = $('#nodeVisualizationWrapper');
+
+    var node = clusterState[nodeName];
+
+    // Properly size the node visualization div
+    nodeVisualizationWrapper.css({
+        top:viz.position().top,
+        left:viz.position().left
+    });
+    nodeVisualizationWrapper.width(viz.width());
+    nodeVisualizationWrapper.height(viz.height());
+
+
+    $('#nodeVisualization').css({
+        width: '800px',
+        height: '600px'
+    });
+
+    // Add the node visualization
+    nodeVisualization = new PieChartNodeVisualization(node);
+    nodeVisualizationWrapper.hide();
+
+    // Set the title
+    $('#nodeVisualizationTitle').html('Visualization of <i>' + nodeVisualization.getNodeName() + '</i>');
+
+    // Show the node visualization
+    nodeVisualization.construct();
+}
+
+
+/**
+ * Show the node visualization (assumes it has been constructed)
+ */
+function showNodeVisualization() {
+    $('#nodeVisualizationWrapper').fadeIn('fast');
+}
+
+
+/**
+ * Hide the node visualization, and return to the main visualization
+ */
+function hideNodeVisualization() {
+    if(nodeVisualization) {
+        nodeVisualization.deconstruct();
+        nodeVisualization = null;
+    }
+    $('#nodeVisualizationWrapper').fadeOut('fast');
 }
