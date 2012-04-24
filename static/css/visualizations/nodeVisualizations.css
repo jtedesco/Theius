@@ -1,0 +1,11 @@
+#nodeVisualizationWrapper {
+    text-align: left;
+    position: absolute;
+    z-index: 10;
+    opacity: 1.0;
+    background-color: #f5f5f5;
+}
+
+#nodeVisualization {
+    margin:25px;
+}

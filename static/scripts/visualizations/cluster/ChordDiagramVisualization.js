@@ -253,7 +253,7 @@ function ChordDiagramVisualization(structure, state) {
             .on("mouseover", fadeToOpacity(.1))
             .on("mouseout", fadeToOpacity(1))
             .on('click', function(d) {
-                showNodeVisualization(machines[d.index].name);
+                createNodeVisualization(machines[d.index].name);
             });
 
         // Add the tick elements in place around the arc (& blocks

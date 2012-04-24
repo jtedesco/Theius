@@ -20,7 +20,7 @@ footer {
     height: 100%;
 }
 
-#cover, #nodeVisualization {
+#cover {
     text-align: left;
     position: absolute;
     z-index: 10;

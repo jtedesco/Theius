@@ -177,7 +177,7 @@ function TreeMapVisualization(structure, state) {
                 return d.children ? '' : d.name;
             })
             .on('click', function (d) {
-                return d.children ? null : showNodeVisualization(d.name);
+                return d.children ? null : createNodeVisualization(d.name);
             });
 
 

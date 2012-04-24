@@ -10,8 +10,9 @@ var clusterStructure;
 // the cumulative logs of the cluster
 var clusterLogs = [];
 
-// The visualization to call (initialized on subscribe success)
+// The macro & micro visualizations (cluster & node)
 var visualization = null;
+var nodeVisualization = null;
 
 // Holds whether the visualization is currently planing
 var playing = true;
@@ -50,6 +51,9 @@ function update(data) {
         if(visualization && visualization!=null) {
             if(playing) {
                 visualization.update(logEvents);
+                if(nodeVisualization && nodeVisualization != null) {
+                    nodeVisualization.update(clusterState[nodeVisualization.getNodeName()]);
+                }
                 updateRightSideBar();
             } else {
                 console.log('Skipping viz update, viz is paused');

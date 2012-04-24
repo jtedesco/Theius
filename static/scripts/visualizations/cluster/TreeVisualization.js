@@ -218,7 +218,7 @@ function TreeVisualization(structure, state) {
                     redrawGraph(d);
                 } else {
                     console.log(d);
-                    showNodeVisualization(d.name);
+                    createNodeVisualization(d.name);
                 }
             });
 

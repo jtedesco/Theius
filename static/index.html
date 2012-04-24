@@ -42,6 +42,10 @@
     <script type="text/javascript" src="/static/scripts/visualizations/cluster/ChordDiagramVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/chordDiagram.css">
 
+    <!-- Node visualizations -->
+    <script type="text/javascript" src="/static/scripts/visualizations/node/PieChartNodeVisualization.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/nodeVisualizations.css">
+
     <!-- Global style & scripts -->
     <link rel="stylesheet" type="text/css" href="/static/css/index.css">
     <script type="text/javascript" src="/static/scripts/index.js"></script>
@@ -146,10 +150,11 @@
             <div class="well">
                 <div id="visualizationWrapper">
                     <div id="visualization"></div>
-                    <div id="nodeVisualization">
+                    <div id="nodeVisualizationWrapper">
                         <center>
                             <a href="javascript:hideNodeVisualization()" style='float:left'>&lt; back</a>
                             <h3 id="nodeVisualizationTitle"></h3>
+                            <div id="nodeVisualization"></div>
                         </center>
                     </div>
                 </div>

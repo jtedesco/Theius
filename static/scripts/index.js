@@ -246,31 +246,46 @@ function chooseSizeDataSet(sizeDataSet) {
 }
 
 /**
- * Show the node visualization
+ * Create the node visualization
  */
-function showNodeVisualization(nodeName) {
+function createNodeVisualization(nodeName) {
 
     var viz = $('#visualization');
-    var nodeVisualization = $('#nodeVisualization');
+    var nodeVisualizationWrapper = $('#nodeVisualizationWrapper');
 
     var node = clusterState[nodeName];
 
     // Properly size the node visualization div
-    nodeVisualization.css({
+    nodeVisualizationWrapper.css({
         top:viz.position().top,
         left:viz.position().left
     });
-    nodeVisualization.width(viz.width());
-    nodeVisualization.height(viz.height());
+    nodeVisualizationWrapper.width(viz.width());
+    nodeVisualizationWrapper.height(viz.height());
+
+
+    $('#nodeVisualization').css({
+        width: '800px',
+        height: '600px'
+    });
+
+    // Add the node visualization
+    nodeVisualization = new PieChartNodeVisualization(node);
+    nodeVisualizationWrapper.hide();
 
     // Set the title
-    $('#nodeVisualizationTitle').html('Visualization of <i>' + node.name + '</i>');
+    $('#nodeVisualizationTitle').html('Visualization of <i>' + nodeVisualization.getNodeName() + '</i>');
 
-    // Show the node visualization div
-    nodeVisualization.hide();
-    nodeVisualization.fadeIn('fast', function() {
-//        viz.hide();
-    });
+    // Show the node visualization
+    nodeVisualization.construct();
+}
+
+
+/**
+ * Show the node visualization (assumes it has been constructed)
+ */
+function showNodeVisualization() {
+    $('#nodeVisualizationWrapper').fadeIn('fast');
 }
 
 
@@ -278,6 +293,9 @@ function showNodeVisualization(nodeName) {
  * Hide the node visualization, and return to the main visualization
  */
 function hideNodeVisualization() {
-//    $('#visualization').show();
-    $('#nodeVisualization').fadeOut('fast');
+    if(nodeVisualization) {
+        nodeVisualization.deconstruct();
+        nodeVisualization = null;
+    }
+    $('#nodeVisualizationWrapper').fadeOut('fast');
 }
