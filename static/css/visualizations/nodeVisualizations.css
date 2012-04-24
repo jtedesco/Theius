@@ -1,5 +1,5 @@
 #nodeVisualizationWrapper {
-    text-align: left;
+    text-align: center;
     position: absolute;
     z-index: 10;
     opacity: 1.0;
@@ -8,4 +8,8 @@
 
 #nodeVisualization {
     margin:25px;
+}
+
+#nodeVisualizationTitle {
+    padding-right: 40px;
 }
