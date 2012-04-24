@@ -244,6 +244,8 @@
         $("#dataCharacteristicSelector").change(function() {
             changeDataCharacteristics($("#dataCharacteristicSelector option:selected").val());
         });
+
+        $('#rankings, #tab').find('li').click(updateRightSideBar);
     })
 </script>
 </html>
