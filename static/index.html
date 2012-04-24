@@ -42,6 +42,10 @@
     <script type="text/javascript" src="/static/scripts/visualizations/cluster/ChordDiagramVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/chordDiagram.css">
 
+    <!-- Circle Packing viz -->
+    <script type="text/javascript" src="/static/scripts/visualizations/cluster/CirclePackingVisualization.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/visualizations/circlePacking.css">
+
     <!-- Node visualizations -->
     <script type="text/javascript" src="/static/scripts/visualizations/node/PieChartNodeVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/nodeVisualizations.css">
@@ -90,7 +94,7 @@
                             Prediction Scatterplot Matrix
                         </a>
                     </li>
-                    <li id="circlePackingLink"><a href="javascript:changeVisualization(null, 'circlePackingLink')">Circle Packing</a></li>
+                    <li id="circlePackingLink"><a href="javascript:changeVisualization(new CirclePackingVisualization(clusterStructure, clusterState), 'circlePackingLink')">Circle Packing</a></li>
                     <li id="chordDiagramLink"><a href="javascript:changeVisualization(new ChordDiagramVisualization(clusterStructure, clusterState), 'chordDiagramLink')">Chord Diagram</a></li>
                 </ul>
             </div>
