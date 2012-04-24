@@ -84,7 +84,16 @@ function updateClusterState(stateChange) {
         if(stateChange.hasOwnProperty(nodeName)) {
             for(var nodeProperty in stateChange[nodeName]) {
                 if(stateChange[nodeName].hasOwnProperty(nodeProperty)) {
-                    clusterState[nodeName][nodeProperty] = stateChange[nodeName][nodeProperty];
+                    var newNodeData = stateChange[nodeName][nodeProperty];
+                    if(nodeProperty === 'events') {
+                        for(var i in newNodeData) {
+                            if(newNodeData.hasOwnProperty(i)) {
+                                clusterState[nodeName][nodeProperty].push(newNodeData[i]);
+                            }
+                        }
+                    } else {
+                        clusterState[nodeName][nodeProperty] = newNodeData;
+                    }
                 }
             }
         }
