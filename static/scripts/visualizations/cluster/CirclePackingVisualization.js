@@ -169,7 +169,11 @@ function CirclePackingVisualization(structure, state) {
             })
             .attr("transform", function (d) {
                 return "translate(" + d.x + "," + d.y + ")";
+            })
+            .on('click', function (d) {
+                return d.children ? null : createNodeVisualization(d.name);
             });
+
 
        // console.log(node);
        // console.log("running");
