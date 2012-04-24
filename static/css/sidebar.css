@@ -1,3 +1,7 @@
 .sidebarText {
     font: 16px sans-serif;
 }
+
+#colorDataSetSelector, #sizeDataSetSelector, #dataCharacteristicSelector {
+    width: 100%;
+}
