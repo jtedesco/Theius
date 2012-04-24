@@ -54,6 +54,7 @@ class DefaultSimulator(BaseSimulator):
                 'cpuUsage': 0.2,
                 'memoryUsage': 0.3,
                 'contextSwitchRate': 0.1, # What is this???
+                'events': [],
                 'lastFailureTime': None,
                 'predictedFailureTime': datetime.strftime(datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]), TIMESTAMP_FORMAT),
                 'predictedSeverityProbabilities': {
@@ -104,6 +105,8 @@ class DefaultSimulator(BaseSimulator):
                 'events' : logEvents,
                 'stateChange' : nodeInfoUpdates
             }
+
+            # Add to the global list of logs
             self.addLog(log)
 
             # Apply the node info updates to the simulator's state
@@ -118,7 +121,10 @@ class DefaultSimulator(BaseSimulator):
         for nodeName in updates:
             nodeDataToUpdate = updates[nodeName]
             for entryName in nodeDataToUpdate:
-                self.nodeInfo[nodeName][entryName] = nodeDataToUpdate[entryName]
+                if entryName is 'events':
+                    self.nodeInfo[nodeName][entryName].extend(nodeDataToUpdate[entryName])
+                else:
+                    self.nodeInfo[nodeName][entryName] = nodeDataToUpdate[entryName]
 
 
     def getUpdatedNodeInfoBasedOnEvents(self, logEvents):
@@ -145,7 +151,10 @@ class DefaultSimulator(BaseSimulator):
             # Add an entry if there isn't one already
             nodeName = logEvent['location']
             if nodeName not in updatedNodeInfo:
-                updatedNodeInfo[nodeName] = {}
+                updatedNodeInfo[nodeName] = {
+                    'events': []
+                }
+            updatedNodeInfo[nodeName]['events'].append(logEvent)
             nodeInfo = updatedNodeInfo[nodeName]
 
             # Update failure data if this log event was FATAL

@@ -44,9 +44,6 @@ function update(data) {
         updateClusterState(stateChange);
         updateNodePopovers(stateChange);
 
-        // Record the events that happened at each node
-        updateNodeEvents(logEvents);
-
         // Update the visualization
         if(visualization && visualization!=null) {
             if(playing) {
@@ -90,24 +87,10 @@ function updateClusterState(stateChange) {
                     clusterState[nodeName][nodeProperty] = stateChange[nodeName][nodeProperty];
                 }
             }
-            if(!clusterState[nodeName].hasOwnProperty('events')) {
-                clusterState[nodeName]['events'] = [];
-            }
         }
     }
 }
 
-
-/**
- * Update the list of events for each node
- */
-function updateNodeEvents(events) {
-    for (var i in events) {
-        if(events.hasOwnProperty(i)) {
-            clusterState[events[i].location]['events'].push(events[i]);
-        }
-    }
-}
 
 /**
  * Changes the data characteristics represented by using a different simulator.
