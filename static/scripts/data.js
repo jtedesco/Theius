@@ -102,7 +102,6 @@ function changeDataCharacteristics(simulatorName) {
             clientId: clientId,
             simulator: simulatorName
         },
-        data: {},
         success: changeDataCharacteristicsSuccess,
         error: logError,
         dataType: 'json'
@@ -208,35 +207,6 @@ function subscribeSuccess(data) {
     });
 }
 
-
-/**
- * Subscribe this client to log updates from the simulator
- */
-function unsubscribe() {
-
-    // Trigger an ajax call to the simulator server
-    $.ajax({
-        url: '/unsubscribe',
-        data: {
-            clientId: clientId
-        },
-        success: unsubscribeSuccess,
-        error: logError,
-        dataType: 'json'
-    });
-}
-
-
-/**
- * Handle a successful unsubscribe, record client id & log it
- */
-function unsubscribeSuccess(data) {
-    if(data['successful']) {
-        console.log('Successfully unsubscribed');
-    } else {
-        console.log('Failed to unsubscribe: ' + data['Successfully unsubscribed']);
-    }
-}
 
 function logError(errorText) {
     console.log('ERROR: ' + errorText);
