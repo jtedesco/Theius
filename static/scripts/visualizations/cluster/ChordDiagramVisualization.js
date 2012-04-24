@@ -251,7 +251,10 @@ function ChordDiagramVisualization(structure, state) {
             .style("stroke", function(d) { return fill(d.index); })
             .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
             .on("mouseover", fadeToOpacity(.1))
-            .on("mouseout", fadeToOpacity(1));
+            .on("mouseout", fadeToOpacity(1))
+            .on('click', function(d) {
+                showNodeVisualization(machines[d.index].name);
+            });
 
         // Add the tick elements in place around the arc (& blocks
         var ticks = svg.append("g")

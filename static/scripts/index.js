@@ -61,6 +61,9 @@ function changeVisualization(newVisualization, liId) {
     // Show a loading message temporarily
     $('#visualizationWrapper').prepend($('<div id="loadingMessage" class="hero-unit"><h3>Loading...</h3><br/><p>Please be patient</p></div>'));
 
+    // Hide the node visualization window if it's up
+    hideNodeVisualization();
+
     // Update the visualization variable
     visualization = newVisualization;
     if(visualization != null) {
@@ -78,6 +81,7 @@ function changeVisualization(newVisualization, liId) {
 
         // Attach mouse over listeners
         attachPopovers();
+
 
     } else {
         $('#visualizationWrapper').prepend($('<div id="errorMessage" class="hero-unit"><h3>Error loading visualization</h3><br/><p>Please try again</p></div>'));
@@ -239,4 +243,41 @@ function chooseSizeDataSet(sizeDataSet) {
     visualization.setSizeDataSet(sizeDataSet);
     visualization.update();
     $('#legend').html(visualization.getLegendContent());
+}
+
+/**
+ * Show the node visualization
+ */
+function showNodeVisualization(nodeName) {
+
+    var viz = $('#visualization');
+    var nodeVisualization = $('#nodeVisualization');
+
+    var node = clusterState[nodeName];
+
+    // Properly size the node visualization div
+    nodeVisualization.css({
+        top:viz.position().top,
+        left:viz.position().left
+    });
+    nodeVisualization.width(viz.width());
+    nodeVisualization.height(viz.height());
+
+    // Set the title
+    $('#nodeVisualizationTitle').html('Visualization of <i>' + node.name + '</i>');
+
+    // Show the node visualization div
+    nodeVisualization.hide();
+    nodeVisualization.fadeIn('fast', function() {
+//        viz.hide();
+    });
+}
+
+
+/**
+ * Hide the node visualization, and return to the main visualization
+ */
+function hideNodeVisualization() {
+//    $('#visualization').show();
+    $('#nodeVisualization').fadeOut('fast');
 }
