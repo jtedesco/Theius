@@ -39,14 +39,15 @@ function PieChartNodeVisualization(nodeState) {
      * Gets a dictionary containing the fraction of logs that are at each log level
      */
     var getLogsByLevel = function() {
+
         var eventsByLevel = {
             INFO: [],
             WARN: [],
             ERROR: [],
             FATAL: []
         };
-
         var totalEventCount = 0;
+
         for(var index in nodeState.events) {
             if(nodeState.events.hasOwnProperty(index)) {
 
@@ -81,11 +82,14 @@ function PieChartNodeVisualization(nodeState) {
 
         if(eventsByLevel['totalCount'] > 0) {
 
+            // Setup the basic visualization
             var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height()-150),
                 outerRadius = Math.min(dim) / 2,
                 innerRadius = outerRadius * .6,
                 data = d3.range(4).map(function(i) {
-                    return eventsByLevel[getEventLevel(i)].length / eventsByLevel['totalCount'];
+                    var eventLevel = getEventLevel(i);
+                    var eventsAtThisLevel = eventsByLevel[eventLevel].length;
+                    return eventsAtThisLevel / eventsByLevel.totalCount;
                 }),
                 color = d3.scale.category20(),
                 donut = d3.layout.pie(),
@@ -97,28 +101,40 @@ function PieChartNodeVisualization(nodeState) {
                 .attr("width", dim)
                 .attr("height", dim);
 
+            // Add arcs for all new data points
             var arcs = vis.selectAll("g.arc")
-                .data(donut)
+                .data(donut, function(d, i) {
+                    var level = getEventLevel(i);
+                    d.data = {
+                        percentage: d.data,
+                        level: level,
+                        count: eventsByLevel[level].length,
+                        totalCount: eventsByLevel.totalCount
+                    };
+                    return i;
+                })
                 .enter().append("g")
                 .attr("class", "arc")
                 .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
+            // Color based on the event level severity
             arcs.append("path")
                 .attr("fill", function(d, i) { return color(i); })
                 .attr("d", arc);
 
+            // Add text containing the level & total & partial counts
             arcs.append("text")
                 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
                 .attr("dy", ".35em")
                 .attr("text-anchor", "middle")
                 .attr("display", function(d) { return d.value > .15 ? null : "none"; })
                 .text(function(d, i) {
-                    var eventLevel = getEventLevel(i);
-                    return eventLevel + ':   ' + eventsByLevel[eventLevel].length + '/' + eventsByLevel['totalCount'];
+                    return d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
                 });
         } else {
             nodeVisualizationDiv.html('<br/><br/><h4>No logs to display!</h4>')
         }
+
         // Actually show the node visualization
         showNodeVisualization();
     };
