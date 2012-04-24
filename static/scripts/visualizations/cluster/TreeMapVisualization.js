@@ -63,7 +63,6 @@ function TreeMapVisualization(structure, state) {
      * Colors the rectangle
      */
     var background = function (node) {
-        console.log("in background tree map");
         if(!node.children) {
             if(This.colorDataSet === 'rack') {
                 return color(state[node.name][This.colorDataSet]);
