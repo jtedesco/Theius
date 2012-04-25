@@ -11,49 +11,55 @@ function PieChartNodeVisualization(nodeState) {
     // The state for this node
     this.nodeState = nodeState;
 
+    // The current data set configuration (severity or facility)
+    this.dataSet = 'severity';
+
 
     /**
-     * Gets the label corresponding to the severity level of the log (0-3)
+     * Gets the array of possible values of event labels
      */
-    var getEventLevel = function(level) {
-        var eventLevel = null;
-        switch (level) {
-            case 0:
-                eventLevel = 'INFO';
-                break;
-            case 1:
-                eventLevel = 'WARN';
-                break;
-            case 2:
-                eventLevel = 'ERROR';
-                break;
-            case 3:
-                eventLevel = 'FATAL';
-                break;
+    var getLabels = function() {
+        if(This.dataSet === 'severity') {
+            return [
+                'INFO',
+                'WARN',
+                'ERROR',
+                'FATAL'
+            ]
         }
-        return eventLevel;
     };
 
 
     /**
-     * Gets a dictionary containing the fraction of logs that are at each log level
+     * Gets the label corresponding to the severity level of the log (0-3), or facility
      */
-    var getLogsByLevel = function() {
+    var getEventLabel = function(level) {
+        return getLabels()[level];
+    };
 
-        var eventsByLevel = {
-            INFO: [],
-            WARN: [],
-            ERROR: [],
-            FATAL: []
-        };
+
+    /**
+     * Gets a dictionary containing the fraction of logs that are at each log level or facility
+     */
+    var groupLogs = function() {
+
+        var eventsByLevel = {};
         var totalEventCount = 0;
+
+        var labels = getLabels();
+        for(var i in labels) {
+            if(labels.hasOwnProperty(i)) {
+                eventsByLevel[labels[i]] = [];
+            }
+        }
 
         for(var index in nodeState.events) {
             if(nodeState.events.hasOwnProperty(index)) {
 
                 var event = nodeState.events[index];
-                var eventLevel = event.severity;
-                eventsByLevel[eventLevel].push(event);
+                var eventLabel = event[This.dataSet];
+
+                eventsByLevel[eventLabel].push(event);
                 totalEventCount++;
             }
         }
@@ -61,6 +67,14 @@ function PieChartNodeVisualization(nodeState) {
         eventsByLevel['totalCount'] = totalEventCount;
 
         return eventsByLevel;
+    };
+
+
+    /**
+     * Sets the 'dataSet' parameter
+     */
+    this.setDataSet = function(dataSet) {
+        This.dataSet = dataSet;
     };
 
 
@@ -87,7 +101,7 @@ function PieChartNodeVisualization(nodeState) {
             outerRadius = Math.min(dim) / 2,
             innerRadius = outerRadius * .6,
             data = d3.range(4).map(function (i) {
-                var eventLevel = getEventLevel(i);
+                var eventLevel = getEventLabel(i);
                 var eventsAtThisLevel = eventsByLevel[eventLevel].length;
                 return eventsAtThisLevel / eventsByLevel.totalCount;
             }),
@@ -104,7 +118,7 @@ function PieChartNodeVisualization(nodeState) {
         // Add arcs for all new data points
         var arcs = vis.selectAll("g.arc")
             .data(donut, function (d, i) {
-                var level = getEventLevel(i);
+                var level = getEventLabel(i);
                 d.data = {
                     percentage:d.data,
                     level:level,
@@ -145,7 +159,7 @@ function PieChartNodeVisualization(nodeState) {
      */
     this.construct = function() {
 
-        var eventsByLevel = getLogsByLevel();
+        var eventsByLevel = groupLogs();
         var nodeVisualizationDiv = $('#nodeVisualization');
 
         if(eventsByLevel['totalCount'] > 0) {
@@ -165,7 +179,7 @@ function PieChartNodeVisualization(nodeState) {
     this.update = function(newNodeState) {
         This.nodeState = newNodeState;
         $('#nodeVisualization').children().remove();
-        drawPieGraph(getLogsByLevel());
+        drawPieGraph(groupLogs());
     };
 
 

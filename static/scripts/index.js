@@ -152,13 +152,11 @@ function generateNodePopoverContent(node, skipStyling) {
 function attachPopovers() {
     for(var nodeName in clusterState) {
         if(clusterState.hasOwnProperty(nodeName)) {
-
             var nodeElement = $('#' + nodeName);
             nodeElement.attr('data-original-title', '<i>' + nodeName + '</i> information');
             nodeElement.attr('data-content', function() {
-
                 var node = clusterState[nodeName];
-                return generateNodePopoverContent(node);
+                return generateNodePopoverContent(node, false);
             });
             nodeElement.popover({ delay: {
                 show: 100,

@@ -295,6 +295,18 @@
             rightSidebar.children().height(mainSpan.height()-60);
         }
 
+        // Add listeners for node visualization controls
+        $("input[type=radio]").click(function(){
+            if(nodeVisualization) {
+                if(this.name === 'nodeVisualizationBreakdown') {
+                    nodeVisualization.setDataSet(this.value);
+                } else {
+                    console.log("ERROR: not yet implemented!");
+                }
+
+            }
+        });
+
         //add listener for Data Characteristics Menu
         $("#dataCharacteristicSelector").change(function() {
             changeDataCharacteristics($("#dataCharacteristicSelector option:selected").val());
