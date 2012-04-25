@@ -169,6 +169,37 @@
                                 <br/><br/>
                                 <h4>Node Information</h4><br/>
                                 <div class="well" id="nodeVisualizationStats"></div>
+                                <div class="well" id="nodeVisualizationControls">
+                                    <div class='form-vertical row-fluid'>
+                                        <div class='span6'>
+                                            <h4>Break Down By:</h4><br/>
+                                            <div class="control-group">
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationBreakdown" id="severity" value="severity" checked>
+                                                    Event severity
+                                                </label>
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationBreakdown" id="facility" value="facility">
+                                                    Event facility
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class='span6'>
+                                            <h4>Visualization:</h4><br/>
+                                            <div class="control-group">
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationGraphic" id="pie" value="pie" checked>
+                                                    Log event pie diagram
+                                                </label>
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationGraphic" id="histogram" value="histogram">
+                                                    Log events historical histograms
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                    </div>
+                                </div>
                             </div>
                             <div class="span5">
                                 <div id="nodeVisualization"></div>
