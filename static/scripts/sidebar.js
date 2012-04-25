@@ -109,37 +109,54 @@ function updateEvents(logs) {
     // grab last ten logs
     var lastLogs = logs.slice(-20).reverse();
 
-    var events = d3.select("#events").selectAll("div")
+    var header = function(d) { return d.timestamp + " " + d.severity };
+    var div1 = function(d) { return "Facility : " + d.facility; };
+    var div2 = function(d) { return "Location : " + d.location; };
+    var div3 = function(d) { return "Message  : " + d.message; };
+
+    var events = d3.select("#events").selectAll("div.logWrapper")
         .data(lastLogs, function(d) { return d.id; })
         .order();
 
-    var text = function(d) { return d.facility + " " + d.id; };
-
-    var eventsEnter = events.enter().insert("div", "div");
+    var eventsEnter = events.enter().insert("div", "div.logWrapper");
 
     eventsEnter
         .style("height", "0px")
-        .style("opacity", 0)
-        .append("p")
+        .attr("class", "logWrapper")
+        .style("opacity", 0);
+
+    eventsEnter.append("a")
         .attr("class", "sidebarText")
         .style("font-size", "0px")
-        .text(text);
+        .attr("data-toggle", "collapse")
+        .attr("href", function(d) { return "#log" + d.id; })
+        .text(header);
+
+    var collapse = eventsEnter.append("div")
+        .attr("id", function(d) { return "log" + d.id; })
+        .attr("class", "collapse");
+
+    collapse.append("div").text(div1);
+    collapse.append("div").text(div2);
+    collapse.append("div").text(div3);
 
     eventsEnter.transition()
         .duration(500)
-        .style("height", "20px")
+        .style("height", "auto")
         .style("opacity", 1.0)
-        .select("p")
+        .select("a")
         .style("font-size", "16px");
 
-    events.exit()
+    var eventsExit = events.exit()
         .transition()
         .duration(500)
         .style("height", "0px")
-        .style("opacity", 0)
-        .select("p")
-        .style("font-size", "0px")
-        .remove();
+        .style("opacity", 0);
+
+    eventsExit.select("p")
+        .style("font-size", "0px");
+
+    eventsExit.remove();
 }
 
 /**
