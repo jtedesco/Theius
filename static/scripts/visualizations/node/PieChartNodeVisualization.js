@@ -115,7 +115,7 @@ function PieChartNodeVisualization(nodeState) {
                 var eventsAtThisLevel = eventsByLevel[eventLevel].length;
                 return eventsAtThisLevel / eventsByLevel.totalCount;
             }),
-            color = d3.scale.category20(),
+            color = d3.scale.category20c(),
             donut = d3.layout.pie(),
             arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
 
@@ -155,11 +155,8 @@ function PieChartNodeVisualization(nodeState) {
             })
             .attr("dy", ".35em")
             .attr("text-anchor", "middle")
-            .attr("display", function (d) {
-                return d.value > .15 ? null : "none";
-            })
             .text(function (d, i) {
-                return d.data.level;
+                return d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
             });
     };
 
