@@ -25,7 +25,17 @@ function PieChartNodeVisualization(nodeState) {
                 'WARN',
                 'ERROR',
                 'FATAL'
-            ]
+            ];
+        } else {
+            return [
+                'MMCS',
+                'APP',
+                'KERNEL',
+                'LINKCARD',
+                'MONITOR',
+                'HARDWARE',
+                'DISCOVERY'
+            ];
         }
     };
 
@@ -100,7 +110,7 @@ function PieChartNodeVisualization(nodeState) {
         var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height() - 50),
             outerRadius = Math.min(dim) / 2,
             innerRadius = outerRadius * .6,
-            data = d3.range(4).map(function (i) {
+            data = d3.range(getLabels().length).map(function (i) {
                 var eventLevel = getEventLabel(i);
                 var eventsAtThisLevel = eventsByLevel[eventLevel].length;
                 return eventsAtThisLevel / eventsByLevel.totalCount;
@@ -149,7 +159,7 @@ function PieChartNodeVisualization(nodeState) {
                 return d.value > .15 ? null : "none";
             })
             .text(function (d, i) {
-                return d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
+                return d.data.level;
             });
     };
 

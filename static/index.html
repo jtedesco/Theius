@@ -300,6 +300,7 @@
             if(nodeVisualization) {
                 if(this.name === 'nodeVisualizationBreakdown') {
                     nodeVisualization.setDataSet(this.value);
+                    nodeVisualization.update(clusterState[nodeVisualization.getNodeName()]);
                 } else {
                     console.log("ERROR: not yet implemented!");
                 }
