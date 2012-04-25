@@ -107,42 +107,38 @@ function updateRankings(state) {
  */
 function updateEvents(logs) {
     // grab last ten logs
-    var lastLogs = logs.slice(-10).reverse();
+    var lastLogs = logs.slice(-20).reverse();
 
-    //helper functions for D3
-    var text = function(d) { return d.facility; };
-    var height = function(i) { return i*25 + 40};
-    var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
-
-    // update svg width + height, and bind data to the elements
-    var events = d3.select("#events").select("svg")
-        .attr("width", $('#events').width())
-        .attr("height", $('#rightSidebar').find('.well').height() - 50)
-        .selectAll("g")
+    var events = d3.select("#events").selectAll("div")
         .data(lastLogs, function(d) { return d.id; })
         .order();
 
-    // add new logs, which should slide in and fade in from the top
-    var eventsEnter = events.enter().append("g")
-        .attr("transform", function(d,i) { return "translate(0," + height(-1) + ")"; })
-        .style("opacity", 0);
+    var text = function(d) { return d.facility + " " + d.id; };
 
-    eventsEnter.append("text")
+    var eventsEnter = events.enter().insert("div", "div");
+
+    eventsEnter
+        .style("height", "0px")
+        .style("opacity", 0)
+        .append("p")
         .attr("class", "sidebarText")
+        .style("font-size", "0px")
         .text(text);
 
-    // move existing (older) logs down the list as new ones come in
-    events.transition()
+    eventsEnter.transition()
         .duration(500)
-        .attr("transform", position(0))
-        .style("opacity", 1.0);
+        .style("height", "20px")
+        .style("opacity", 1.0)
+        .select("p")
+        .style("font-size", "16px");
 
-    // old logs slide off the bottom and disappear
     events.exit()
         .transition()
         .duration(500)
-        .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })
+        .style("height", "0px")
         .style("opacity", 0)
+        .select("p")
+        .style("font-size", "0px")
         .remove();
 }
 
