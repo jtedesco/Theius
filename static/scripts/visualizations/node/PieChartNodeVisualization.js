@@ -83,7 +83,7 @@ function PieChartNodeVisualization(nodeState) {
         $('#nodeVisualizationStats').html(generateNodePopoverContent(This.nodeState, true));
 
         // Setup the basic visualization
-        var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height() - 150),
+        var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height() - 50),
             outerRadius = Math.min(dim) / 2,
             innerRadius = outerRadius * .6,
             data = d3.range(4).map(function (i) {
