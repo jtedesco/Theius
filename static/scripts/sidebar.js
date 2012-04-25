@@ -74,9 +74,11 @@ function updateRankings(state) {
         .attr("transform", position(-100))
         .style("opacity", 1.0);
 
-    rankingsEnter.append("text")
+    rankingsEnter.append("a")
+        .append("text")
         .attr("class" , "sidebarText")
-        .text(text);
+        .text(text)
+        .on("click", function(d) { createNodeVisualization(d.name); });
 
     rankingsEnter.transition()
         .duration(500)
@@ -87,6 +89,7 @@ function updateRankings(state) {
         .duration(500)
         .attr("transform", position(0))
         .style("opacity", 1.0)
+        .select("a")
         .select("text")
         .text(text);
 
@@ -105,43 +108,56 @@ function updateRankings(state) {
  */
 function updateEvents(logs) {
     // grab last ten logs
-    var lastLogs = logs.slice(-10).reverse();
+    var lastLogs = logs.slice(-20).reverse();
 
-    //helper functions for D3
-    var text = function(d) { return d.facility; };
-    var height = function(i) { return i*25 + 40};
-    var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
+    var header = function(d) { return d.timestamp + " " + d.severity };
+    var div1 = function(d) { return "Facility : " + d.facility; };
+    var div2 = function(d) { return "Location : " + d.location; };
+    var div3 = function(d) { return "Message  : " + d.message; };
 
-    // update svg width + height, and bind data to the elements
-    var events = d3.select("#events").select("svg")
-        .attr("width", $('#events').width())
-        .attr("height", $('#rightSidebar').find('.well').height() - 50)
-        .selectAll("g")
+    var events = d3.select("#events").selectAll("div.logWrapper")
         .data(lastLogs, function(d) { return d.id; })
         .order();
 
-    // add new logs, which should slide in and fade in from the top
-    var eventsEnter = events.enter().append("g")
-        .attr("transform", function(d,i) { return "translate(0," + height(-1) + ")"; })
+    var eventsEnter = events.enter().insert("div", "div.logWrapper");
+
+    eventsEnter
+        .style("height", "0px")
+        .attr("class", "logWrapper")
         .style("opacity", 0);
 
-    eventsEnter.append("text")
+    eventsEnter.append("a")
         .attr("class", "sidebarText")
-        .text(text);
+        .style("font-size", "0px")
+        .attr("data-toggle", "collapse")
+        .attr("href", function(d) { return "#log" + d.id; })
+        .text(header);
 
-    // move existing (older) logs down the list as new ones come in
-    events.transition()
+    var collapse = eventsEnter.append("div")
+        .attr("id", function(d) { return "log" + d.id; })
+        .attr("class", "collapse");
+
+    collapse.append("div").text(div1);
+    collapse.append("div").text(div2);
+    collapse.append("div").text(div3);
+
+    eventsEnter.transition()
         .duration(500)
-        .attr("transform", position(0))
-        .style("opacity", 1.0);
+        .style("height", "auto")
+        .style("opacity", 1.0)
+        .select("a")
+        .style("font-size", "16px");
 
-    // old logs slide off the bottom and disappear
-    events.exit()
+    var eventsExit = events.exit()
         .transition()
         .duration(500)
-        .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })
-        .style("opacity", 0)
-        .remove();
+        .style("height", "0px")
+        .style("opacity", 0);
+
+    eventsExit.select("p")
+        .style("font-size", "0px");
+
+    eventsExit.remove();
 }
 
 /**

@@ -163,11 +163,49 @@
                 <div id="visualizationWrapper">
                     <div id="visualization"></div>
                     <div id="nodeVisualizationWrapper">
-                        <center>
-                            <a href="javascript:hideNodeVisualization()" style='float:left'>&lt; back</a>
+                            <a href="javascript:hideNodeVisualization()" style='float:left'>&larr; back</a>
                             <h3 id="nodeVisualizationTitle"></h3>
-                            <div id="nodeVisualization"></div>
-                        </center>
+                            <div class="span4">
+                                <br/><br/>
+                                <h4>Node Information</h4><br/>
+                                <div class="well" id="nodeVisualizationStats"></div>
+                                <br/>
+                                <h4>Node Visualization Controls</h4><br/>
+                                <div class="well" id="nodeVisualizationControls">
+                                    <div class='form-vertical row-fluid'>
+                                        <div class='span6'>
+                                            <h4>Break Down By:</h4><br/>
+                                            <div class="control-group">
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationBreakdown" id="severity" value="severity" checked>
+                                                    Event severity
+                                                </label>
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationBreakdown" id="facility" value="facility">
+                                                    Event facility
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class='span6'>
+                                            <h4>Visualization:</h4><br/>
+                                            <div class="control-group">
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationGraphic" id="pie" value="pie" checked>
+                                                    Log event pie diagram
+                                                </label>
+                                                <label class="radio">
+                                                    <input type="radio" name="nodeVisualizationGraphic" id="histogram" value="histogram">
+                                                    Log events historical histograms
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span5">
+                                <div id="nodeVisualization"></div>
+                            </div>
                     </div>
                 </div>
                 <div id="cover"></div>
@@ -201,7 +239,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="events">
-                        <svg></svg>
+
                     </div>
 
                     <div class="tab-pane fade" id="general">
@@ -256,6 +294,19 @@
             rightSidebar.height(mainSpan.height());
             rightSidebar.children().height(mainSpan.height()-60);
         }
+
+        // Add listeners for node visualization controls
+        $("input[type=radio]").click(function(){
+            if(nodeVisualization) {
+                if(this.name === 'nodeVisualizationBreakdown') {
+                    nodeVisualization.setDataSet(this.value);
+                    nodeVisualization.update(clusterState[nodeVisualization.getNodeName()]);
+                } else {
+                    console.log("ERROR: not yet implemented!");
+                }
+
+            }
+        });
 
         //add listener for Data Characteristics Menu
         $("#dataCharacteristicSelector").change(function() {

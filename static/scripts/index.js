@@ -117,19 +117,25 @@ function showVisualization() {
 
 /**
  * Generates the popover content for a node
- *  @param node The node for which to generate the popover data
+ *  @param node         The node for which to generate the popover data
+ *  @param  skipStyling Whether or not to skip the explicit styling for column widths
  */
-function generateNodePopoverContent(node) {
+function generateNodePopoverContent(node, skipStyling) {
 
+    // Helper function to format a number to 2 digits
     function formatNum(num) {
         return num.toFixed(2);
     }
 
+    // The style tags to include
+    var style1 = skipStyling ? '' : "style='width:220px;'";
+    var style2 = skipStyling ? '' : "style='width:90px;'";
+
     return "<table>" +
-        "<tr><td style='width:220px;'><b>CPU Usage:&nbsp;&nbsp;</b></td><td style='width:90px;>" + formatNum(node['cpuUsage']) + "</td></tr>" +
+        "<tr><td" + style1 + "><b>CPU Usage:&nbsp;&nbsp;</b></td><td" + style2 + ">" + formatNum(node['cpuUsage']) + "</td></tr>" +
         "<tr><td><b>Memory Usage:&nbsp;&nbsp;</b></td><td>" + formatNum(node['memoryUsage']) + "</td></tr>" +
         "<tr><td><b>Context Switch Rate:&nbsp;&nbsp;</b></td><td>" + formatNum(node['contextSwitchRate']) + "</td></tr>" +
-        "<tr><td><b>Last Failure Time:&nbsp;&nbsp;</b></td><td'>" + node['lastFailureTime'] + "</td></tr>" +
+        "<tr><td><b>Last Failure Time:&nbsp;&nbsp;</b></td><td>" + node['lastFailureTime'] + "</td></tr>" +
         "<tr><td><b>Predicted Failure Time:&nbsp;&nbsp;</b></td><td>" + node['predictedFailureTime'] + "</td></tr>" +
         "<tr><td><b>Prob of FATAL Event:&nbsp;&nbsp;</b></td><td>" + formatNum(node['predictedSeverityProbabilities']['FATAL']) + "</td></tr>" +
         "<tr><td><b>Prob of ERROR Event:&nbsp;&nbsp;</b></td><td>" + formatNum(node['predictedSeverityProbabilities']['ERROR']) + "</td></tr>" +
@@ -146,13 +152,11 @@ function generateNodePopoverContent(node) {
 function attachPopovers() {
     for(var nodeName in clusterState) {
         if(clusterState.hasOwnProperty(nodeName)) {
-
             var nodeElement = $('#' + nodeName);
             nodeElement.attr('data-original-title', '<i>' + nodeName + '</i> information');
             nodeElement.attr('data-content', function() {
-
                 var node = clusterState[nodeName];
-                return generateNodePopoverContent(node);
+                return generateNodePopoverContent(node, false);
             });
             nodeElement.popover({ delay: {
                 show: 100,
@@ -265,11 +269,11 @@ function createNodeVisualization(nodeName) {
 
 
     $('#nodeVisualization').css({
-        width: '800px',
-        height: '600px'
+        width: $('#nodeVisualization').parent().parent().width()/2 + 'px',
+        height: $('#nodeVisualization').parent().parent().height() + 'px'
     });
 
-    // Add the node visualization
+    // Add the default node visualization
     nodeVisualization = new PieChartNodeVisualization(node);
     nodeVisualizationWrapper.hide();
 

@@ -11,49 +11,65 @@ function PieChartNodeVisualization(nodeState) {
     // The state for this node
     this.nodeState = nodeState;
 
+    // The current data set configuration (severity or facility)
+    this.dataSet = 'severity';
+
 
     /**
-     * Gets the label corresponding to the severity level of the log (0-3)
+     * Gets the array of possible values of event labels
      */
-    var getEventLevel = function(level) {
-        var eventLevel = null;
-        switch (level) {
-            case 0:
-                eventLevel = 'INFO';
-                break;
-            case 1:
-                eventLevel = 'WARN';
-                break;
-            case 2:
-                eventLevel = 'ERROR';
-                break;
-            case 3:
-                eventLevel = 'FATAL';
-                break;
+    var getLabels = function() {
+        if(This.dataSet === 'severity') {
+            return [
+                'INFO',
+                'WARN',
+                'ERROR',
+                'FATAL'
+            ];
+        } else {
+            return [
+                'MMCS',
+                'APP',
+                'KERNEL',
+                'LINKCARD',
+                'MONITOR',
+                'HARDWARE',
+                'DISCOVERY'
+            ];
         }
-        return eventLevel;
     };
 
 
     /**
-     * Gets a dictionary containing the fraction of logs that are at each log level
+     * Gets the label corresponding to the severity level of the log (0-3), or facility
      */
-    var getLogsByLevel = function() {
+    var getEventLabel = function(level) {
+        return getLabels()[level];
+    };
 
-        var eventsByLevel = {
-            INFO: [],
-            WARN: [],
-            ERROR: [],
-            FATAL: []
-        };
+
+    /**
+     * Gets a dictionary containing the fraction of logs that are at each log level or facility
+     */
+    var groupLogs = function() {
+
+        var eventsByLevel = {};
         var totalEventCount = 0;
+
+        var labels = getLabels();
+        for(var i in labels) {
+            if(labels.hasOwnProperty(i)) {
+                eventsByLevel[labels[i]] = [];
+            }
+        }
 
         for(var index in nodeState.events) {
             if(nodeState.events.hasOwnProperty(index)) {
 
                 var event = nodeState.events[index];
-                var eventLevel = event.severity;
-                eventsByLevel[eventLevel].push(event);
+                var eventLabel = event[This.dataSet];
+
+                eventsByLevel[eventLabel].push(event);
                 totalEventCount++;
             }
         }
@@ -61,6 +77,14 @@ function PieChartNodeVisualization(nodeState) {
         eventsByLevel['totalCount'] = totalEventCount;
 
         return eventsByLevel;
+    };
+
+
+    /**
+     * Sets the 'dataSet' parameter
+     */
+    this.setDataSet = function(dataSet) {
+        This.dataSet = dataSet;
     };
 
 
@@ -73,64 +97,80 @@ function PieChartNodeVisualization(nodeState) {
 
 
     /**
+     * Helper function to draw the pie graph, assuming there is nothing in the node visualization yet
+     */
+    var drawPieGraph = function(eventsByLevel) {
+
+        var nodeVisualizationDiv = $('#nodeVisualization');
+
+        // Update the node stats
+        $('#nodeVisualizationStats').html(generateNodePopoverContent(This.nodeState, true));
+
+        // Setup the basic visualization
+        var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height() - 50),
+            outerRadius = Math.min(dim) / 2,
+            innerRadius = outerRadius * .6,
+            data = d3.range(getLabels().length).map(function (i) {
+                var eventLevel = getEventLabel(i);
+                var eventsAtThisLevel = eventsByLevel[eventLevel].length;
+                return eventsAtThisLevel / eventsByLevel.totalCount;
+            }),
+            color = d3.scale.category20b(),
+            donut = d3.layout.pie(),
+            arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+
+        var vis = d3.select("#nodeVisualization")
+            .append("svg")
+            .data([data])
+            .attr("width", dim)
+            .attr("height", dim);
+
+        // Add arcs for all new data points
+        var arcs = vis.selectAll("g.arc")
+            .data(donut, function (d, i) {
+                var level = getEventLabel(i);
+                d.data = {
+                    percentage:d.data,
+                    level:level,
+                    count:eventsByLevel[level].length,
+                    totalCount:eventsByLevel.totalCount
+                };
+                return i;
+            })
+            .enter().append("g")
+            .attr("class", "arc")
+            .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+        // Color based on the event level severity
+        var a = arcs.append("path")
+            .attr("fill", function (d, i) {
+                return color(i);
+            })
+            .attr("d", arc);
+
+        // Add text containing the level & total & partial counts
+        arcs.append("text")
+            .attr("transform", function (d) {
+                return "translate(" + arc.centroid(d) + ")";
+            })
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
+            .text(function (d, i) {
+                return d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
+            });
+    };
+
+
+    /**
      * Builds the node visualization
      */
     this.construct = function() {
 
-        var eventsByLevel = getLogsByLevel();
+        var eventsByLevel = groupLogs();
         var nodeVisualizationDiv = $('#nodeVisualization');
 
         if(eventsByLevel['totalCount'] > 0) {
-
-            // Setup the basic visualization
-            var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height()-150),
-                outerRadius = Math.min(dim) / 2,
-                innerRadius = outerRadius * .6,
-                data = d3.range(4).map(function(i) {
-                    var eventLevel = getEventLevel(i);
-                    var eventsAtThisLevel = eventsByLevel[eventLevel].length;
-                    return eventsAtThisLevel / eventsByLevel.totalCount;
-                }),
-                color = d3.scale.category20(),
-                donut = d3.layout.pie(),
-                arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
-
-            var vis = d3.select("#nodeVisualization")
-                .append("svg")
-                .data([data])
-                .attr("width", dim)
-                .attr("height", dim);
-
-            // Add arcs for all new data points
-            var arcs = vis.selectAll("g.arc")
-                .data(donut, function(d, i) {
-                    var level = getEventLevel(i);
-                    d.data = {
-                        percentage: d.data,
-                        level: level,
-                        count: eventsByLevel[level].length,
-                        totalCount: eventsByLevel.totalCount
-                    };
-                    return i;
-                })
-                .enter().append("g")
-                .attr("class", "arc")
-                .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
-
-            // Color based on the event level severity
-            arcs.append("path")
-                .attr("fill", function(d, i) { return color(i); })
-                .attr("d", arc);
-
-            // Add text containing the level & total & partial counts
-            arcs.append("text")
-                .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-                .attr("dy", ".35em")
-                .attr("text-anchor", "middle")
-                .attr("display", function(d) { return d.value > .15 ? null : "none"; })
-                .text(function(d, i) {
-                    return d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
-                });
+            drawPieGraph(eventsByLevel);
         } else {
             nodeVisualizationDiv.html('<br/><br/><h4>No logs to display!</h4>')
         }
@@ -144,15 +184,9 @@ function PieChartNodeVisualization(nodeState) {
      * Updates the active nodeVisualization with the node's new state
      */
     this.update = function(newNodeState) {
-
         This.nodeState = newNodeState;
-
-        var eventsByLevel = getLogsByLevel();
-
-        var data = d3.range(4).map(function(i) {
-            return eventsByLevel[getEventLevel(i)].length / eventsByLevel['totalCount'];
-        });
-
+        $('#nodeVisualization').children().remove();
+        drawPieGraph(groupLogs());
     };
 
 
@@ -162,4 +196,12 @@ function PieChartNodeVisualization(nodeState) {
     this.deconstruct = function() {
         $('#nodeVisualization').children().fadeOut('fast');
     }
+}
+
+function test(name, severity) {
+    var a = {
+        severity: severity
+    };
+    clusterState[name]['events'].push(a);
+    return a;
 }
