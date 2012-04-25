@@ -77,7 +77,8 @@ function updateRankings(state) {
     rankingsEnter.append("a")
         .append("text")
         .attr("class" , "sidebarText")
-        .text(text);
+        .text(text)
+        .on("click", function(d) { createNodeVisualization(d.name); });
 
     rankingsEnter.transition()
         .duration(500)
