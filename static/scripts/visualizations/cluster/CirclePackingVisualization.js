@@ -27,15 +27,15 @@ function CirclePackingVisualization(structure, state) {
         This.sizeDataSet = dataSet;
     };
 
-    /*
+
     var radius = function(node) {
         if (node.hasOwnProperty('children')) {
-            return node.r;
+            node.value = node.r;
         } else {
-            var value = (This.sizeDataSet === 'health' ? (1-state[node.name][This.sizeDataSet]) : state[node.name][This.sizeDataSet]);
-            return value * 15 + 5; //radius between 5 and 20
+            node.value = (This.sizeDataSet === 'health' ? (1-state[node.name][This.sizeDataSet]) : state[node.name][This.sizeDataSet]);
+            //return ((value * 15) + 5); //radius between 5 and 20
         }
-    }; radius function for tree, maybe useful*/
+    }; //radius function for tree, maybe useful*/
 
     /**
      * Returns the list of possible metrics on which to the node colors for this visualization
@@ -89,7 +89,10 @@ function CirclePackingVisualization(structure, state) {
 
 
     var value = function (node) {
-        return state[node.name][This.sizeDataSet];
+        if(state[node.name][This.sizeDataSet]==0)
+            return 0.05 ;
+        else
+            return state[node.name][This.sizeDataSet];
     };
 
     // Build the list of rack names
@@ -147,7 +150,7 @@ function CirclePackingVisualization(structure, state) {
      * Updates the graph so that it is up to date with it's associated data
      */
     function redraw() {
-
+        //console.log(value);
         var duration = 200;
         var width = $("#visualization").width();
         var height = $("#visualization").height();
@@ -164,7 +167,6 @@ function CirclePackingVisualization(structure, state) {
         //input node first time
         var nodeInput = node.enter().append("g")
             .attr("class", function (d) {
-               // console.log("children:  "+ d.children);
                 return d.children ? "node" : "leaf node";
             })
             .attr("transform", function (d) {
@@ -174,10 +176,6 @@ function CirclePackingVisualization(structure, state) {
                 return d.children ? null : createNodeVisualization(d.name);
             });
 
-
-       // console.log(node);
-       // console.log("running");
-        //console.log(node.append("circle"));
         nodeInput.append("circle")
             .style("fill", background)
             .attr("r", function (d) {
@@ -199,17 +197,13 @@ function CirclePackingVisualization(structure, state) {
             .duration(duration)
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-
-
         nodeUpdate.select("circle")
-           //used d.r here and tried couple of other things but circles overlap.
-           // .attr("r", function (d) {
-           //     return d.r ;
-           // })
+
+            .attr("r", function (d) {
+               // console.log(d);
+                return d.r ;
+            })
             .style("fill", background);
-
-
-
 
     }
 
