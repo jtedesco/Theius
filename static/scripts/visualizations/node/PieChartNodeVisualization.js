@@ -115,7 +115,7 @@ function PieChartNodeVisualization(nodeState) {
                 var eventsAtThisLevel = eventsByLevel[eventLevel].length;
                 return eventsAtThisLevel / eventsByLevel.totalCount;
             }),
-            color = d3.scale.category20c(),
+            color = d3.scale.category20b(),
             donut = d3.layout.pie(),
             arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
 
