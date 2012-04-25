@@ -74,7 +74,8 @@ function updateRankings(state) {
         .attr("transform", position(-100))
         .style("opacity", 1.0);
 
-    rankingsEnter.append("text")
+    rankingsEnter.append("a")
+        .append("text")
         .attr("class" , "sidebarText")
         .text(text);
 
@@ -87,6 +88,7 @@ function updateRankings(state) {
         .duration(500)
         .attr("transform", position(0))
         .style("opacity", 1.0)
+        .select("a")
         .select("text")
         .text(text);
 
