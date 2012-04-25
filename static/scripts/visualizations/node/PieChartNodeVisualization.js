@@ -80,8 +80,7 @@ function PieChartNodeVisualization(nodeState) {
         var nodeVisualizationDiv = $('#nodeVisualization');
 
         // Update the node stats
-        var node = clusterState[This.nodeName];
-        $('#nodeVisualizationStats').html(generateNodePopoverContent(node, true));
+        $('#nodeVisualizationStats').html(generateNodePopoverContent(This.nodeState, true));
 
         // Setup the basic visualization
         var dim = Math.min(nodeVisualizationDiv.width(), nodeVisualizationDiv.height() - 150),
