@@ -228,7 +228,6 @@ function ChordDiagramVisualization(structure, state) {
             .sortSubgroups(d3.descending)
             .matrix(buildMatrixData());
 
-
         // Define the color scheme for
         var fill = d3.scale.ordinal()
             .domain(d3.range(machines.length))
@@ -298,6 +297,7 @@ function ChordDiagramVisualization(structure, state) {
      * Initialize visualization for the first time
      */
     this.initialize = function() {
+        $('#visualization svg').remove();
         drawChordDiagram();
         showVisualization();
     };
