@@ -274,7 +274,11 @@ function createNodeVisualization(nodeName) {
     });
 
     // Add the default node visualization
-    nodeVisualization = new PieChartNodeVisualization(node);
+    selectedNodeState = node;
+    if(!nodeVisualization) {
+        nodeVisualization = new PieChartNodeVisualization();
+    }
+
     nodeVisualizationWrapper.hide();
 
     // Set the title
@@ -290,6 +294,39 @@ function createNodeVisualization(nodeName) {
  */
 function showNodeVisualization() {
     $('#nodeVisualizationWrapper').fadeIn('fast');
+}
+
+
+/**
+ * Change the node visualization on the fly
+ */
+function changeNodeVisualization(newVisualizationName) {
+
+    // Switch the visualization to the selected one
+    var nodeVisualizationDiv = $('#nodeVisualization');
+    nodeVisualizationDiv.children().fadeOut('fast', function () {
+        nodeVisualizationDiv.children().remove();
+
+        // Deconstruct the old node visualization
+        nodeVisualization.deconstruct();
+
+        // Switch to the appropriate visualization
+        switch (newVisualizationName) {
+            case 'pie':
+                nodeVisualization = new PieChartNodeVisualization(selectedNodeState);
+                break;
+            case 'stream':
+                nodeVisualization = new StreamGraphNodeVisualization(selectedNodeState);
+                break;
+        }
+
+        // Build the node visualization
+        nodeVisualization.construct();
+
+        // Smoothly show the new visualization
+        nodeVisualizationDiv.children().hide();
+        nodeVisualizationDiv.children().fadeIn('fast');
+    });
 }
 
 

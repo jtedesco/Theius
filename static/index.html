@@ -48,6 +48,7 @@
 
     <!-- Node visualizations -->
     <script type="text/javascript" src="/static/scripts/visualizations/node/PieChartNodeVisualization.js"></script>
+    <script type="text/javascript" src="/static/scripts/visualizations/node/StreamGraphNodeVisualization.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/visualizations/nodeVisualizations.css">
 
     <!-- Global style & scripts -->
@@ -194,8 +195,8 @@
                                                     Log event pie diagram
                                                 </label>
                                                 <label class="radio">
-                                                    <input type="radio" name="nodeVisualizationGraphic" id="histogram" value="histogram">
-                                                    Log events historical histograms
+                                                    <input type="radio" name="nodeVisualizationGraphic" id="stream" value="stream">
+                                                    Log events streamgraph
                                                 </label>
                                             </div>
                                         </div>
@@ -272,6 +273,7 @@
 
 </body>
 <script type='text/javascript'>
+
     $(document).ready(function () {
 
         // Star the visualization
@@ -302,9 +304,8 @@
                     nodeVisualization.setDataSet(this.value);
                     nodeVisualization.update(clusterState[nodeVisualization.getNodeName()]);
                 } else {
-                    console.log("ERROR: not yet implemented!");
+                    changeNodeVisualization(this.value);
                 }
-
             }
         });
 

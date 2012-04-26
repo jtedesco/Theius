@@ -1,9 +1,10 @@
 /**
  * Shows a pie chart of the log data types, based on the logs generate at that node
  */
-function PieChartNodeVisualization(nodeState) {
+function PieChartNodeVisualization() {
 
     var This = this;
+    var nodeState = selectedNodeState;
 
     // The identifier for the node being visualized
     this.nodeName = nodeState.name;

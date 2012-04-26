@@ -1,8 +1,9 @@
 // The id assigned to this client
 var clientId;
 
-// The state of the entire cluster
+// The state of the entire cluster & the selected node
 var clusterState;
+var selectedNodeState;
 
 // The structure of the cluster
 var clusterStructure;
