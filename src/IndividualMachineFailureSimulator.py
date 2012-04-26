@@ -22,7 +22,7 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
 
         self.badNodeHealthDelta = { }
         for name in self.deltaMap['health']:
-            self.badNodeHealthDelta[name] = self.deltaMap['health'][name] - .05
+            self.badNodeHealthDelta[name] = self.deltaMap['health'][name] - .10
 
         self.badNodeCpuDelta = numpy.random.normal(loc=0.05, scale=0.1, size=1000)
 

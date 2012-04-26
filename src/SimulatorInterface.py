@@ -6,6 +6,7 @@ from json import dumps, load
 from DefaultSimulator import DefaultSimulator
 from UnevenLoadSimulator import UnevenLoadSimulator
 from IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
+from RackFailureSimulator import RackFailureSimulator
 
 __author__ = 'roman'
 
@@ -101,6 +102,11 @@ class SimulatorInterface(object):
             clientSimulatorMap[clientId] = individualFailureSimulator
             clientSimulatorMap[clientId].addClient(clientId)
 
+        elif simulator == "rack":
+            clientSimulatorMap[clientId].removeClient(clientId)
+            clientSimulatorMap[clientId] = rackFailureSimulator
+            clientSimulatorMap[clientId].addClient(clientId)
+
         # could not find name of simulator
         else:
             serverLock.release()
@@ -188,3 +194,7 @@ unevenLoadSimulator.start()
 # Start the Individual Nodes prone to failure Simulator
 individualFailureSimulator = IndividualMachineFailureSimulator(networkTopology['machines'], networkTopology['structure'])
 individualFailureSimulator.start()
+
+#Start the One rack prone to failure simulator
+rackFailureSimulator = RackFailureSimulator(networkTopology['machines'], networkTopology['structure'])
+rackFailureSimulator.start()
