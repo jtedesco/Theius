@@ -57,7 +57,7 @@ function ChordDiagramVisualization(structure, state) {
 
                             // Cube the 'correlation' to make large correlation dominate small ones, and remove very thin arcs for performances
                             var diff = Math.abs(machineValue - otherMachineValue);
-                            var machineCorrelation = diff*100*diff*10*diff;
+                            var machineCorrelation = diff*diff*1000;
                             if(machineCorrelation < 5) {
                                 machineCorrelation = 0;
                             }
