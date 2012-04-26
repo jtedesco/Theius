@@ -90,6 +90,11 @@ class SimulatorInterface(object):
             clientSimulatorMap[clientId] = heterogeneousSimulator
             clientSimulatorMap[clientId].addClient(clientId)
 
+        elif simulator == "uneven":
+            clientSimulatorMap[clientId].removeClient(clientId)
+            clientSimulatorMap[clientId] = unevenLoadSimulator
+            clientSimulatorMap[clientId].addClient(clientId)
+
         # could not find name of simulator
         else:
             serverLock.release()
@@ -170,5 +175,6 @@ heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heteroge
 heterogeneousSimulator = DefaultSimulator(heterogeneousNetworkTopology['machines'], heterogeneousNetworkTopology['structure'])
 heterogeneousSimulator.start()
 
+# Start the uneven CPU load simulator
 unevenLoadSimulator = UnevenLoadSimulator(networkTopology['machines'], networkTopology['structure'])
 unevenLoadSimulator.start()
