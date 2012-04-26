@@ -7,9 +7,7 @@ from BaseSimulator import BaseSimulator
 
 TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
 
-
 __author__ = 'jon'
-
 
 class DefaultSimulator(BaseSimulator):
     def __init__(self, machineNames, structure):
@@ -116,14 +114,14 @@ class DefaultSimulator(BaseSimulator):
             Randomizes a property for a given node, returning its new value
         """
 
-        if propertyName is 'predictedSeverityProbabilities':
+        if propertyName == 'predictedSeverityProbabilities':
             return {
                 'FATAL' : self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(self.deltaMap['predictedFatal'])),
                 'ERROR': self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(self.deltaMap['predictedError'])),
                 'WARN': self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(self.deltaMap['predictedWarn'])),
                 'INFO': self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(self.deltaMap['predictedInfo']))
             }
-        elif propertyName is 'health':
+        elif propertyName == 'health':
             return self.normalizeValue(self.nodeState[nodeName]['health'] + self.deltaMap['health'][associatedData['severity']])
         else:
             return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.deltaMap[propertyName]))
@@ -166,7 +164,7 @@ class DefaultSimulator(BaseSimulator):
         for nodeName in updates:
             nodeDataToUpdate = updates[nodeName]
             for entryName in nodeDataToUpdate:
-                if entryName is 'events':
+                if entryName == 'events':
                     self.nodeState[nodeName][entryName].extend(nodeDataToUpdate[entryName])
                 else:
                     self.nodeState[nodeName][entryName] = nodeDataToUpdate[entryName]
@@ -237,7 +235,7 @@ class DefaultSimulator(BaseSimulator):
         """
 
         # Update failure data if this log event was FATAL
-        if logEvent['severity'] is 'FATAL':
+        if logEvent['severity'] == 'FATAL':
 
             if self.nodeState[nodeName]['lastFailureTime'] is not None:
                 lastFailureTime = datetime.strptime(self.nodeState[nodeName]['lastFailureTime'], TIMESTAMP_FORMAT)

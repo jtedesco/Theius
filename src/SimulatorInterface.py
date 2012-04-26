@@ -159,10 +159,8 @@ config = {
 cherrypy.tree.mount(SimulatorInterface(), '/', config=config)
 cherrypy.engine.start()
 
-# Load the network topology
-networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
-
 # Start the default simulator
+networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
 defaultSimulator = DefaultSimulator(networkTopology['machines'], networkTopology['structure'])
 defaultSimulator.start()
 
