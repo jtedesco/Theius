@@ -49,8 +49,8 @@ class SimulatorInterface(object):
         simulator.addClient(clientId)
 
         # Get the current system state
-        currentState = deepcopy(simulator.currentState())
-        currentStructure = deepcopy(simulator.getStructure())
+        currentState = deepcopy(simulator.state())
+        currentStructure = deepcopy(simulator.topology())
 
         serverLock.release()
 
@@ -98,8 +98,8 @@ class SimulatorInterface(object):
             })
 
         # Get the current system state
-        currentState = deepcopy(clientSimulatorMap[clientId].currentState())
-        currentStructure = deepcopy(clientSimulatorMap[clientId].getStructure())
+        currentState = deepcopy(clientSimulatorMap[clientId].state())
+        currentStructure = deepcopy(clientSimulatorMap[clientId].topology())
 
         serverLock.release()
         return  dumps({

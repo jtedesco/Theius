@@ -38,6 +38,17 @@ class DefaultSimulator(BaseSimulator):
 
         )
 
+        # Create distributions for randomly increasing/decreasing predicted severity probabilities
+        self.predictedFatalDelta =  numpy.random.normal(loc=0, scale=0.02, size=1000)
+        self.predictedErrorDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        self.predictedWarnDelta =  self.predictedErrorDelta
+        self.predictedInfoDelta =  self.predictedErrorDelta
+
+        # Create distributions for randomly increasing/decreasing CPU/memory/context switch stats
+        self.cpuUsageDelta =  numpy.random.normal(loc=0, scale=0.1, size=1000)
+        self.memoryUsageDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
+        self.contextSwitchRateDelta =  self.memoryUsageDelta
+
         # Holds index of node information, including:
         #   - last failure time for each node (initially 'None' for each node),
         #   - CPU usage (initially 20% for each node)
@@ -69,13 +80,14 @@ class DefaultSimulator(BaseSimulator):
             }
             nodeIndex += 1
 
-    def currentState(self):
+
+    def state(self):
         """
             returns the current state of the cluster
         """
         return self.nodeInfo
 
-    def getStructure(self):
+    def topology(self):
         """
             Returns the current structure of the cluster
         """
@@ -98,22 +110,20 @@ class DefaultSimulator(BaseSimulator):
                 logEvents.append(self.generateRandomLogEvent())
 
             # Gather updated node info based on each log event
-            nodeInfoUpdates = self.getUpdatedNodeInfoBasedOnEvents(logEvents)
+            nodeStateChange = self.getStateChange(logEvents)
 
-            # Add log to simulator
             log = {
                 'events' : logEvents,
-                'stateChange' : nodeInfoUpdates
+                'stateChange' : nodeStateChange
             }
 
             # Add to the global list of logs
             self.addLog(log)
 
             # Apply the node info updates to the simulator's state
-            self.applyNodeInfoUpdates(nodeInfoUpdates)
+            self.applyChanges(nodeStateChange)
 
-
-    def applyNodeInfoUpdates(self, updates):
+    def applyChanges(self, updates):
         """
           Apply the node info updates to the simulator thread's state
         """
@@ -127,35 +137,49 @@ class DefaultSimulator(BaseSimulator):
                     self.nodeInfo[nodeName][entryName] = nodeDataToUpdate[entryName]
 
 
-    def getUpdatedNodeInfoBasedOnEvents(self, logEvents):
+    def getStateChange(self, logEvents):
         """
           Creates some updated node data (for random parts of the cluster), based on the given log events.
         """
 
-        # Create distributions for randomly increasing/decreasing predicted severity probabilities
-        predictedFatalDelta =  numpy.random.normal(loc=0, scale=0.02, size=1000)
-        predictedErrorDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
-        predictedWarnDelta =  predictedErrorDelta
-        predictedInfoDelta =  predictedErrorDelta
+        stateChange = self.getStateChangeFromLogs(logEvents)
 
-        # Create distributions for randomly increasing/decreasing CPU/memory/context switch stats
-        cpuUsageDelta =  numpy.random.normal(loc=0, scale=0.1, size=1000)
-        memoryUsageDelta =  numpy.random.normal(loc=0, scale=0.05, size=1000)
-        contextSwitchRateDelta =  memoryUsageDelta
+        # Randomly update between 0 and 1/2 of the usage statistics of the nodes
+        numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
+        for nodeNum in xrange(0, numberOfMachinesToUpdate):
+            nodeName = self.getRandomElement(self.machineNames)
 
-        updatedNodeInfo = {}
+            if nodeName in stateChange:
+                nodeInfo = stateChange[nodeName]
+            else:
+                stateChange[nodeName] = {}
+                nodeInfo = stateChange[nodeName]
+
+            # Update this node's cpu/memory/context-switch stats
+            nodeInfo['cpuUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['cpuUsage'] + self.getRandomElement(self.cpuUsageDelta))
+            nodeInfo['memoryUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['memoryUsage'] + self.getRandomElement(self.memoryUsageDelta))
+            nodeInfo['contextSwitchRate'] = self.normalizeValue(self.nodeInfo[nodeName]['contextSwitchRate'] + self.getRandomElement(self.contextSwitchRateDelta))
+
+        return stateChange
+
+    def addRandomStateChanges(self):
+        pass
+
+
+    def getStateChangeFromLogs(self, logEvents):
+        stateChange = {}
 
         # Definitely update everything (except performance/usage) for nodes associated with log events
         for logEvent in logEvents:
 
             # Add an entry if there isn't one already
             nodeName = logEvent['location']
-            if nodeName not in updatedNodeInfo:
-                updatedNodeInfo[nodeName] = {
+            if nodeName not in stateChange:
+                stateChange[nodeName] = {
                     'events': []
                 }
-            updatedNodeInfo[nodeName]['events'].append(logEvent)
-            nodeInfo = updatedNodeInfo[nodeName]
+            stateChange[nodeName]['events'].append(logEvent)
+            nodeInfo = stateChange[nodeName]
 
             # Update failure data if this log event was FATAL
             if logEvent['severity'] is 'FATAL':
@@ -185,35 +209,18 @@ class DefaultSimulator(BaseSimulator):
 
             # Update this node's predicted severity probabilities
             nodeInfo['predictedSeverityProbabilities'] = {
-                'FATAL' : self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(predictedFatalDelta)),
-                'ERROR': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(predictedErrorDelta)),
-                'WARN': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(predictedWarnDelta)),
-                'INFO': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(predictedInfoDelta))
+                'FATAL' : self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(self.predictedFatalDelta)),
+                'ERROR': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(self.predictedErrorDelta)),
+                'WARN': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(self.predictedWarnDelta)),
+                'INFO': self.normalizeValue(self.nodeInfo[nodeName]['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(self.predictedInfoDelta))
             }
 
             # Update this node's cpu/memory/context-switch stats
-            nodeInfo['cpuUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
-            nodeInfo['memoryUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
-            nodeInfo['contextSwitchRate'] = self.normalizeValue(self.nodeInfo[nodeName]['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
+            nodeInfo['cpuUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['cpuUsage'] + self.getRandomElement(self.cpuUsageDelta))
+            nodeInfo['memoryUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['memoryUsage'] + self.getRandomElement(self.memoryUsageDelta))
+            nodeInfo['contextSwitchRate'] = self.normalizeValue(self.nodeInfo[nodeName]['contextSwitchRate'] + self.getRandomElement(self.contextSwitchRateDelta))
 
-
-        # Randomly update between 0 and 1/2 of the usage statistics of the nodes
-        numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
-        for nodeNum in xrange(0, numberOfMachinesToUpdate):
-            nodeName = self.getRandomElement(self.machineNames)
-
-            if nodeName in updatedNodeInfo:
-                nodeInfo = updatedNodeInfo[nodeName]
-            else:
-                updatedNodeInfo[nodeName] = {}
-                nodeInfo = updatedNodeInfo[nodeName]
-
-            # Update this node's cpu/memory/context-switch stats
-            nodeInfo['cpuUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['cpuUsage'] + self.getRandomElement(cpuUsageDelta))
-            nodeInfo['memoryUsage'] = self.normalizeValue(self.nodeInfo[nodeName]['memoryUsage'] + self.getRandomElement(memoryUsageDelta))
-            nodeInfo['contextSwitchRate'] = self.normalizeValue(self.nodeInfo[nodeName]['contextSwitchRate'] + self.getRandomElement(contextSwitchRateDelta))
-
-        return updatedNodeInfo
+        return stateChange
 
 
     def generateRandomLogEvent(self):

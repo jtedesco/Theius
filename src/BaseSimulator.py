@@ -120,16 +120,16 @@ class BaseSimulator(threading.Thread):
         """
         raise NotImplementedError("Must override method 'run' first")
 
-    def currentState(self):
+    def state(self):
         """
             Abstract method
             Returns the current state of the cluster
         """
-        raise NotImplementedError("Must override method 'currentState' first")
+        raise NotImplementedError("Must override method 'state' first")
 
-    def getStructure(self):
+    def topology(self):
         """
             Abstract method
             Returns the current structure of the cluster
         """
-        raise NotImplementedError("Must override method 'getStructure' first")
+        raise NotImplementedError("Must override method 'topology' first")
