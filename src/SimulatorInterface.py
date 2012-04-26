@@ -4,6 +4,7 @@ import cherrypy
 import os
 from json import dumps, load
 from DefaultSimulator import DefaultSimulator
+from UnevenLoadSimulator import UnevenLoadSimulator
 
 __author__ = 'roman'
 
@@ -168,3 +169,6 @@ defaultSimulator.start()
 heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
 heterogeneousSimulator = DefaultSimulator(heterogeneousNetworkTopology['machines'], heterogeneousNetworkTopology['structure'])
 heterogeneousSimulator.start()
+
+unevenLoadSimulator = UnevenLoadSimulator(networkTopology['machines'], networkTopology['structure'])
+unevenLoadSimulator.start()
