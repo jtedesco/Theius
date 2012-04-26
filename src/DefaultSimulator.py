@@ -5,8 +5,6 @@ from time import sleep
 import numpy
 from BaseSimulator import BaseSimulator
 
-TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
-
 __author__ = 'jon'
 
 class DefaultSimulator(BaseSimulator):
@@ -53,6 +51,8 @@ class DefaultSimulator(BaseSimulator):
             'INFO': 0.15
         }
 
+        self.TIMESTAMP_FORMAT = '%d/%m/%y %H:%M'
+
         # Holds index of node information, including:
         #   - last failure time for each node (initially 'None' for each node),
         #   - CPU usage (initially 20% for each node)
@@ -71,7 +71,7 @@ class DefaultSimulator(BaseSimulator):
                 'contextSwitchRate': 0.1, # What is this???
                 'events': [],
                 'lastFailureTime': None,
-                'predictedFailureTime': datetime.strftime(datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]), TIMESTAMP_FORMAT),
+                'predictedFailureTime': datetime.strftime(datetime.now() + timedelta(minutes=averageMinutesBetweenFailures[nodeIndex]), self.TIMESTAMP_FORMAT),
                 'predictedSeverityProbabilities': {
                     'FATAL' : 0.05,
                     'ERROR': 0.1,
@@ -238,18 +238,18 @@ class DefaultSimulator(BaseSimulator):
         if logEvent['severity'] == 'FATAL':
 
             if self.nodeState[nodeName]['lastFailureTime'] is not None:
-                lastFailureTime = datetime.strptime(self.nodeState[nodeName]['lastFailureTime'], TIMESTAMP_FORMAT)
+                lastFailureTime = datetime.strptime(self.nodeState[nodeName]['lastFailureTime'], self.TIMESTAMP_FORMAT)
 
                 # Update average minutes between failures & last failure info
-                delta = datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) - lastFailureTime
+                delta = datetime.strptime(logEvent['timestamp'], self.TIMESTAMP_FORMAT) - lastFailureTime
                 nodeInfo['averageMinutesBetweenFailures'] = (self.nodeState[nodeName]['averageMinutesBetweenFailures'] + (delta.seconds//3600))/2
 
             nodeInfo['lastFailureTime'] = logEvent['timestamp']
-            nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) + timedelta(minutes=self.nodeState[nodeName]['averageMinutesBetweenFailures']), TIMESTAMP_FORMAT)
+            nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], self.TIMESTAMP_FORMAT) + timedelta(minutes=self.nodeState[nodeName]['averageMinutesBetweenFailures']), self.TIMESTAMP_FORMAT)
 
         # Update predicted crash time if
-        elif datetime.strptime(self.nodeState[nodeName]['predictedFailureTime'], TIMESTAMP_FORMAT) < datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT):
-            nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], TIMESTAMP_FORMAT) + timedelta(minutes=self.nodeState[nodeName]['averageMinutesBetweenFailures']), TIMESTAMP_FORMAT)
+        elif datetime.strptime(self.nodeState[nodeName]['predictedFailureTime'], self.TIMESTAMP_FORMAT) < datetime.strptime(logEvent['timestamp'], self.TIMESTAMP_FORMAT):
+            nodeInfo['predictedFailureTime'] = datetime.strftime(datetime.strptime(logEvent['timestamp'], self.TIMESTAMP_FORMAT) + timedelta(minutes=self.nodeState[nodeName]['averageMinutesBetweenFailures']), self.TIMESTAMP_FORMAT)
 
     def generateRandomLogEvent(self):
         """
@@ -270,7 +270,7 @@ class DefaultSimulator(BaseSimulator):
             'severity': randomSeverity,
             'facility': randomFacility,
             'location': machineName,
-            'timestamp': datetime.strftime(datetime.now(), TIMESTAMP_FORMAT)
+            'timestamp': datetime.strftime(datetime.now(), self.TIMESTAMP_FORMAT)
         }
 
         return logEvent

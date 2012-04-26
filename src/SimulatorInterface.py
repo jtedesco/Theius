@@ -5,6 +5,7 @@ import os
 from json import dumps, load
 from DefaultSimulator import DefaultSimulator
 from UnevenLoadSimulator import UnevenLoadSimulator
+from IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
 
 __author__ = 'roman'
 
@@ -95,6 +96,11 @@ class SimulatorInterface(object):
             clientSimulatorMap[clientId] = unevenLoadSimulator
             clientSimulatorMap[clientId].addClient(clientId)
 
+        elif simulator == "individual":
+            clientSimulatorMap[clientId].removeClient(clientId)
+            clientSimulatorMap[clientId] = individualFailureSimulator
+            clientSimulatorMap[clientId].addClient(clientId)
+
         # could not find name of simulator
         else:
             serverLock.release()
@@ -178,3 +184,7 @@ heterogeneousSimulator.start()
 # Start the uneven CPU load simulator
 unevenLoadSimulator = UnevenLoadSimulator(networkTopology['machines'], networkTopology['structure'])
 unevenLoadSimulator.start()
+
+# Start the Individual Nodes prone to failure Simulator
+individualFailureSimulator = IndividualMachineFailureSimulator(networkTopology['machines'], networkTopology['structure'])
+individualFailureSimulator.start()

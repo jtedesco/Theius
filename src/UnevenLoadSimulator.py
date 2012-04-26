@@ -28,4 +28,4 @@ class UnevenLoadSimulator(DefaultSimulator):
             return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.highCpuUsageDelta))
 
         else:
-            return super(UnevenLoadSimulator, self).randomizeProperty(nodeName, propertyName, associatedData);
+            return super(UnevenLoadSimulator, self).randomizeProperty(nodeName, propertyName, associatedData)
