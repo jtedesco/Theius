@@ -2,12 +2,9 @@ from copy import deepcopy
 import threading
 import cherrypy
 import os
-from Queue import Queue
 from json import dumps, load
 from DefaultSimulator import DefaultSimulator
 
-
-__author__ = 'jon'
 __author__ = 'roman'
 
 # Index of log messages for each thread
