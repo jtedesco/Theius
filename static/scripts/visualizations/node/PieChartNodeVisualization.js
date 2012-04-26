@@ -156,7 +156,7 @@ function PieChartNodeVisualization(nodeState) {
             .attr("dy", ".35em")
             .attr("text-anchor", "middle")
             .text(function (d, i) {
-                return d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
+                return d.value < 0.05 ? null : d.data.level + ':   ' + d.data.count + '/' + d.data.totalCount;
             });
     };
 
