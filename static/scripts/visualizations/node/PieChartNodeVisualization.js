@@ -197,11 +197,3 @@ function PieChartNodeVisualization(nodeState) {
         $('#nodeVisualization').children().fadeOut('fast');
     }
 }
-
-function test(name, severity) {
-    var a = {
-        severity: severity
-    };
-    clusterState[name]['events'].push(a);
-    return a;
-}
