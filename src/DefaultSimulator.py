@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from random import random, choice
 import string
-import threading
 from time import sleep
 import numpy
 from BaseSimulator import BaseSimulator
