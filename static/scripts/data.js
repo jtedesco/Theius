@@ -138,13 +138,8 @@ function changeDataCharacteristicsSuccess(data) {
 
         // Reload the current visualization with the new data
         if (visualization instanceof SplomVisualization) {
-            //too lazy to fix Splom (too much code that I don't know what it is doing), so this is a workaround
-            if ($("#theiusNavBar .active").attr("id") == "usageMatrixLink") {
-                changeVisualization(new SplomVisualization(clusterStructure, clusterState, false), 'usageMatrixLink');
-            }
-            else {
-                changeVisualization(new SplomVisualization(clusterStructure, clusterState, true), 'predictionMatrixLink');
-            }
+            var usageMatrix = $("#theiusNavBar .active").attr("id") == "usageMatrixLink";
+            changeVisualization(new SplomVisualization(clusterStructure, clusterState, usageMatrix), 'usageMatrixLink');
         }
         else {
             visualization.setStructure(clusterStructure);
