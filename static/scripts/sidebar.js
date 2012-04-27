@@ -8,7 +8,6 @@
 
 /**
  * Updates the right side bar
- * @param state the current state of all nodes
  */
 function updateRightSideBar() {
     // the current active tab
@@ -64,7 +63,7 @@ function updateRankings(state) {
     // update svg width + height, and bind data to the elements
     var rankings = d3.select("#rankings").select("svg")
         .attr("width", $('#rankings').width())
-        .attr("height", 600)
+        .attr("height", $('#rankings').height())
         .selectAll("g")
         .data(stateArray, function(d) {return d.name;})
         .order();
