@@ -111,9 +111,17 @@ function updateEvents(logs) {
     var lastLogs = logs.slice(-20).reverse();
 
     var header = function(d) { return d.timestamp + " " + d.severity };
+    var h1 = function(d) { return "Log #" + d.id; }
     var div1 = function(d) { return "Facility : " + d.facility; };
     var div2 = function(d) { return "Location : " + d.location; };
-    var div3 = function(d) { return "Message  : " + d.message; };
+    var div3 = function(d) {
+        if (d.message.length > 15) {
+            return "Message  : " + d.message.substring(0,15) + "...";
+        }
+        else {
+            return "Message  : " + d.message;
+        }
+    };
 
     var events = d3.select("#events").selectAll("div.logWrapper")
         .data(lastLogs, function(d) { return d.id; })
@@ -135,8 +143,12 @@ function updateEvents(logs) {
 
     var collapse = eventsEnter.append("div")
         .attr("id", function(d) { return "log" + d.id; })
-        .attr("class", "collapse");
+        .attr("class", "collapse")
+        .append("div")
+        .attr("class", "well");
 
+    collapse.append("h4").text(h1);
+    collapse.append("br");
     collapse.append("div").text(div1);
     collapse.append("div").text(div2);
     collapse.append("div").text(div3);
