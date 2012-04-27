@@ -56,6 +56,16 @@ function TreeVisualization(structure, state) {
         return dataSets;
     };
 
+    // set the structure of this visualization
+    this.setStructure = function(newStructure) {
+        structure = newStructure;
+    };
+
+    // set the state of this visualization
+    this.setState = function(newState) {
+        state = newState;
+    };
+
 
     /**
      * Helper function to interpolate linearly between red and green (to give a health color, or anything else between 0 and 1)

@@ -76,6 +76,16 @@ function SplomVisualization(structure, state, predictions) {
         };
     };
 
+    // set the structure of this visualization
+    this.setStructure = function(newStructure) {
+        structure = newStructure;
+    };
+
+    // set the state of this visualization
+    this.setState = function(newState) {
+        state = newState;
+    };
+
 
     /**
      * Sizes a point by looking at the size data set
