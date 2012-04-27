@@ -302,7 +302,6 @@ function ChordDiagramVisualization(structure, state) {
             .attr("d", d3.svg.chord().radius(innerRadius))
             .style("opacity", 1)
             .attr('display', function(d) {
-                console.log(d);
                 return d.source.value > 0.01 ? "" : "none";
             })
     }
