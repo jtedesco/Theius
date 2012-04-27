@@ -67,7 +67,7 @@ class DefaultSimulator(BaseSimulator):
             self.nodeState[name] = {
                 'name': name,
                 'cpuUsage': 0.2,
-                'memoryUsage': 0.3,
+                'memoryUsage': 0.2,
                 'contextSwitchRate': 0.1, # What is this???
                 'events': [],
                 'lastFailureTime': None,
