@@ -57,48 +57,59 @@ function updateRankings(state) {
 
     //helper functions for D3
     var text = function(d) { return d.name + ": " + (d[key] * 100).toFixed(0) + "%"};
-    var height = function(i) { return i*25 + 20};
-    var position = function(x) { return function(d,i) { return "translate(" + x + "," + height(i) + ")"; }};
+    var title = function(d) { return "Node '" + d.name + "'";};
 
     // update svg width + height, and bind data to the elements
-    var rankings = d3.select("#rankings").select("svg")
-        .attr("width", $('#rankings').width())
-        .attr("height", $('#rankings').height())
-        .selectAll("g")
-        .data(stateArray, function(d) {return d.name;})
+    var rankings = d3.select("#rankingsData")
+        .selectAll("div.nodeWrapper")
+        .data(stateArray, function(node) { return node.name; })
         .order();
 
-    // add new nodes, which should slide in from the left
-    var rankingsEnter = rankings.enter().append("g")
-        .attr("transform", position(-100))
-        .style("opacity", 1.0);
+    // add new nodes
+    var rankingsEnter = rankings.enter().insert("div", "div.nodeWrapper");
 
-    rankingsEnter.append("a")
-        .append("text")
+    rankingsEnter
+        .style("height", "0px")
+        .attr("class", "nodeWrapper")
+        .style("opacity", 0);
+
+    rankingsEnter
+        .append("a")
         .attr("class" , "sidebarText")
-        .text(text)
-        .on("click", function(d) { createNodeVisualization(d.name); });
+        .style("font-size", "0px")
+        .attr("data-toggle", "collapse")
+        .attr("href", function(d) { return "#nodeWrapper" + d.name;})
+        .text(text);
+
+    var collapse = rankingsEnter.append("div")
+        .attr("id", function(node) { return "nodeWrapper" + node.name; })
+        .attr("class", "collapse")
+        .append("div")
+        .attr("class", "well");
+
+    // Add the title & node popover content
+    collapse.append("h4").text(title);
+    collapse.append("br");
+    collapse.append("div").html(function(d) {return generateNodePopoverContent(d, true);});
 
     rankingsEnter.transition()
         .duration(500)
-        .attr("transform", position(0));
-
-    // update current nodes, which slide to their new position
-    rankings.transition()
-        .duration(500)
-        .attr("transform", position(0))
+        .style("height", "auto")
         .style("opacity", 1.0)
         .select("a")
-        .select("text")
-        .text(text);
+        .style("font-size", "16px");
 
     // exiting nodes slide to the bottom and fade off screen
-    rankings.exit()
+    var rankingsExit = rankings.exit()
         .transition()
         .duration(500)
-        .attr("transform", function(d,i) { return "translate(0," + height(10) + ")"; })
-        .style("opacity", 0)
-        .remove();
+        .style("height", "0px")
+        .style("opacity", 0);
+
+    rankingsExit.select("p")
+        .style("font-size", "0px");
+
+    rankingsExit.remove();
 }
 
 /**
@@ -110,7 +121,7 @@ function updateEvents(logs) {
     var lastLogs = logs.slice(-20).reverse();
 
     var header = function(d) { return d.timestamp + " " + d.severity };
-    var h1 = function(d) { return "Log #" + d.id; }
+    var h1 = function(d) { return "Log #" + d.id; };
     var div1 = function(d) { return "Facility : " + d.facility; };
     var div2 = function(d) { return "Location : " + d.location; };
     var div3 = function(d) {
