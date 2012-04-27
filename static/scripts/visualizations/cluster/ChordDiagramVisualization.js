@@ -59,13 +59,13 @@ function ChordDiagramVisualization(structure, state) {
                             var diff = Math.abs(machineValue - otherMachineValue);
                             var machineCorrelation = diff*diff*1000;
                             if(machineCorrelation < 5) {
-                                machineCorrelation = 0;
+                                machineCorrelation = 0.01;
                             }
 
                             matrixRow.push(machineCorrelation);
 
                         } else {
-                            matrixRow.push(0);
+                            matrixRow.push(0.01);
                         }
                     }
                 }
@@ -300,7 +300,11 @@ function ChordDiagramVisualization(structure, state) {
             .style("fill", function(d) {return fill(d.target.index); })
             .style("stroke", "rgba(0, 0, 0, 0.1)")
             .attr("d", d3.svg.chord().radius(innerRadius))
-            .style("opacity", 1);
+            .style("opacity", 1)
+            .attr('display', function(d) {
+                console.log(d);
+                return d.source.value > 0.01 ? "" : "none";
+            })
     }
 
     /**
