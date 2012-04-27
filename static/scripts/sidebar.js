@@ -57,7 +57,7 @@ function updateRankings(state) {
 
     //helper functions for D3
     var text = function(d) { return d.name + ": " + (d[key] * 100).toFixed(0) + "%"};
-    var title = function(d) { return "Node '" + d.name + "'";};
+    var linkedTitle = function(d) { return "<a href='javascript:createNodeVisualization(\"" + d.name + "\")'>Node '" + d.name + "'</a>";};
 
     // update svg width + height, and bind data to the elements
     var rankings = d3.select("#rankingsData")
@@ -88,7 +88,7 @@ function updateRankings(state) {
         .attr("class", "well");
 
     // Add the title & node popover content
-    collapse.append("h4").text(title);
+    collapse.append("h4").html(linkedTitle);
     collapse.append("br");
     collapse.append("div").html(function(d) {return generateNodePopoverContent(d, true);});
 
