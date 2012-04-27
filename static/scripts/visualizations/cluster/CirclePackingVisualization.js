@@ -63,6 +63,16 @@ function CirclePackingVisualization(structure, state) {
         };
     };
 
+    // set the structure of this visualization
+    this.setStructure = function(newStructure) {
+        structure = newStructure;
+    };
+
+    // set the state of this visualization
+    this.setState = function(newState) {
+        state = newState;
+    };
+
 
     /**
      * Helper function to interpolate linearly between red and green (to give a health color, or anything else between 0 and 1)
@@ -150,7 +160,6 @@ function CirclePackingVisualization(structure, state) {
      * Updates the graph so that it is up to date with it's associated data
      */
     function redraw() {
-        //console.log(value);
         var duration = 200;
         var width = $("#visualization").width();
         var height = $("#visualization").height();
@@ -204,6 +213,8 @@ function CirclePackingVisualization(structure, state) {
                 return d.r ;
             })
             .style("fill", background);
+
+        node.exit().remove();
 
     }
 
