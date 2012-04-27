@@ -1,4 +1,5 @@
 import numpy
+from src.Utility import getRandomElement, normalizeValue
 from src.simulator.DefaultSimulator import DefaultSimulator
 
 __author__ = 'Roman'
@@ -21,11 +22,11 @@ class UnevenLoadSimulator(DefaultSimulator):
 
         # rack1 will have low CPU & memory utilization
         if propertyName == "cpuUsage" or propertyName == "memoryUsage" and "machine1" in nodeName:
-            return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.lowCpuUsageDelta))
+            return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.lowCpuUsageDelta))
 
         # rack3 will have high CPU utilization
         elif propertyName == "cpuUsage" or propertyName == "memoryUsage" and "machine3" in nodeName:
-            return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.highCpuUsageDelta))
+            return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.highCpuUsageDelta))
 
         else:
             return super(UnevenLoadSimulator, self).randomizeProperty(nodeName, propertyName, associatedData)

@@ -2,6 +2,7 @@ from copy import deepcopy
 from random import random, choice
 import string
 from datetime import datetime
+from src.Utility import normalizeValue, getRandomElement
 from src.simulator.DefaultSimulator import DefaultSimulator
 
 __author__ = 'Roman'
@@ -51,9 +52,9 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
         # the following machines will have poor health
         if nodeName in self.badMachines:
             if propertyName == "health":
-                return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.badNodeHealthDelta[associatedData['severity']])
+                return normalizeValue(self.nodeState[nodeName][propertyName] + self.badNodeHealthDelta[associatedData['severity']])
             elif propertyName == "memoryUsage":
-                return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.badNodeMemoryDelta))
+                return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.badNodeMemoryDelta))
 
         return super(IndividualMachineFailureSimulator, self).randomizeProperty(nodeName, propertyName, associatedData)
 
@@ -63,14 +64,14 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
         """
 
         # Get a random node, severity, and facility
-        machineName = self.getRandomElement(self.weightedMachineNamesList)
+        machineName = getRandomElement(self.weightedMachineNamesList)
 
         if machineName in self.badMachines:
-            randomSeverity = self.getRandomElement(self.weightedSeverities)
-            randomFacility = self.getRandomElement(self.weightedFacilities)
+            randomSeverity = getRandomElement(self.weightedSeverities)
+            randomFacility = getRandomElement(self.weightedFacilities)
         else:
-            randomSeverity = self.getRandomElement(self.severities)
-            randomFacility = self.getRandomElement(self.facilities)
+            randomSeverity = getRandomElement(self.severities)
+            randomFacility = getRandomElement(self.facilities)
 
         # Generate a random ascii string
         randomLength = int(random() * 50)

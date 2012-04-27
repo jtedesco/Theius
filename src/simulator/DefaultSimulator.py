@@ -3,6 +3,7 @@ from random import random, choice
 import string
 from time import sleep
 import numpy
+from src.Utility import normalizeValue, getRandomElement
 from src.simulator.BaseSimulator import BaseSimulator
 
 __author__ = 'jon'
@@ -116,15 +117,15 @@ class DefaultSimulator(BaseSimulator):
 
         if propertyName == 'predictedSeverityProbabilities':
             return {
-                'FATAL' : self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['FATAL'] + self.getRandomElement(self.deltaMap['predictedFatal'])),
-                'ERROR': self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['ERROR'] + self.getRandomElement(self.deltaMap['predictedError'])),
-                'WARN': self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['WARN'] + self.getRandomElement(self.deltaMap['predictedWarn'])),
-                'INFO': self.normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['INFO'] + self.getRandomElement(self.deltaMap['predictedInfo']))
+                'FATAL' : normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['FATAL'] + getRandomElement(self.deltaMap['predictedFatal'])),
+                'ERROR': normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['ERROR'] + getRandomElement(self.deltaMap['predictedError'])),
+                'WARN': normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['WARN'] + getRandomElement(self.deltaMap['predictedWarn'])),
+                'INFO': normalizeValue(self.nodeState[nodeName]['predictedSeverityProbabilities']['INFO'] + getRandomElement(self.deltaMap['predictedInfo']))
             }
         elif propertyName == 'health':
-            return self.normalizeValue(self.nodeState[nodeName]['health'] + self.deltaMap['health'][associatedData['severity']])
+            return normalizeValue(self.nodeState[nodeName]['health'] + self.deltaMap['health'][associatedData['severity']])
         else:
-            return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.deltaMap[propertyName]))
+            return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.deltaMap[propertyName]))
 
     def run(self):
         """
@@ -193,7 +194,7 @@ class DefaultSimulator(BaseSimulator):
         # numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
         numberOfMachinesToUpdate = len(self.machineNames)
         for nodeNum in xrange(0, numberOfMachinesToUpdate):
-            nodeName = self.getRandomElement(self.machineNames)
+            nodeName = getRandomElement(self.machineNames)
             nodeInfo = stateChange[nodeName]
 
             # Update this node's cpu/memory/context-switch stats
@@ -258,9 +259,9 @@ class DefaultSimulator(BaseSimulator):
         """
 
         # Get a random node, severity, and facility
-        machineName = self.getRandomElement(self.machineNames)
-        randomSeverity = self.getRandomElement(self.severities)
-        randomFacility = self.getRandomElement(self.facilities)
+        machineName = getRandomElement(self.machineNames)
+        randomSeverity = getRandomElement(self.severities)
+        randomFacility = getRandomElement(self.facilities)
 
         # Generate a random ascii string
         randomLength = int(random() * 50)
@@ -275,26 +276,3 @@ class DefaultSimulator(BaseSimulator):
         }
 
         return logEvent
-
-
-    def getRandomElement(self, array):
-        """
-            Returns a random element from an array
-        """
-
-        index = int(random() * len(array))
-        if index == len(array):
-            index -= 1
-        return array[index]
-
-
-    def normalizeValue(self, value):
-        """
-          Returns the value if it is between 0 and 1, otherwise, limits it within [0,1]
-        """
-
-        if value < 0:
-            return 0
-        if value > 1:
-            return 1
-        return value
