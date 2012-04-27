@@ -3,6 +3,7 @@
  */
 function SplomVisualization(structure, state, predictions) {
 
+
     // Build the traits to use for visualizing (parametrized)
     var predictionTraits = [
         'predictedSeverityProbabilities.INFO',
@@ -17,9 +18,9 @@ function SplomVisualization(structure, state, predictions) {
     ];
     var traits = predictions ? predictionTraits : statsTraits;
 
-    // Selected data sets to use for color & size (respectively)
     var This = this;
-
+    this.state = state;
+    this.structure = structure;
 
     /**
      * Set the data set that will determine the color of nodes
@@ -27,7 +28,6 @@ function SplomVisualization(structure, state, predictions) {
     this.setColorDataSet = function(dataSet) {
         This.colorDataSet = dataSet;
     };
-
 
     /**
      * Set the data that will determine the size of nodes
@@ -78,12 +78,12 @@ function SplomVisualization(structure, state, predictions) {
 
     // set the structure of this visualization
     this.setStructure = function(newStructure) {
-        structure = newStructure;
+        This.structure = newStructure;
     };
 
     // set the state of this visualization
     this.setState = function(newState) {
-        state = newState;
+        This.state = newState;
     };
 
 
@@ -97,9 +97,9 @@ function SplomVisualization(structure, state, predictions) {
 
     // Build the list form of data entries
     var values = [];
-    for (var name in state) {
-        if (state.hasOwnProperty(name) && name.indexOf('master') === -1) {
-            values.push(state[name]); // Get a handle on the state of this machine, which will update
+    for (var name in This.state) {
+        if (This.state.hasOwnProperty(name) && name.indexOf('master') === -1) {
+            values.push(This.state[name]); // Get a handle on the state of this machine, which will update
         }
     }
 
@@ -376,6 +376,7 @@ function SplomVisualization(structure, state, predictions) {
      * Updates the splom visualization by looking at the newest cluster state
      */
     this.update = function() {
+
 
         // Convert the data for nodes into points to be plotted
         var __ret = convertDataToPoints();
