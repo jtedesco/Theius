@@ -19,12 +19,12 @@ class UnevenLoadSimulator(DefaultSimulator):
             Randomizes a property for a given node, returning its new value
         """
 
-        # rack1 will have low CPU utilization
-        if propertyName == "cpuUsage" and "machine1" in nodeName:
+        # rack1 will have low CPU & memory utilization
+        if propertyName == "cpuUsage" or propertyName == "memoryUsage" and "machine1" in nodeName:
             return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.lowCpuUsageDelta))
 
         # rack3 will have high CPU utilization
-        elif propertyName == "cpuUsage" and "machine3" in nodeName:
+        elif propertyName == "cpuUsage" or propertyName == "memoryUsage" and "machine3" in nodeName:
             return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.highCpuUsageDelta))
 
         else:
