@@ -1,10 +1,5 @@
 {
     "machines": [
-        "master",
-        "rack1",
-        "rack2",
-        "rack3",
-        "rack4",
         "machine1-1",
         "machine1-2",
         "machine1-3",
