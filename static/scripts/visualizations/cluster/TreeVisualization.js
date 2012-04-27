@@ -13,7 +13,7 @@ function TreeVisualization(structure, state) {
 
     // layout
     var tree = d3.layout.tree();
-    tree.sort(function(a,b) { return a.name > b.name; });
+    tree.sort(function(a,b) { return a.name > b.name ? 1 : -1; });
 
     // helper function for links
     var diagonal = d3.svg.diagonal()
