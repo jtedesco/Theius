@@ -202,10 +202,19 @@ function updateGeneralTab(state, logs) {
     cpu /= count;
     memory /= count;
 
+    // Tally the total logs associated with all nodes
+    var logsCollected = 0;
+    for(var name in clusterState) {
+        if(clusterState.hasOwnProperty(name)) {
+            logsCollected += clusterState[name].events.length;
+        }
+    }
+
+
     $("#general-avg-health").text((avgHealth * 100).toFixed(2));
     $("#general-worst-health").text((worstHealth * 100).toFixed(0));
     $("#general-best-health").text((bestHealth * 100).toFixed(0));
     $("#general-cpu").text((cpu * 100).toFixed(2));
     $("#general-memory").text((memory * 100).toFixed(2));
-    $("#general-total-logs").text(logs.length);
+    $("#general-total-logs").text(logsCollected);
 }
