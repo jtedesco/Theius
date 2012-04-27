@@ -41,14 +41,6 @@ function StreamGraphNodeVisualization() {
 
 
     /**
-     * Gets the label corresponding to the severity level of the log (0-3), or facility
-     */
-    var getEventLabel = function(level) {
-        return getLabels()[level];
-    };
-
-
-    /**
      * Gets a dictionary containing the fraction of logs that are at each log level or facility
      */
     var groupLogs = function() {
@@ -94,61 +86,83 @@ function StreamGraphNodeVisualization() {
         return This.nodeName;
     };
 
-    /* Inspired by Lee Byron's test data generator. */
-    function stream_layers(n, m, o) {
-        if (arguments.length < 3) o = 0;
-        function bump(a) {
-            var x = 1 / (.1 + Math.random()),
-                y = 2 * Math.random() - .5,
-                z = 10 / (.1 + Math.random());
-            for (var i = 0; i < m; i++) {
-                var w = (i / m - y) * z;
-                a[i] += x * Math.exp(-w * w);
+
+    /**
+     * Function that creates an array of as many levels as correspond to the length of 'getLabels()', given the
+     *  number of samples.
+     */
+    var streamLayers = function(numberOfSamples) {
+
+        var logs = groupLogs();
+        var labels = getLabels();
+
+        // Find the label of the severity of the log with the most recent event in 'logs'
+        var findMaxNext = function(logs) {
+
+            var maxLabel, maxTimestamp;
+
+            for(var i in labels) {
+                if(labels.hasOwnProperty(i)) {
+                    var label = labels[i];
+                    var nextEvent = logs[label][logs[label].length - 1];
+
+                    if(nextEvent && (!maxLabel && !maxTimestamp) || (nextEvent.timestamp > maxTimestamp)) {
+                        maxLabel = label;
+                        maxTimestamp = nextEvent.timestamp;
+                    }
+                }
+            }
+
+            return maxLabel;
+        };
+
+        // Holds the layers
+        var layers = [];
+        for(i=0; i<labels.length; i++) {
+            layers.push([]);
+        }
+
+        // Build the stream data
+        for(var i=0; i<numberOfSamples; i++) {
+
+            var nextMaxLabel = findMaxNext(logs);
+
+            logs[nextMaxLabel].pop(); // Remove the last element
+            var indexToAddElement = labels.indexOf(nextMaxLabel);
+
+            for(var j=0; j<labels.length; j++) {
+                var oldValue = i === 0 ? 1.0 : layers[j][i-1];
+                if(indexToAddElement === j) {
+                    layers[j].push(oldValue+1.0);
+                } else {
+                    layers[j].push(oldValue);
+                }
             }
         }
-        return d3.range(n).map(function() {
-            var a = [], i;
-            for (i = 0; i < m; i++) a[i] = o + o * Math.random();
-            for (i = 0; i < 5; i++) bump(a);
-            return a.map(stream_index);
-        });
-    }
 
-    /* Another layer generator using gamma distributions. */
-    function stream_waves(n, m) {
-        return d3.range(n).map(function(i) {
-            return d3.range(m).map(function(j) {
-                var x = 20 * j / m - i / 3;
-                return 2 * x * Math.exp(-.5 * x);
-            }).map(stream_index);
-        });
-    }
+        return layers;
+    };
 
-    function stream_index(d, i) {
-        return {x: i, y: Math.max(0, d)};
-    }
 
     /**
      * Helper function to draw the stream graph, assuming there is nothing in the node visualization yet
      */
     var drawStreamGraph = function() {
 
-        console.log('stream');
-
         var nodeVisualizationDiv = $('#nodeVisualization');
 
         // Update the node stats
         $('#nodeVisualizationStats').html(generateNodePopoverContent(This.nodeState, true));
 
-        var n = getLabels().length, // number of layers
-            m = 100, // number of samples per layer
-            data0 = d3.layout.stack().offset("wiggle")(stream_layers(n, m)),
-            data1 = d3.layout.stack().offset("wiggle")(stream_layers(n, m)),
+        var numberOfSamples = 10, // number of samples per layer
+            layersData = streamLayers(numberOfSamples),
+            data0 = d3.layout.stack().offset("wiggle")(layersData),
+            data1 = d3.layout.stack().offset("wiggle")(layersData),
             color = d3.interpolateRgb("#aad", "#556");
 
         var width = nodeVisualizationDiv.width(),
             height = nodeVisualizationDiv.height()-50,
-            mx = m - 1,
+            mx = numberOfSamples - 1,
             my = d3.max(data0.concat(data1), function(d) {
                 return d3.max(d, function(d) {
                     return d.y0 + d.y;
@@ -159,6 +173,8 @@ function StreamGraphNodeVisualization() {
             .x(function(d) { return d.x * width / mx; })
             .y0(function(d) { return height - d.y0 * height / my; })
             .y1(function(d) { return height - (d.y + d.y0) * height / my; });
+
+        console.log(area);
 
         var vis = d3.select("#nodeVisualization")
             .append("svg")
@@ -189,7 +205,6 @@ function StreamGraphNodeVisualization() {
      * Builds the node visualization
      */
     this.construct = function() {
-        console.log(nodeState);
 
         var eventsByLevel = groupLogs();
         var nodeVisualizationDiv = $('#nodeVisualization');
@@ -218,5 +233,5 @@ function StreamGraphNodeVisualization() {
      */
     this.deconstruct = function() {
         $('#nodeVisualization').children().fadeOut('fast');
-    }
+    };
 }
