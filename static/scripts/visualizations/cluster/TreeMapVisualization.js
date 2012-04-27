@@ -52,6 +52,16 @@ function TreeMapVisualization(structure, state) {
         };
     };
 
+    // set the structure of this visualization
+    this.setStructure = function(newStructure) {
+        structure = newStructure;
+    };
+
+    // set the state of this visualization
+    this.setState = function(newState) {
+        state = newState;
+    };
+
 
     /**
      * Helper function to interpolate linearly between red and green (to give a health color, or anything else between 0 and 1)
@@ -163,29 +173,22 @@ function TreeMapVisualization(structure, state) {
 
         var div = d3.select("#visualization").select("div")
             .style("width", width + "px")
-            .style("height", height + "px");
+            .style("height", height + "px")
+            .selectAll("div")
+            .data(treemap.nodes(structure), function(d) { return d.name;});
 
-        div.data([structure]).selectAll("div")
-            .data(treemap.nodes, function(d) { return d.name;})
-            .enter().append("div")
+        div.enter().append("div")
             .attr("class", "cell")
             .call(cell)
-            .attr("id", function(node) {
-                return node.name;
-            })
-            .text(function (d) {
-                return d.children ? '' : d.name;
-            })
-            .on('click', function (d) {
-                return d.children ? null : createNodeVisualization(d.name);
-            });
+            .attr("id", function(node) { return node.name; })
+            .text(function (d) { return d.children ? '' : d.name; })
+            .on('click', function (d) { return d.children ? null : createNodeVisualization(d.name); });
 
-
-        d3.select("#visualization").select("div").selectAll("div")
-            .data(treemap.nodes, function(d) { return d.name;})
-            .style("background", background)
+       div.style("background", background)
             .transition()
             .call(cell);
+
+        div.exit().remove();
     }
 
     this.update = redraw;
