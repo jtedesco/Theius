@@ -141,20 +141,22 @@
                     </div>
                     <br/>
 
+                    <h4>Data Characteristics</h4><br/>
+                    <div class="control-group">
+                        <select id="dataCharacteristicSelector">
+                            <option value="random">Random Cluster</option>
+                            <option value="heterogeneous">Heterogeneous Cluster</option>
+                            <option value="uneven">Uneven CPU Load Distribution</option>
+                            <option value="individual">Individual machine failure</option>
+                            <option value="rack">One rack prone to failure</option>
+                        </select>
+                    </div>
+                    <br/>
+
                     <h4>Legend</h4><br/>
                     <div class="well">
                         <div id="legend"></div>
                     </div>
-                    <br/>
-
-                    <h4>Data Characteristics</h4><br/>
-                    <select id="dataCharacteristicSelector">
-                        <option value="random">Random Cluster</option>
-                        <option value="heterogeneous">Heterogeneous Cluster</option>
-                        <option value="uneven">Uneven CPU Load Distribution</option>
-                        <option value="individual">Individual machine failure</option>
-                        <option value="rack">One rack prone to failure</option>
-                    </select>
                 </div>
             </div>
         </div>
