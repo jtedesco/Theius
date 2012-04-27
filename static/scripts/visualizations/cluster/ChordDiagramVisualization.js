@@ -126,6 +126,16 @@ function ChordDiagramVisualization(structure, state) {
         }
     };
 
+    // set the structure of this visualization
+    this.setStructure = function(newStructure) {
+        structure = newStructure;
+    };
+
+    // set the state of this visualization
+    this.setState = function(newState) {
+        state = newState;
+    };
+
 
     /**
      * Returns the list of possible metrics on which to the arc colors for this visualization

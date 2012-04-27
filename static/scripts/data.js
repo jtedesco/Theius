@@ -129,11 +129,39 @@ function changeDataCharacteristics(simulatorName) {
 function changeDataCharacteristicsSuccess(data) {
 
     if (data.hasOwnProperty("successful") && data['successful']) {
+        clusterState = data['currentState'];
+        clusterStructure = data['structure'];
+        clusterLogs = [];
 
-        // call subscribeSuccess, since it is like we are starting from scratch
-        // the only thing that stays the same is the clientId
-        data['clientId'] = clientId;
-        subscribeSuccess(data);
+        buildRacksData();
+        updateRightSideBar();
+
+        // Reload the current visualization with the new data
+        if (visualization instanceof SplomVisualization) {
+            //too lazy to fix Splom (too much code that I don't know what it is doing), so this is a workaround
+            if ($("#theiusNavBar .active").attr("id") == "usageMatrixLink") {
+                changeVisualization(new SplomVisualization(clusterStructure, clusterState, false), 'usageMatrixLink');
+            }
+            else {
+                changeVisualization(new SplomVisualization(clusterStructure, clusterState, true), 'predictionMatrixLink');
+            }
+        }
+        else {
+            visualization.setStructure(clusterStructure);
+            visualization.setState(clusterState);
+            visualization.update();
+        }
+
+        // Start calling the AJAX update loop
+        $.ajax({
+            url: '/update',
+            data: {
+                clientId: clientId
+            },
+            success: update,
+            error: logError,
+            dataType: 'json'
+        });
     }
     else {
         logError(data);

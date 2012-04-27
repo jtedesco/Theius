@@ -13,7 +13,7 @@ function TreeVisualization(structure, state) {
 
     // layout
     var tree = d3.layout.tree();
-    tree.sort(function(a,b) { return a.name > b.name; });
+    tree.sort(function(a,b) { return a.name > b.name ? 1 : -1; });
 
     // helper function for links
     var diagonal = d3.svg.diagonal()
@@ -54,6 +54,16 @@ function TreeVisualization(structure, state) {
      */
     this.getSizeDataSets = function() {
         return dataSets;
+    };
+
+    // set the structure of this visualization
+    this.setStructure = function(newStructure) {
+        structure = newStructure;
+    };
+
+    // set the state of this visualization
+    this.setState = function(newState) {
+        state = newState;
     };
 
 

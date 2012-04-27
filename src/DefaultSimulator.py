@@ -190,7 +190,8 @@ class DefaultSimulator(BaseSimulator):
         """
 
         # Randomly update between 0 and 1/2 of the usage statistics of the nodes
-        numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
+        # numberOfMachinesToUpdate = int(random() * len(self.machineNames) / 2.0) + 1
+        numberOfMachinesToUpdate = len(self.machineNames)
         for nodeNum in xrange(0, numberOfMachinesToUpdate):
             nodeName = self.getRandomElement(self.machineNames)
             nodeInfo = stateChange[nodeName]

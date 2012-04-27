@@ -22,19 +22,24 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
 
         self.badNodeHealthDelta = { }
         for name in self.deltaMap['health']:
-            self.badNodeHealthDelta[name] = self.deltaMap['health'][name] - .10
+            self.badNodeHealthDelta[name] = self.deltaMap['health'][name]
 
-        self.badNodeCpuDelta = numpy.random.normal(loc=0.05, scale=0.1, size=1000)
+        self.badNodeMemoryDelta = numpy.random.normal(loc=0.015, scale=0.05, size=1000)
 
         self.weightedMachineNamesList = deepcopy(self.machineNames)
         for name in self.badMachines:
-            for i in xrange(0,5):
+            for i in xrange(0,3):
                 self.weightedMachineNamesList.append(name)
 
         self.weightedSeverities = deepcopy(self.severities)
-        self.weightedSeverities.append("FATAL")
-        self.weightedSeverities.append("ERROR")
-        self.weightedSeverities.append("ERROR")
+        for i in xrange(0,4):
+            self.weightedSeverities.append("FATAL")
+        for i in xrange(0,3):
+            self.weightedSeverities.append("ERROR")
+
+        self.weightedFacilities = deepcopy(self.facilities)
+        for i in xrange(0,4):
+            self.weightedFacilities.append("KERNEL")
 
 
 
@@ -47,8 +52,8 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
         if nodeName in self.badMachines:
             if propertyName == "health":
                 return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.badNodeHealthDelta[associatedData['severity']])
-            elif propertyName == "cpuUsage":
-                return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.badNodeCpuDelta))
+            elif propertyName == "memoryUsage":
+                return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.badNodeMemoryDelta))
 
         return super(IndividualMachineFailureSimulator, self).randomizeProperty(nodeName, propertyName, associatedData)
 
@@ -62,10 +67,10 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
 
         if machineName in self.badMachines:
             randomSeverity = self.getRandomElement(self.weightedSeverities)
+            randomFacility = self.getRandomElement(self.weightedFacilities)
         else:
             randomSeverity = self.getRandomElement(self.severities)
-
-        randomFacility = self.getRandomElement(self.facilities)
+            randomFacility = self.getRandomElement(self.facilities)
 
         # Generate a random ascii string
         randomLength = int(random() * 50)

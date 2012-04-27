@@ -9,8 +9,8 @@ class UnevenLoadSimulator(DefaultSimulator):
         """
             constructor
         """
-        self.lowCpuUsageDelta = numpy.random.normal(loc=-0.1, scale=0.1, size=1000)
-        self.highCpuUsageDelta = numpy.random.normal(loc=0.1, scale=0.1, size=1000)
+        self.lowCpuUsageDelta = numpy.random.normal(loc=-0.025, scale=0.1, size=1000)
+        self.highCpuUsageDelta = numpy.random.normal(loc=0.025, scale=0.1, size=1000)
 
         DefaultSimulator.__init__(self, machineNames, structure)
 
