@@ -3,10 +3,10 @@ import threading
 import cherrypy
 import os
 from json import dumps, load
-from DefaultSimulator import DefaultSimulator
-from UnevenLoadSimulator import UnevenLoadSimulator
-from IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
-from RackFailureSimulator import RackFailureSimulator
+from src.simulator.UnevenLoadSimulator import UnevenLoadSimulator
+from src.simulator.RackFailureSimulator import RackFailureSimulator
+from src.simulator.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
+from src.simulator.DefaultSimulator import DefaultSimulator
 
 __author__ = 'roman'
 

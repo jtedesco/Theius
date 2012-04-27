@@ -1,8 +1,6 @@
+from src.simulator.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
+
 __author__ = 'Roman'
-
-
-import numpy
-from IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
 
 __author__ = 'Roman'
 

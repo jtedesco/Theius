@@ -1,5 +1,5 @@
 import numpy
-from DefaultSimulator import DefaultSimulator
+from src.simulator.DefaultSimulator import DefaultSimulator
 
 __author__ = 'Roman'
 

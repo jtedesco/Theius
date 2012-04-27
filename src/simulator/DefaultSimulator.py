@@ -3,7 +3,7 @@ from random import random, choice
 import string
 from time import sleep
 import numpy
-from BaseSimulator import BaseSimulator
+from src.simulator.BaseSimulator import BaseSimulator
 
 __author__ = 'jon'
 

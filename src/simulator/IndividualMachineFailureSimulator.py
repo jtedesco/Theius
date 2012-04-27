@@ -2,11 +2,11 @@ from copy import deepcopy
 from random import random, choice
 import string
 from datetime import datetime
+from src.simulator.DefaultSimulator import DefaultSimulator
 
 __author__ = 'Roman'
 
 import numpy
-from DefaultSimulator import DefaultSimulator
 
 __author__ = 'Roman'
 
