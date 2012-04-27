@@ -58,6 +58,17 @@ function updateRankings(state) {
     //helper functions for D3
     var text = function(d) { return d.name + ": " + (d[key] * 100).toFixed(0) + "%"};
     var linkedTitle = function(d) { return "<a href='javascript:createNodeVisualization(\"" + d.name + "\")'>Node '" + d.name + "'</a>";};
+    var probabilitiesData = function(d) {
+        return "<h4>Probabilities of Events:</h4><br/>" +
+            "<div style='margin-left:10px;'>" +
+                "FATAL: " + d.predictedSeverityProbabilities.FATAL.toFixed(2) + "<br/>" +
+                "ERROR: " + d.predictedSeverityProbabilities.ERROR.toFixed(2) + "<br/>" +
+                "WARN: " + d.predictedSeverityProbabilities.WARN.toFixed(2) + "<br/>" +
+                "INFO: " + d.predictedSeverityProbabilities.INFO.toFixed(2) + "<br/>" +
+            "</div><br/>";
+    };
+    var predictedFailureTime = function(d) { return "<b>Predicted Failure:</b><br/><br/>&nbsp;&nbsp;&nbsp;" + d.predictedFailureTime + "<br/><br/>"; };
+    var lastFailureTime = function(d) { return "<b>Last Failure:</b><br/><br/>&nbsp;&nbsp;&nbsp;" + d.lastFailureTime; };
 
     // update svg width + height, and bind data to the elements
     var rankings = d3.select("#rankingsData")
@@ -90,7 +101,9 @@ function updateRankings(state) {
     // Add the title & node popover content
     collapse.append("h4").html(linkedTitle);
     collapse.append("br");
-    collapse.append("div").html(function(d) {return generateNodePopoverContent(d, true);});
+    collapse.append("div").html(probabilitiesData);
+    collapse.append("div").html(predictedFailureTime);
+    collapse.append("div").html(lastFailureTime);
 
     rankingsEnter.transition()
         .duration(500)
