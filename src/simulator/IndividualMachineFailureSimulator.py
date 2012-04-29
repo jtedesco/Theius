@@ -25,7 +25,7 @@ class IndividualMachineFailureSimulator(RandomSimulator):
         for name in self.deltaMap['health']:
             self.badNodeHealthDelta[name] = self.deltaMap['health'][name]
 
-        self.badNodeMemoryDelta = numpy.random.normal(loc=0.015, scale=0.05, size=1000)
+        self.badNodeMemoryDelta = numpy.random.normal(loc=0.02, scale=0.05, size=1000)
 
         self.weightedMachineNamesList = deepcopy(self.machineNames)
         for name in self.badMachines:
@@ -55,6 +55,9 @@ class IndividualMachineFailureSimulator(RandomSimulator):
                 return normalizeValue(self.nodeState[nodeName][propertyName] + self.badNodeHealthDelta[associatedData['severity']])
             elif propertyName == "memoryUsage":
                 return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.badNodeMemoryDelta))
+
+        if propertyName == "memoryUsage":
+            return normalizeValue(self.nodeState[nodeName][propertyName] + numpy.random.normal(loc=-0.025, scale=0.05))
 
         return RandomSimulator.randomizeProperty(self, nodeName, propertyName, associatedData)
 
