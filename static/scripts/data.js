@@ -29,7 +29,6 @@ function update(data) {
     if(data['successful']) {
 
         // Collect all new log entries
-        console.log(data);
         var clusterData = data['cluster'];
         var updateData = clusterData['events'];
         var logEvents = [];
