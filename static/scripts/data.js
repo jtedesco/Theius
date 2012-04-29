@@ -177,8 +177,9 @@ function changeDataCharacteristics(simulatorName) {
 function changeDataCharacteristicsSuccess(data) {
 
     if (data.hasOwnProperty("successful") && data['successful']) {
-        clusterState = data['currentState'];
+        clusterState = data['currentState']['cluster'];
         clusterStructure = data['structure'];
+        mapReduceState = data['currentState']['mapReduce'];
         clusterLogs = [];
 
         buildRacksData();
