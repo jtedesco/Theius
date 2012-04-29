@@ -3,7 +3,7 @@ from random import random, choice
 import string
 from datetime import datetime
 from src.Utility import normalizeValue, getRandomElement
-from src.simulator.DefaultSimulator import DefaultSimulator
+from src.simulator.RandomSimulator import RandomSimulator
 
 __author__ = 'Roman'
 
@@ -12,12 +12,12 @@ import numpy
 __author__ = 'Roman'
 
 
-class IndividualMachineFailureSimulator(DefaultSimulator):
-    def __init__(self, machineNames, structure):
+class IndividualMachineFailureSimulator(RandomSimulator):
+    def __init__(self, machineNames):
         """
             constructor
         """
-        DefaultSimulator.__init__(self, machineNames, structure)
+        RandomSimulator.__init__(self, machineNames)
 
         self.badMachines = ["machine1-3", "machine2-6", "machine2-7", "machine3-1"]
 
@@ -56,7 +56,7 @@ class IndividualMachineFailureSimulator(DefaultSimulator):
             elif propertyName == "memoryUsage":
                 return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.badNodeMemoryDelta))
 
-        return super(IndividualMachineFailureSimulator, self).randomizeProperty(nodeName, propertyName, associatedData)
+        return RandomSimulator.randomizeProperty(self, nodeName, propertyName, associatedData)
 
     def generateRandomLogEvent(self):
         """

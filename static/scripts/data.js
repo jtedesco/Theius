@@ -29,7 +29,9 @@ function update(data) {
     if(data['successful']) {
 
         // Collect all new log entries
-        var updateData = data['events'];
+        console.log(data);
+        var clusterData = data['cluster'];
+        var updateData = clusterData['events'];
         var logEvents = [];
         for(var i in updateData) {
             if(updateData.hasOwnProperty(i)) {
@@ -41,7 +43,7 @@ function update(data) {
         }
 
         // Update the global cluster state
-        var stateChange = data['stateChange'];
+        var stateChange = clusterData['stateChange'];
         updateClusterState(stateChange);
         updateNodePopovers(stateChange);
 

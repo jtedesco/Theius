@@ -3,10 +3,12 @@ import threading
 import cherrypy
 import os
 from json import dumps, load
+from src.simulator.DefaultSimulator import DefaultSimulator
 from src.simulator.UnevenLoadSimulator import UnevenLoadSimulator
 from src.simulator.RackFailureSimulator import RackFailureSimulator
 from src.simulator.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
-from src.simulator.DefaultSimulator import DefaultSimulator
+from src.simulator.RandomSimulator import RandomSimulator
+from src.simulator.mapReduce.MapReduceSimulator import MapReduceSimulator
 
 __author__ = 'roman'
 
@@ -47,7 +49,7 @@ class SimulatorInterface(object):
         nextClientId += 1
 
         # Assign this client the default simulator
-        simulator = defaultSimulator
+        simulator = randomSimulator
         clientSimulatorMap[clientId] = simulator
         simulator.addClient(clientId)
 
@@ -84,7 +86,7 @@ class SimulatorInterface(object):
 
         if simulator == "random":
             clientSimulatorMap[clientId].removeClient(clientId)
-            clientSimulatorMap[clientId] = defaultSimulator
+            clientSimulatorMap[clientId] = randomSimulator
             clientSimulatorMap[clientId].addClient(clientId)
 
         elif simulator == "heterogeneous":
@@ -158,8 +160,8 @@ class SimulatorInterface(object):
             })
 
         return dumps({
-            'events' : logData['events'],
-            'stateChange': logData['stateChange'],
+            'cluster' : logData['cluster'],
+            'mapReduce': logData['mapReduce'],
             'successful': True
         })
 
@@ -179,22 +181,22 @@ cherrypy.engine.start()
 
 # Start the default simulator
 networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))
-defaultSimulator = DefaultSimulator(networkTopology['machines'], networkTopology['structure'])
-defaultSimulator.start()
+randomSimulator = DefaultSimulator(RandomSimulator(networkTopology['machines']), networkTopology['structure'], MapReduceSimulator(networkTopology['machines']))
+randomSimulator.start()
 
 # Start the heterogeneous cluster simulator
 heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
-heterogeneousSimulator = DefaultSimulator(heterogeneousNetworkTopology['machines'], heterogeneousNetworkTopology['structure'])
+heterogeneousSimulator = DefaultSimulator(RandomSimulator(heterogeneousNetworkTopology['machines']), heterogeneousNetworkTopology['structure'], MapReduceSimulator(heterogeneousNetworkTopology['machines']))
 heterogeneousSimulator.start()
 
 # Start the uneven CPU load simulator
-unevenLoadSimulator = UnevenLoadSimulator(networkTopology['machines'], networkTopology['structure'])
+unevenLoadSimulator = DefaultSimulator(UnevenLoadSimulator(networkTopology['machines']), networkTopology['structure'], MapReduceSimulator(networkTopology['machines']))
 unevenLoadSimulator.start()
 
 # Start the Individual Nodes prone to failure Simulator
-individualFailureSimulator = IndividualMachineFailureSimulator(networkTopology['machines'], networkTopology['structure'])
+individualFailureSimulator = DefaultSimulator(IndividualMachineFailureSimulator(networkTopology['machines']), networkTopology['structure'], MapReduceSimulator(networkTopology['machines']))
 individualFailureSimulator.start()
 
 #Start the One rack prone to failure simulator
-rackFailureSimulator = RackFailureSimulator(networkTopology['machines'], networkTopology['structure'])
+rackFailureSimulator = DefaultSimulator(RackFailureSimulator(networkTopology['machines']), networkTopology['structure'], MapReduceSimulator(networkTopology['machines']))
 rackFailureSimulator.start()

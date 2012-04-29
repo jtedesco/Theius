@@ -6,11 +6,11 @@ __author__ = 'Roman'
 
 
 class RackFailureSimulator(IndividualMachineFailureSimulator):
-    def __init__(self, machineNames, structure):
+    def __init__(self, machineNames):
         """
             constructor
         """
-        IndividualMachineFailureSimulator.__init__(self, machineNames, structure)
+        IndividualMachineFailureSimulator.__init__(self, machineNames)
 
         self.badMachines = []
         for name in self.machineNames:

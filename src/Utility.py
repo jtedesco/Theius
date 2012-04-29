@@ -8,6 +8,9 @@ def getRandomElement(array):
         Returns a random element from an array
     """
 
+    if len(array) == 0:
+        return None
+
     index = int(random() * len(array))
     if index == len(array):
         index -= 1

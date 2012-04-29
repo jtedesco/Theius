@@ -1,19 +1,19 @@
 import numpy
 from src.Utility import getRandomElement, normalizeValue
-from src.simulator.DefaultSimulator import DefaultSimulator
+from src.simulator.RandomSimulator import RandomSimulator
 
 __author__ = 'Roman'
 
 
-class UnevenLoadSimulator(DefaultSimulator):
-    def __init__(self, machineNames, structure):
+class UnevenLoadSimulator(RandomSimulator):
+    def __init__(self, machineNames):
         """
             constructor
         """
         self.lowCpuUsageDelta = numpy.random.normal(loc=-0.025, scale=0.1, size=1000)
         self.highCpuUsageDelta = numpy.random.normal(loc=0.025, scale=0.1, size=1000)
 
-        DefaultSimulator.__init__(self, machineNames, structure)
+        RandomSimulator.__init__(self, machineNames)
 
     def randomizeProperty(self, nodeName, propertyName, associatedData=None):
         """
@@ -29,4 +29,4 @@ class UnevenLoadSimulator(DefaultSimulator):
             return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.highCpuUsageDelta))
 
         else:
-            return super(UnevenLoadSimulator, self).randomizeProperty(nodeName, propertyName, associatedData)
+            return RandomSimulator.randomizeProperty(self, nodeName, propertyName, associatedData)
