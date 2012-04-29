@@ -33,3 +33,11 @@ class MapReduceSimulator:
 
         self.mapReduceTasks[taskName] = MapReduceTaskSimulator(self.machineNames, taskName)
         print "started new map task: ", taskName
+
+    def state(self):
+        currentState = {}
+        for taskName in self.mapReduceTasks:
+            taskSimulator = self.mapReduceTasks[taskName]
+            currentState[taskName] = taskSimulator.state()
+
+        return currentState

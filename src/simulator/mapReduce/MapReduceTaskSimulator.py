@@ -81,4 +81,9 @@ class MapReduceTaskSimulator(RandomSimulator):
         return True
 
     def state(self):
-        pass
+        currentState = {}
+        for mapTask in self.map:
+            currentState[mapTask['name']] = mapTask
+        for reduceTask in self.reduce:
+            currentState[reduceTask['name']] = reduceTask
+        return currentState

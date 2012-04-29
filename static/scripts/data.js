@@ -11,6 +11,9 @@ var clusterStructure;
 // the cumulative logs of the cluster
 var clusterLogs = [];
 
+// state of map reduce tasks
+var mapReduceState = {};
+
 // The macro & micro visualizations (cluster & node)
 var visualization = null;
 var nodeVisualization = null;
@@ -46,6 +49,8 @@ function update(data) {
         updateClusterState(stateChange);
         updateNodePopovers(stateChange);
 
+        updateMapReduceData(data['mapReduce']);
+
         // Update the visualization
         if(visualization && visualization!=null) {
             if(playing) {
@@ -77,6 +82,48 @@ function update(data) {
     }
 }
 
+function updateMapReduceData(data) {
+    for (var taskName in data) {
+        task = data[taskName];
+
+        if (!mapReduceState.hasOwnProperty(taskName)) {
+            mapReduceState[taskName] = {};
+        }
+
+        if (task.hasOwnProperty('complete')) {
+            delete mapReduceState[taskName]
+            continue;
+        }
+
+        updateMapReduceTaskData(task, taskName);
+    }
+}
+
+function updateMapReduceTaskData(task, taskName) {
+    for (var jobIndex in task['start']) {
+        if (task['start'].hasOwnProperty(jobIndex)) {
+            var job = task['start'][jobIndex];
+            var jobName = job['name'];
+            mapReduceState[taskName][jobName] = job;
+        }
+    }
+
+    for (var jobName in task['stateChange']) {
+        var jobChange = task['stateChange'][jobName];
+        for (var jobPropertyName in jobChange) {
+            var jobProperty = jobChange[jobPropertyName];
+            mapReduceState[taskName][jobName][jobPropertyName] = jobProperty;
+        }
+    }
+
+    for (var jobIndex in task['end']) {
+        if (task['end'].hasOwnProperty(jobIndex)) {
+            var job = task['end'][jobIndex];
+            var jobName = job['name'];
+            delete mapReduceState[taskName][jobName];
+        }
+    }
+}
 
 /**
  * Update the cluster state based on the state change provided by the simulator
@@ -220,8 +267,9 @@ function subscribeSuccess(data) {
 
     // Get info returned from simulator on subscribe
     clientId = data['clientId'];
-    clusterState = data['currentState'];
+    clusterState = data['currentState']['cluster'];
     clusterStructure = data['structure'];
+    mapReduceState = data['currentState']['mapReduce'];
     clusterLogs = [];
 
     // Add the 'rack' to each node

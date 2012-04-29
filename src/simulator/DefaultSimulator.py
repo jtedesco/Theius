@@ -57,7 +57,10 @@ class DefaultSimulator(BaseSimulator):
         return self.clusterTopology
 
     def state(self):
-        return self.clusterSimulator.state()
+        return {
+            'cluster': self.clusterSimulator.state(),
+            'mapReduce': self.mapReduceSimulator.state()
+        };
 
 def main():
     STATIC_DIR = os.path.join(os.path.abspath('../../'), 'static')
@@ -69,9 +72,12 @@ def main():
 
     mainSimulator.addClient(1)
 
+    count = 0
     while True:
         stuff = mainSimulator.getNextLog(1)
-        print stuff['mapReduce']
+        count += 1
+        if count > 10:
+            print mainSimulator.state()
 
 if __name__ == '__main__':
     main()
