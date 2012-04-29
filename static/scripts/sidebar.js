@@ -70,6 +70,8 @@ function updateRankings(state) {
     var predictedFailureTime = function(d) { return "<b>Predicted Failure:</b><br/><br/>&nbsp;&nbsp;&nbsp;" + d.predictedFailureTime + "<br/><br/>"; };
     var lastFailureTime = function(d) { return "<b>Last Failure:</b><br/><br/>&nbsp;&nbsp;&nbsp;" + d.lastFailureTime; };
 
+    $('#rankingsData').children().remove();
+
     // update svg width + height, and bind data to the elements
     var rankings = d3.select("#rankingsData")
         .selectAll("div.nodeWrapper")
@@ -106,7 +108,7 @@ function updateRankings(state) {
     collapse.append("div").html(lastFailureTime);
 
     rankingsEnter.transition()
-        .duration(500)
+        .duration(0)
         .style("height", "auto")
         .style("opacity", 1.0)
         .select("a")
@@ -115,7 +117,7 @@ function updateRankings(state) {
     // exiting nodes slide to the bottom and fade off screen
     var rankingsExit = rankings.exit()
         .transition()
-        .duration(500)
+        .duration(0)
         .style("height", "0px")
         .style("opacity", 0);
 

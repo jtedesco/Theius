@@ -100,7 +100,7 @@ function TreeVisualization(structure, state) {
             return 15;
         } else {
             var value = (This.sizeDataSet === 'health' ? (1-state[node.name][This.sizeDataSet]) : state[node.name][This.sizeDataSet]);
-            return value * 15 + 5; //radius between 5 and 20
+            return value * 10 + 10; //radius between 10 and 20
         }
     };
 
@@ -237,6 +237,13 @@ function TreeVisualization(structure, state) {
         nodeEnter.append("circle")
             .attr("r", 1e-6)
             .style("fill", fillColor);
+
+        nodeEnter.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", ".3em")
+            .text(function (d) {
+                return d.name.substring(7, d.name.length);
+            });
 
         // update existing nodes, with animation
         var nodeUpdate = node.transition()

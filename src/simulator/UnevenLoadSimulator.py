@@ -10,8 +10,8 @@ class UnevenLoadSimulator(RandomSimulator):
         """
             constructor
         """
-        self.lowCpuUsageDelta = numpy.random.normal(loc=-0.025, scale=0.1, size=1000)
-        self.highCpuUsageDelta = numpy.random.normal(loc=0.025, scale=0.1, size=1000)
+        self.lowCpuUsageDelta = numpy.random.normal(loc=-0.025, scale=0.05, size=1000)
+        self.highCpuUsageDelta = numpy.random.normal(loc=0.025, scale=0.05, size=1000)
 
         RandomSimulator.__init__(self, machineNames)
 
@@ -21,12 +21,16 @@ class UnevenLoadSimulator(RandomSimulator):
         """
 
         # rack1 will have low CPU & memory utilization
-        if propertyName == "cpuUsage" or propertyName == "memoryUsage" and "machine1" in nodeName:
-            return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.lowCpuUsageDelta))
+        if propertyName == "cpuUsage" and "machine1" in nodeName:
+            return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.lowCpuUsageDelta))
+        elif propertyName == "memoryUsage" and "machine1" in nodeName:
+            return self.normalizeValue(self.nodeState[nodeName]["cpuUsage"] + self.getRandomElement(self.lowCpuUsageDelta))
 
         # rack3 will have high CPU utilization
-        elif propertyName == "cpuUsage" or propertyName == "memoryUsage" and "machine3" in nodeName:
-            return normalizeValue(self.nodeState[nodeName][propertyName] + getRandomElement(self.highCpuUsageDelta))
+        elif propertyName == "cpuUsage" and "machine3" in nodeName:
+            return self.normalizeValue(self.nodeState[nodeName][propertyName] + self.getRandomElement(self.highCpuUsageDelta))
+        elif propertyName == "memoryUsage" and "machine3" in nodeName:
+            return self.normalizeValue(self.nodeState[nodeName]["cpuUsage"] + self.getRandomElement(self.highCpuUsageDelta))
 
         else:
             return RandomSimulator.randomizeProperty(self, nodeName, propertyName, associatedData)
