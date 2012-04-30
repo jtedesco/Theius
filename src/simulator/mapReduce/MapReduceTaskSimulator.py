@@ -5,7 +5,7 @@ from src.simulator.RandomSimulator import RandomSimulator
 __author__ = 'Roman'
 
 class MapReduceTaskSimulator(RandomSimulator):
-    def __init__(self, machineNames, taskName):
+    def __init__(self, machineNames, taskName, time):
         RandomSimulator.__init__(self, [])
 
         self.taskName = taskName
@@ -16,7 +16,7 @@ class MapReduceTaskSimulator(RandomSimulator):
             mapJob = {
                 'id': i,
                 'name': "%s%s%d" % (self.taskName, "-mapJob", i),
-                'start': 0,
+                'start': time + 0,
                 'duration': int(numpy.random.normal(loc=60, scale=5)),
                 'location': getRandomElement(machineNames)
             }
@@ -31,7 +31,7 @@ class MapReduceTaskSimulator(RandomSimulator):
             reduceJob = {
                 'id': numberOfMapJobs + i,
                 'name': "%s%s%d" % (self.taskName, "-reduceJob", i),
-                'start': int(numpy.random.normal(loc=60, scale=5)),
+                'start': time + int(numpy.random.normal(loc=60, scale=5)),
                 'duration': int(numpy.random.normal(loc=60, scale=5)),
                 'location': getRandomElement(machineNames)
             }
@@ -40,7 +40,7 @@ class MapReduceTaskSimulator(RandomSimulator):
             reduceJob['end'] = int(reduceJob['start'] + reduceJob['duration'])
             self.reduce.append(reduceJob)
 
-        self.time = 0
+        self.time = time
 
     def updates(self):
         updates = RandomSimulator.updates(self)
@@ -102,3 +102,6 @@ class MapReduceTaskSimulator(RandomSimulator):
             if reduceTask['name'] in self.nodeState:
                 currentState[reduceTask['name']] = dict(self.nodeState[reduceTask['name']].items() + reduceTask.items())
         return currentState
+
+    def getTime(self):
+        return self.time

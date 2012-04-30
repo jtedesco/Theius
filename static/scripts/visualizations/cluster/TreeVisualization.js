@@ -54,6 +54,7 @@ function TreeVisualization(structure, state, mapReduce) {
     var sizeDataSets = {}
     if (mapReduce) {
         sizeDataSets = {
+            work: "Time Remaining (%)",
             health : 'Job Health (%)',
             cpuUsage : 'Job CPU Usage (%)',
             memoryUsage : 'Job Memory Usage (%)',
@@ -135,6 +136,13 @@ function TreeVisualization(structure, state, mapReduce) {
         if (node.hasOwnProperty('children')) {
             return 15;
         } else {
+            if (This.sizeDataSet == "work") {
+                var start = state[node.name]['start'];
+                var duration = state[node.name]['duration'];
+                var percentComplete = (currentTime - start)/duration;
+                var value = 1 - percentComplete;
+                return value * 15 + 5; // radius between 5 and 15
+            }
             var value = (This.sizeDataSet === 'health' ? (1-state[node.name][This.sizeDataSet]) : state[node.name][This.sizeDataSet]);
             return value * 10 + 10; //radius between 10 and 20
         }

@@ -8,8 +8,11 @@ class MapReduceSimulator:
         self.machineNames = machineNames
         self.mapReduceTasks = {}
         self.tasksCreated = 0
+        self.time = 0
 
     def updates(self):
+        self.time += 1
+
         if random() < .025:
             self.startNewMapReduceTask()
 
@@ -34,7 +37,7 @@ class MapReduceSimulator:
         taskName = "%s%d" % ("task", self.tasksCreated)
         self.tasksCreated += 1
 
-        self.mapReduceTasks[taskName] = MapReduceTaskSimulator(self.machineNames, taskName)
+        self.mapReduceTasks[taskName] = MapReduceTaskSimulator(self.machineNames, taskName, self.time)
         print "started new map task: ", taskName
 
     def topology(self):
@@ -55,3 +58,6 @@ class MapReduceSimulator:
             currentState = dict(taskSimulator.state().items() + currentState.items())
 
         return currentState
+
+    def getTime(self):
+        return self.time

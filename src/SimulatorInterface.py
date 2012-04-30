@@ -162,6 +162,7 @@ class SimulatorInterface(object):
         return dumps({
             'cluster' : logData['cluster'],
             'mapReduce': logData['mapReduce'],
+            'time': simulator.getTime(),
             'successful': True
         })
 

@@ -65,6 +65,9 @@ class DefaultSimulator(BaseSimulator):
             'mapReduce': self.mapReduceSimulator.state()
         };
 
+    def getTime(self):
+        return self.mapReduceSimulator.getTime()
+
 def main():
     STATIC_DIR = os.path.join(os.path.abspath('../../'), 'static')
     networkTopology = load(open(os.path.join(STATIC_DIR, 'data/topology.json')))

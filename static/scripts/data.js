@@ -17,6 +17,9 @@ var mapReduceState = {};
 // structure of map reduce tasks
 var mapReduceStructure = {};
 
+// current time, used for map reduce tasks
+var currentTime = 0;
+
 // The macro & micro visualizations (cluster & node)
 var visualization = null;
 var nodeVisualization = null;
@@ -54,6 +57,8 @@ function update(data) {
 
         mapReduceState = data['mapReduce']['state'];
         mapReduceStructure = data['mapReduce']['topology'];
+
+        currentTime = data['time'];
 
         // Update the visualization
         if(visualization && visualization!=null) {
