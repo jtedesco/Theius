@@ -136,6 +136,9 @@ function TreeVisualization(structure, state, mapReduce) {
         if (node.hasOwnProperty('children')) {
             return 15;
         } else {
+            if (!state.hasOwnProperty(node.name)) {
+                return 1;
+            }
             if (This.sizeDataSet == "work") {
                 var start = state[node.name]['start'];
                 var duration = state[node.name]['duration'];
@@ -273,13 +276,20 @@ function TreeVisualization(structure, state, mapReduce) {
             .data(tree.links(nodes), function(d) { return d.target.name; });
 
         // add new links, with animation starting from parent's old position
-        link.enter().insert("path", "g")
-            .attr("class", "treeVisualizationLink")
-            .attr("d", function(d) {
+        var linkEnter = link.enter().insert("path", "g")
+            .attr("class", "treeVisualizationLink");
+
+        if (mapReduce) {
+            linkEnter.attr("d", diagonal);
+        }
+        else {
+            linkEnter.attr("d", function(d) {
                 var o = {x: source.x0, y: source.y0};
                 return diagonal({source: o, target: o});
-            })
-            .transition()
+            });
+        }
+
+        linkEnter.transition()
             .duration(duration)
             .attr("d", diagonal);
 
