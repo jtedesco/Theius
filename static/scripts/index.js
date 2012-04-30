@@ -12,6 +12,9 @@ function initializeDataSets() {
         });
         $("#sizeDataSetSelector").change(function () {
             chooseSizeDataSet($("#sizeDataSetSelector option:selected").val());
+            if (!playing) {
+                showTimeline();
+            }
         });
         $("select").removeAttr('disabled');
         initialized = true;

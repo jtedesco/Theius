@@ -7,16 +7,18 @@
  */
 
 function showTimeline() {
+    var dataSet = $("#sizeDataSetSelector option:selected").val();
     $("#timelineDiv").fadeIn();
-    var data = getData(clusterStateHistory);
-    drawTimeline(data);
+    var history = deepCopy(clusterStateHistory);
+    var data = getData(clusterStateHistory, dataSet);
+    drawTimeline(data, history);
 }
 
 function hideTimeline() {
     $("#timelineDiv").fadeOut();
 }
 
-function getData(history) {
+function getData(history, dataSet) {
     var data = [];
     for (var i in history) {
         if (history.hasOwnProperty(i)) {
@@ -27,7 +29,7 @@ function getData(history) {
             for (var j in point) {
                 if (point.hasOwnProperty(j)) {
                     var node = point[j];
-                    var datum = node['cpuUsage'];
+                    var datum = node[dataSet];
                     result += datum;
                     count += 1;
                 }
@@ -39,10 +41,7 @@ function getData(history) {
     return data;
 }
 
-function drawTimeline(data) {
-
-    console.log(data);
-    console.log(data.length);
+function drawTimeline(data, history) {
 
     var width = $("#timeline").width();
     var height = $("#timeline").height();
@@ -108,12 +107,46 @@ function drawTimeline(data) {
     svg.select("path.line").attr("d", line);
 
     // add brush
+    var lastBrush = [[0,0],[1,1]];
     var brush = d3.svg.brush();
     brush.x(x);
     brush.y(y);
-    brush.extent([[0,0],[1, 1]]);
-    svg.append("g").call(brush);
+    brush.extent(lastBrush);
+    svg.append("g").attr("class", "brush").call(brush);
+    $(".resize").hide();
+    $(".background").hide();
 
+    brush.on("brushstart", onBrushStart)
+        .on("brush", onBrush)
+        .on("brushend", onBrushEnd);
 
+    function onBrushStart(p) {
+        brush.extent(lastBrush);
+        svg.select("g.brush").call(brush);
+        $(".resize").hide();
+        $(".background").hide();
+    }
+
+    function onBrush(p) {
+        var e = brush.extent();
+        var xdiff = e[1][0] - e[0][0];
+        var ydiff = e[1][1] - e[0][1];
+        if (xdiff < 1.05 && xdiff > 0.95 && ydiff < 1.05 && ydiff > 0.95) {
+            lastBrush = e;
+            updateDataSets(Math.round(lastBrush[0][0]));
+        }
+    }
+
+    function onBrushEnd() {
+        brush.extent(lastBrush);
+        svg.select("g.brush").call(brush);
+        $(".resize").hide();
+        $(".background").hide();
+    }
+
+    function updateDataSets(index) {
+        visualization.setState(history[index]);
+        visualization.update();
+    }
 }
 
