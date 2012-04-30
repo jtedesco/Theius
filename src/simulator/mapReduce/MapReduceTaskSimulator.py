@@ -80,10 +80,25 @@ class MapReduceTaskSimulator(RandomSimulator):
 
         return True
 
+    def topology(self):
+        currentTopology = {
+            'name': self.taskName,
+            'children': []
+        }
+        for mapTask in self.map:
+            if mapTask['name'] in self.nodeState:
+                currentTopology['children'].append(mapTask)
+        for reduceTask in self.reduce:
+            if reduceTask['name'] in self.nodeState:
+                currentTopology['children'].append(reduceTask)
+        return currentTopology
+
     def state(self):
         currentState = {}
         for mapTask in self.map:
-            currentState[mapTask['name']] = mapTask
+            if mapTask['name'] in self.nodeState:
+                currentState[mapTask['name']] = dict(self.nodeState[mapTask['name']].items() + mapTask.items())
         for reduceTask in self.reduce:
-            currentState[reduceTask['name']] = reduceTask
+            if reduceTask['name'] in self.nodeState:
+                currentState[reduceTask['name']] = dict(self.nodeState[reduceTask['name']].items() + reduceTask.items())
         return currentState

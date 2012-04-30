@@ -10,7 +10,7 @@ class MapReduceSimulator:
         self.tasksCreated = 0
 
     def updates(self):
-        if random() < .05:
+        if random() < .025:
             self.startNewMapReduceTask()
 
         updates = {}
@@ -25,7 +25,10 @@ class MapReduceSimulator:
         for taskName in toRemove:
             del self.mapReduceTasks[taskName]
 
-        return updates
+        return {
+            'state': self.state(),
+            'topology': self.topology()
+        }
 
     def startNewMapReduceTask(self):
         taskName = "%s%d" % ("task", self.tasksCreated)
@@ -34,10 +37,21 @@ class MapReduceSimulator:
         self.mapReduceTasks[taskName] = MapReduceTaskSimulator(self.machineNames, taskName)
         print "started new map task: ", taskName
 
+    def topology(self):
+        currentTopology = {
+            'name': "master",
+            'children': []
+        }
+        for taskName in self.mapReduceTasks:
+            taskSimulator = self.mapReduceTasks[taskName]
+            currentTopology['children'].append(taskSimulator.topology())
+
+        return currentTopology
+
     def state(self):
         currentState = {}
         for taskName in self.mapReduceTasks:
             taskSimulator = self.mapReduceTasks[taskName]
-            currentState[taskName] = taskSimulator.state()
+            currentState = dict(taskSimulator.state().items() + currentState.items())
 
         return currentState

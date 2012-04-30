@@ -9,7 +9,7 @@
  *  @param  structure     The structure of the tree
  *  @param  state         The state of the tree (node by node)
  */
-function TreeVisualization(structure, state) {
+function TreeVisualization(structure, state, mapReduce) {
 
     // layout
     var tree = d3.layout.tree();
@@ -31,21 +31,49 @@ function TreeVisualization(structure, state) {
         This.sizeDataSet = dataSet;
     };
 
-
     // The data sets possible (same for both color & size)
-    var dataSets = {
-        health : 'Node Health (%)',
-        cpuUsage : 'Node CPU Usage (%)',
-        memoryUsage : 'Node Memory Usage (%)',
-        contextSwitchRate : 'Node Context Switch Rate (%)'
-    };
+    var colorDataSets = {}
+    if (mapReduce) {
+        colorDataSets = {
+            mapReduce: 'by Map/Reduce',
+            health : 'Job Health (%)',
+            cpuUsage : 'Job CPU Usage (%)',
+            memoryUsage : 'Job Memory Usage (%)',
+            contextSwitchRate : 'Job Context Switch Rate (%)'
+        };
+    }
+    else {
+        colorDataSets = {
+            health : 'Node Health (%)',
+            cpuUsage : 'Node CPU Usage (%)',
+            memoryUsage : 'Node Memory Usage (%)',
+            contextSwitchRate : 'Node Context Switch Rate (%)'
+        };
+    }
 
+    var sizeDataSets = {}
+    if (mapReduce) {
+        sizeDataSets = {
+            health : 'Job Health (%)',
+            cpuUsage : 'Job CPU Usage (%)',
+            memoryUsage : 'Job Memory Usage (%)',
+            contextSwitchRate : 'Job Context Switch Rate (%)'
+        };
+    }
+    else {
+        sizeDataSets = {
+            health : 'Node Health (%)',
+            cpuUsage : 'Node CPU Usage (%)',
+            memoryUsage : 'Node Memory Usage (%)',
+            contextSwitchRate : 'Node Context Switch Rate (%)'
+        };
+    }
 
     /**
      * Returns the list of possible metrics on which to the node colors for this visualization
      */
     this.getColorDataSets = function() {
-        return dataSets;
+        return colorDataSets;
     };
 
 
@@ -53,7 +81,7 @@ function TreeVisualization(structure, state) {
      * Returns the list of possible metrics on which to the node sizes for this visualization
      */
     this.getSizeDataSets = function() {
-        return dataSets;
+        return sizeDataSets;
     };
 
     // set the structure of this visualization
@@ -85,6 +113,14 @@ function TreeVisualization(structure, state) {
         if (node.hasOwnProperty('children')) {
             return 'white';
         } else {
+            if (This.colorDataSet == "mapReduce") {
+                if (node.name.indexOf("reduce") == -1) { //map task
+                    return "blue"
+                }
+                else {
+                    return "green";
+                }
+            }
             var value = (This.colorDataSet === 'health' ? state[node.name][This.colorDataSet] : (1-state[node.name][This.colorDataSet]));
             return interpolateUnitValueToColor(value);
         }
@@ -108,14 +144,34 @@ function TreeVisualization(structure, state) {
      * Gives the title for this visualization
      */
     this.title = function() {
-        return "Topology Graph Showing Node Health";
+        if (mapReduce) {
+            return "Topology Graph showing Map Reduce Jobs"
+        }
+        else {
+            return "Topology Graph Showing Node Health";
+        }
     };
-
 
     /**
      * Return the content to put in the 'legend' div
      */
     this.getLegendContent = function() {
+        if (mapReduce && This.colorDataSet == "mapReduce") {
+            return "<table>" +
+                "<tr>" +
+                    "<td>" +
+                        "<svg style='width:10px; height:10px;'><circle fill='" + "blue" + "' cx=5 cy=5 r=5></svg>" +
+                    "</td>" +
+                    "<td style='padding-left:10px;'>Map Task</td>" +
+                "</tr>" +
+                "<tr>" +
+                    "<td>" +
+                        "<svg style='width:10px; height:10px;'><circle fill='" + "green" + "' cx=5 cy=5 r=5></svg>" +
+                    "</td>" +
+                    "<td style='padding-left:10px;'>Reduce Task</td>" +
+                "</tr>" +
+                "</table>";
+        }
         return "<table>" +
             "<tr>" +
                 "<td>" +
@@ -131,7 +187,6 @@ function TreeVisualization(structure, state) {
             "</tr>" +
         "</table>"
     };
-
 
     /**
      * Construct the visualization for the first time
@@ -157,10 +212,28 @@ function TreeVisualization(structure, state) {
         showVisualization();
     };
 
+    function updateToggling(source) {
+        if (source.hasOwnProperty('children')) {
+            for (var child in source['children']) {
+                if (source['children'].hasOwnProperty(child)) {
+                    updateToggling(source['children'][child]);
+                }
+            }
+        }
+        if (toggled.hasOwnProperty(source.name) && toggled[source.name]) {
+            toggle(source);
+        }
+    }
+
     /**
      * Process the set of new log entries
      */
     this.update = function() {
+        if (mapReduce) {
+            structure = mapReduceStructure;
+            state = mapReduceState;
+            updateToggling(structure);
+        }
         redrawGraph(structure);
     };
 
@@ -207,14 +280,19 @@ function TreeVisualization(structure, state) {
             .duration(duration)
             .attr("d", diagonal);
 
-        // remove old links, with animation to parent's new position
-        link.exit().transition()
-            .duration(duration)
-            .attr("d", function(d) {
-                var o = {x: source.x, y: source.y};
-                return diagonal({source: o, target: o});
-            })
-            .remove();
+        if (mapReduce) {
+            link.exit().remove();
+        }
+        else {
+            // remove old links, with animation to parent's new position
+            link.exit().transition()
+                .duration(duration)
+                .attr("d", function(d) {
+                    var o = {x: source.x, y: source.y};
+                    return diagonal({source: o, target: o});
+                })
+                .remove();
+        }
 
         // update nodes
 
@@ -223,15 +301,21 @@ function TreeVisualization(structure, state) {
         // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
             .attr("class", "treeVisualizationNode")
-            .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
             .on("click", function(d) {
                 if(d.hasOwnProperty('children')) {
                     toggle(d);
                     redrawGraph(d);
-                } else {
+                } else if (!mapReduce) {
                     createNodeVisualization(d.name);
                 }
             });
+
+        if (mapReduce) {
+            nodeEnter.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        }
+        else {
+            nodeEnter.attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; });
+        }
 
         // add circles representing computers
         nodeEnter.append("circle")
@@ -242,7 +326,15 @@ function TreeVisualization(structure, state) {
             .attr("text-anchor", "middle")
             .attr("dy", ".3em")
             .text(function (d) {
-                return d.name.substring(7, d.name.length);
+                if (d.hasOwnProperty('children')) {
+                    return "";
+                }
+                if (mapReduce) {
+                    return d.name.substring(d.name.indexOf("Job") + "Job".length);
+                }
+                else {
+                    return d.name.substring(7, d.name.length);
+                }
             });
 
         // update existing nodes, with animation
@@ -256,11 +348,16 @@ function TreeVisualization(structure, state) {
             .attr("r", radius)
             .style("fill", fillColor);
 
-        // remove old nodes, with animation to the parent's new position.
-        var nodeExit = node.exit().transition()
-            .duration(duration)
-            .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
-            .remove();
+        if (mapReduce) {
+            var nodeExit = node.exit().remove();
+        }
+        else {
+            // remove old nodes, with animation to the parent's new position.
+            var nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
+                .remove();
+        }
 
         nodeExit.select("circle")
             .attr("r", 1e-6);
@@ -272,6 +369,8 @@ function TreeVisualization(structure, state) {
         });
     };
 
+    var toggled = {};
+
     /**
      * Toggles whether the given node's children are visible or not
      * @param d the node
@@ -281,9 +380,11 @@ function TreeVisualization(structure, state) {
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
+                toggled[d.name] = true;
             } else {
                 d.children = d._children;
                 d._children = null;
+                toggled[d.name] = false;
             }
         }
     }

@@ -11,8 +11,11 @@ var clusterStructure;
 // the cumulative logs of the cluster
 var clusterLogs = [];
 
-// state of map reduce tasks
+// state of all map reduce tasks
 var mapReduceState = {};
+
+// structure of map reduce tasks
+var mapReduceStructure = {};
 
 // The macro & micro visualizations (cluster & node)
 var visualization = null;
@@ -49,7 +52,8 @@ function update(data) {
         updateClusterState(stateChange);
         updateNodePopovers(stateChange);
 
-        updateMapReduceData(data['mapReduce']);
+        mapReduceState = data['mapReduce']['state'];
+        mapReduceStructure = data['mapReduce']['topology'];
 
         // Update the visualization
         if(visualization && visualization!=null) {
@@ -79,49 +83,6 @@ function update(data) {
 
     } else {
         logError('Update failed: ' + data['message']);
-    }
-}
-
-function updateMapReduceData(data) {
-    for (var taskName in data) {
-        task = data[taskName];
-
-        if (!mapReduceState.hasOwnProperty(taskName)) {
-            mapReduceState[taskName] = {};
-        }
-
-        if (task.hasOwnProperty('complete')) {
-            delete mapReduceState[taskName]
-            continue;
-        }
-
-        updateMapReduceTaskData(task, taskName);
-    }
-}
-
-function updateMapReduceTaskData(task, taskName) {
-    for (var jobIndex in task['start']) {
-        if (task['start'].hasOwnProperty(jobIndex)) {
-            var job = task['start'][jobIndex];
-            var jobName = job['name'];
-            mapReduceState[taskName][jobName] = job;
-        }
-    }
-
-    for (var jobName in task['stateChange']) {
-        var jobChange = task['stateChange'][jobName];
-        for (var jobPropertyName in jobChange) {
-            var jobProperty = jobChange[jobPropertyName];
-            mapReduceState[taskName][jobName][jobPropertyName] = jobProperty;
-        }
-    }
-
-    for (var jobIndex in task['end']) {
-        if (task['end'].hasOwnProperty(jobIndex)) {
-            var job = task['end'][jobIndex];
-            var jobName = job['name'];
-            delete mapReduceState[taskName][jobName];
-        }
     }
 }
 
@@ -178,8 +139,9 @@ function changeDataCharacteristicsSuccess(data) {
 
     if (data.hasOwnProperty("successful") && data['successful']) {
         clusterState = data['currentState']['cluster'];
-        clusterStructure = data['structure'];
+        clusterStructure = data['structure']['cluster'];
         mapReduceState = data['currentState']['mapReduce'];
+        mapReduceStructure = data['structure']['mapReduce'];
         clusterLogs = [];
 
         buildRacksData();
@@ -269,8 +231,9 @@ function subscribeSuccess(data) {
     // Get info returned from simulator on subscribe
     clientId = data['clientId'];
     clusterState = data['currentState']['cluster'];
-    clusterStructure = data['structure'];
+    clusterStructure = data['structure']['cluster'];
     mapReduceState = data['currentState']['mapReduce'];
+    mapReduceStructure = data['structure']['mapReduce'];
     clusterLogs = [];
 
     // Add the 'rack' to each node

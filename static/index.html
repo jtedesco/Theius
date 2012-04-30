@@ -76,8 +76,13 @@
             <div class="nav-collapse">
                 <ul class="nav" id="theiusNavBar">
                     <li id="treeLink" class="active">
-                        <a href="javascript:changeVisualization(new TreeVisualization(clusterStructure, clusterState), 'treeLink')">
+                        <a href="javascript:changeVisualization(new TreeVisualization(clusterStructure, clusterState, false), 'treeLink')">
                             Tree
+                        </a>
+                    </li>
+                    <li id="mapLink">
+                        <a href="javascript:changeVisualization(new TreeVisualization(mapReduceStructure, mapReduceState, true), 'mapLink')">
+                            Map Reduce
                         </a>
                     </li>
                     <li id="treemapLink">

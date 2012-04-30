@@ -54,7 +54,10 @@ class DefaultSimulator(BaseSimulator):
         return self.mapReduceSimulator
 
     def topology(self):
-        return self.clusterTopology
+        return {
+            'cluster': self.clusterTopology,
+            'mapReduce': self.mapReduceSimulator.topology()
+        }
 
     def state(self):
         return {
@@ -72,12 +75,10 @@ def main():
 
     mainSimulator.addClient(1)
 
-    count = 0
     while True:
         stuff = mainSimulator.getNextLog(1)
-        count += 1
-        if count > 10:
-            print mainSimulator.state()
+        print mainSimulator.state()['mapReduce']
+        print mainSimulator.topology()['mapReduce']
 
 if __name__ == '__main__':
     main()
