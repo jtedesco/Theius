@@ -335,7 +335,12 @@ function TreeVisualization(structure, state, mapReduce) {
             .attr("dy", ".3em")
             .text(function (d) {
                 if (d.hasOwnProperty('children')) {
-                    return "";
+                    if (d.name.indexOf("rack") != -1 || d.name.indexOf("task") != -1) {
+                        return d.name.substring(4);
+                    }
+                    else {
+                        return "";
+                    }
                 }
                 if (mapReduce) {
                     return d.name.substring(d.name.indexOf("Job") + "Job".length);
