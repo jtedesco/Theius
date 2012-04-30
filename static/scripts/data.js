@@ -3,6 +3,7 @@ var clientId;
 
 // The state of the entire cluster & the selected node
 var clusterState;
+var clusterStateHistory;
 var selectedNodeState;
 
 // The structure of the cluster
@@ -54,6 +55,12 @@ function update(data) {
         var stateChange = clusterData['stateChange'];
         updateClusterState(stateChange);
         updateNodePopovers(stateChange);
+
+        //store history of cluster state
+        clusterStateHistory.push(deepCopy(clusterState));
+        if (clusterStateHistory.length > 50) {
+            clusterStateHistory.shift();
+        }
 
         mapReduceState = data['mapReduce']['state'];
         mapReduceStructure = data['mapReduce']['topology'];
@@ -144,6 +151,7 @@ function changeDataCharacteristicsSuccess(data) {
 
     if (data.hasOwnProperty("successful") && data['successful']) {
         clusterState = data['currentState']['cluster'];
+        clusterStateHistory = [deepCopy(clusterState)];
         clusterStructure = data['structure']['cluster'];
         mapReduceState = data['currentState']['mapReduce'];
         mapReduceStructure = data['structure']['mapReduce'];
@@ -236,6 +244,7 @@ function subscribeSuccess(data) {
     // Get info returned from simulator on subscribe
     clientId = data['clientId'];
     clusterState = data['currentState']['cluster'];
+    clusterStateHistory = [deepCopy(clusterState)];
     clusterStructure = data['structure']['cluster'];
     mapReduceState = data['currentState']['mapReduce'];
     mapReduceStructure = data['structure']['mapReduce'];

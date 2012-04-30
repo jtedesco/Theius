@@ -182,14 +182,16 @@ function togglePlayPause() {
         // Update UI
         playPauseDiv.removeClass('icon-pause');
         playPauseDiv.addClass('icon-play');
-        playPauseStatus.text('Resume Viz')
+        playPauseStatus.text('Resume Viz');
+        showTimeline();
 
     } else {
 
         // Update UI
         playPauseDiv.removeClass('icon-play');
         playPauseDiv.addClass('icon-pause');
-        playPauseStatus.text('Pause Viz')
+        playPauseStatus.text('Pause Viz');
+        hideTimeline();
     }
 
     playing = !playing;

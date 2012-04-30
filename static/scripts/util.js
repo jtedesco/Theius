@@ -12,3 +12,7 @@ function getCompoundKeyFromDict(dictionary, key) {
         return dictionary[keys[0]];
     }
 }
+
+function deepCopy(obj) {
+    return jQuery.extend(true, {}, obj);
+}
