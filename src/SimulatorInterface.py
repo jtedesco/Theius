@@ -3,12 +3,12 @@ import threading
 import cherrypy
 import os
 from json import dumps, load
-from src.simulator.DefaultSimulator import DefaultSimulator
-from src.simulator.UnevenLoadSimulator import UnevenLoadSimulator
-from src.simulator.RackFailureSimulator import RackFailureSimulator
-from src.simulator.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
-from src.simulator.RandomSimulator import RandomSimulator
-from src.simulator.mapReduce.MapReduceSimulator import MapReduceSimulator
+from src.MapReduceSimulator import MapReduceSimulator
+from src.DefaultSimulator import DefaultSimulator
+from src.UnevenLoadSimulator import UnevenLoadSimulator
+from src.RackFailureSimulator import RackFailureSimulator
+from src.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
+from src.RandomSimulator import RandomSimulator
 
 __author__ = 'roman'
 
