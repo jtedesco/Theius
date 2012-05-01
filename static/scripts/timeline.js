@@ -38,6 +38,7 @@ function getData(history, dataSet) {
             data.push(result / count);
         }
     }
+    //data.push(0);
     return data;
 }
 
@@ -93,7 +94,7 @@ function drawTimeline(data, history) {
         .attr("width", w)
         .attr("height", h);
 
-    x.domain([0, data.length]);
+    x.domain([0, data.length-1]);
     y.domain([d3.min(data) - 0.05, d3.max(data) + 0.05]);
 
     // bind data
@@ -107,11 +108,10 @@ function drawTimeline(data, history) {
     svg.select("path.line").attr("d", line);
 
     // add brush
-    var lastBrush = [[0,0],[1,1]];
     var brush = d3.svg.brush();
     brush.x(x);
     brush.y(y);
-    brush.extent(lastBrush);
+    brush.extent([[data.length-2,0],[data.length-1,1]]);
     svg.append("g").attr("class", "brush").call(brush);
     $(".resize").hide();
     $(".background").hide();
@@ -121,30 +121,22 @@ function drawTimeline(data, history) {
         .on("brushend", onBrushEnd);
 
     function onBrushStart(p) {
-        brush.extent(lastBrush);
-        svg.select("g.brush").call(brush);
         $(".resize").hide();
         $(".background").hide();
     }
 
     function onBrush(p) {
-        var e = brush.extent();
-        var xdiff = e[1][0] - e[0][0];
-        var ydiff = e[1][1] - e[0][1];
-        if (xdiff < 1.05 && xdiff > 0.95 && ydiff < 1.05 && ydiff > 0.95) {
-            lastBrush = e;
-            updateDataSets(Math.round(lastBrush[0][0]));
-        }
+        var brushLocation = brush.extent();
+        updateDataSets(Math.round(brushLocation[0][0] + 0.5));
     }
 
     function onBrushEnd() {
-        brush.extent(lastBrush);
-        svg.select("g.brush").call(brush);
         $(".resize").hide();
         $(".background").hide();
     }
 
     function updateDataSets(index) {
+        console.log(index);
         visualization.setState(history[index]);
         visualization.update();
     }
