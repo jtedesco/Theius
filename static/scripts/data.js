@@ -162,8 +162,9 @@ function changeDataCharacteristicsSuccess(data) {
 
         // Reload the current visualization with the new data
         if (visualization instanceof SplomVisualization) {
-            var usageMatrix = $("#theiusNavBar .active").attr("id") == "usageMatrixLink";
-            changeVisualization(new SplomVisualization(clusterStructure, clusterState, usageMatrix), 'usageMatrixLink');
+            var predictionMatrix = $("#theiusNavBar .active").attr("id") === "predictionMatrixLink";
+            var navItem = predictionMatrix ? 'predictionMatrixLink' : 'usageMatrixLink';
+            changeVisualization(new SplomVisualization(clusterStructure, clusterState, predictionMatrix), navItem);
         }
         else {
             visualization.setStructure(clusterStructure);
