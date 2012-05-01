@@ -16,6 +16,8 @@ function showTimeline() {
 
 function hideTimeline() {
     $("#timelineDiv").fadeOut();
+    visualization.setState(clusterState);
+    visualization.update();
 }
 
 function getData(history, dataSet) {
