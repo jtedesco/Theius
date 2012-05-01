@@ -1,5 +1,5 @@
 from random import random
-from src import MapReduceTaskSimulator
+from src.MapReduceTaskSimulator import MapReduceTaskSimulator
 
 __author__ = 'Roman'
 
