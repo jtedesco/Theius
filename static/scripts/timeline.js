@@ -11,7 +11,7 @@ function showTimeline() {
     $("#timelineDiv").fadeIn();
     var history = deepCopy(clusterStateHistory);
     var data = getData(clusterStateHistory, dataSet);
-    drawTimeline(data, history);
+    drawTimeline(data, history, dataSet);
 }
 
 function hideTimeline() {
@@ -44,12 +44,12 @@ function getData(history, dataSet) {
     return data;
 }
 
-function drawTimeline(data, history) {
+function drawTimeline(data, history, dataSet) {
 
     var width = $("#timeline").width();
     var height = $("#timeline").height();
 
-    var m = [30, 20, 20, 30],
+    var m = [30, 20, 20, 60],
         w = width - m[1] - m[3],
         h = height - m[0] - m[2];
 
@@ -92,6 +92,11 @@ function drawTimeline(data, history) {
         .attr("transform", "translate(" + w/2 + ", " + (h + m[0]) +  ")")
         .append("text")
         .text("Time");
+
+    svg.append("svg:g")
+        .attr("transform", "translate(" + (w + m[1] + 25) + ", " + (h/2 + dataSet.length*2) + ") rotate(270,0,0)")
+        .append("text")
+        .text(dataSet);
 
     svg.append("svg:path")
         .attr("class", "line");
