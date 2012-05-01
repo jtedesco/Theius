@@ -49,7 +49,7 @@ function drawTimeline(data, history) {
     var width = $("#timeline").width();
     var height = $("#timeline").height();
 
-    var m = [20, 20, 20, 30],
+    var m = [30, 20, 20, 30],
         w = width - m[1] - m[3],
         h = height - m[0] - m[2];
 
@@ -87,6 +87,11 @@ function drawTimeline(data, history) {
     svg.append("svg:g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + h + ")");
+
+    svg.append("svg:g")
+        .attr("transform", "translate(" + w/2 + ", " + (h + m[0]) +  ")")
+        .append("text")
+        .text("Time");
 
     svg.append("svg:path")
         .attr("class", "line");
@@ -138,7 +143,6 @@ function drawTimeline(data, history) {
     }
 
     function updateDataSets(index) {
-        console.log(index);
         visualization.setState(history[index]);
         visualization.update();
     }
