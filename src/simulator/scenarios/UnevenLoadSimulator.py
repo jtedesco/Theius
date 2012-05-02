@@ -1,6 +1,6 @@
 import numpy
-from src.RandomSimulator import RandomSimulator
 from src.Utility import getRandomElement, normalizeValue
+from src.simulator.RandomSimulator import RandomSimulator
 
 __author__ = 'Roman'
 

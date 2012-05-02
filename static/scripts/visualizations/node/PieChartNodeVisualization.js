@@ -102,7 +102,10 @@ function PieChartNodeVisualization() {
      */
     var drawPieGraph = function(eventsByLevel) {
 
+
         var nodeVisualizationDiv = $('#nodeVisualization');
+        nodeVisualizationDiv.height(nodeVisualizationDiv.parent().height());
+        nodeVisualizationDiv.width(nodeVisualizationDiv.parent().width());
 
         // Update the node stats
         $('#nodeVisualizationStats').html(generateNodePopoverContent(This.nodeState, true));
@@ -178,6 +181,8 @@ function PieChartNodeVisualization() {
 
         // Actually show the node visualization
         showNodeVisualization();
+        nodeVisualizationDiv.height(nodeVisualizationDiv.parent().height());
+        nodeVisualizationDiv.width(nodeVisualizationDiv.parent().width());
     };
 
 
