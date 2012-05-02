@@ -2,9 +2,9 @@ from json import load
 import os
 from random import random
 from time import sleep
-from src.BaseSimulator import BaseSimulator
-from src.MapReduceSimulator import MapReduceSimulator
-from src.RandomSimulator import RandomSimulator
+from src.simulator.RandomSimulator import RandomSimulator
+from src.simulator.BaseSimulator import BaseSimulator
+from src.simulator.mapReduce.MapReduceSimulator import MapReduceSimulator
 
 __author__ = 'Roman'
 
@@ -63,7 +63,7 @@ class DefaultSimulator(BaseSimulator):
         return {
             'cluster': self.clusterSimulator.state(),
             'mapReduce': self.mapReduceSimulator.state()
-        };
+        }
 
     def getTime(self):
         return self.mapReduceSimulator.getTime()

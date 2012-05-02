@@ -1,14 +1,20 @@
+import os, sys
+
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if not path in sys.path:
+    sys.path.insert(1, path)
+del path
+
 from copy import deepcopy
 import threading
 import cherrypy
-import os
 from json import dumps, load
-from src.MapReduceSimulator import MapReduceSimulator
-from src.DefaultSimulator import DefaultSimulator
-from src.UnevenLoadSimulator import UnevenLoadSimulator
-from src.RackFailureSimulator import RackFailureSimulator
-from src.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
-from src.RandomSimulator import RandomSimulator
+from src.simulator.RandomSimulator import RandomSimulator
+from src.simulator.mapReduce.MapReduceSimulator import MapReduceSimulator
+from src.simulator.scenarios.UnevenLoadSimulator import UnevenLoadSimulator
+from src.simulator.DefaultSimulator import DefaultSimulator
+from src.simulator.scenarios.RackFailureSimulator import RackFailureSimulator
+from src.simulator.scenarios.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
 
 __author__ = 'roman'
 

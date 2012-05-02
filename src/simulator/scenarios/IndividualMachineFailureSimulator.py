@@ -2,8 +2,8 @@ from copy import deepcopy
 from random import random, choice
 import string
 from datetime import datetime
-from src.RandomSimulator import RandomSimulator
 from src.Utility import normalizeValue, getRandomElement
+from src.simulator.RandomSimulator import RandomSimulator
 
 __author__ = 'Roman'
 

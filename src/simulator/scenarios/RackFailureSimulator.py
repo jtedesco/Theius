@@ -1,4 +1,4 @@
-from src.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
+from src.simulator.scenarios.IndividualMachineFailureSimulator import IndividualMachineFailureSimulator
 
 __author__ = 'Roman'
 
