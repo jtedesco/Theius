@@ -3,6 +3,7 @@ import threading
 import cherrypy
 import os
 from json import dumps, load
+from src.LargeTopology import makeLargeTopology
 from src.MapReduceSimulator import MapReduceSimulator
 from src.DefaultSimulator import DefaultSimulator
 from src.UnevenLoadSimulator import UnevenLoadSimulator
@@ -186,7 +187,8 @@ randomSimulator = DefaultSimulator(RandomSimulator(networkTopology['machines']),
 randomSimulator.start()
 
 # Start the heterogeneous cluster simulator
-heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
+#heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
+heterogeneousNetworkTopology = makeLargeTopology()
 heterogeneousSimulator = DefaultSimulator(RandomSimulator(heterogeneousNetworkTopology['machines']), heterogeneousNetworkTopology['structure'], MapReduceSimulator(heterogeneousNetworkTopology['machines']))
 heterogeneousSimulator.start()
 

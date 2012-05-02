@@ -19,6 +19,8 @@ function TreeVisualization(structure, state, mapReduce) {
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.x, d.y]; });
 
+    var stateSize = Object.keys(state).length;
+
 
     // Selected data sets to use for color & size (respectively)
     var This = this;
@@ -93,6 +95,7 @@ function TreeVisualization(structure, state, mapReduce) {
     // set the state of this visualization
     this.setState = function(newState) {
         state = newState;
+        stateSize = Object.keys(state).length;
     };
 
 
@@ -269,7 +272,14 @@ function TreeVisualization(structure, state, mapReduce) {
 
         // fix node depths
         var nodes = tree.nodes(structure);
-        nodes.forEach(function(d) { d.y = d.depth * 200; });
+        nodes.forEach(function(d) {
+            if (stateSize > 500) {
+                d.y = d.depth * 120;
+            }
+            else {
+                d.y = d.depth * 200;
+            }
+        });
 
         // update links
         var link = graph.selectAll("path")
