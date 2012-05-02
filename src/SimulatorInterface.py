@@ -102,6 +102,11 @@ class SimulatorInterface(object):
             clientSimulatorMap[clientId] = heterogeneousSimulator
             clientSimulatorMap[clientId].addClient(clientId)
 
+        elif simulator == "largeCluster":
+            clientSimulatorMap[clientId].removeClient(clientId)
+            clientSimulatorMap[clientId] = largeClusterSimulator
+            clientSimulatorMap[clientId].addClient(clientId)
+
         elif simulator == "uneven":
             clientSimulatorMap[clientId].removeClient(clientId)
             clientSimulatorMap[clientId] = unevenLoadSimulator
@@ -194,10 +199,14 @@ randomSimulator = DefaultSimulator(RandomSimulator(networkTopology['machines']),
 randomSimulator.start()
 
 # Start the heterogeneous cluster simulator
-#heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
-heterogeneousNetworkTopology = makeLargeTopology()
+heterogeneousNetworkTopology = load(open(os.path.join(STATIC_DIR, 'data/heterogeneousTopology.json')))
 heterogeneousSimulator = DefaultSimulator(RandomSimulator(heterogeneousNetworkTopology['machines']), heterogeneousNetworkTopology['structure'], MapReduceSimulator(heterogeneousNetworkTopology['machines']))
 heterogeneousSimulator.start()
+
+# Start the large topology cluster simulator
+largeClusterTopology = makeLargeTopology()
+largeClusterSimulator = DefaultSimulator(RandomSimulator(largeClusterTopology['machines']), largeClusterTopology['structure'], MapReduceSimulator(largeClusterTopology['machines']))
+largeClusterSimulator.start()
 
 # Start the uneven CPU load simulator
 unevenLoadSimulator = DefaultSimulator(UnevenLoadSimulator(networkTopology['machines']), networkTopology['structure'], MapReduceSimulator(networkTopology['machines']))
