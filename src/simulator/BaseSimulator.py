@@ -1,3 +1,4 @@
+from Queue import Queue
 import threading
 
 __author__ = 'Roman'
@@ -20,12 +21,6 @@ class BaseSimulator(threading.Thread):
         # map from clientId to information about the client (see addClient for more information)
         self.clientMap = {}
 
-        # an array of all logs created by this simulator
-        self.logs = []
-
-        # the next index to be used for the next log that is added
-        self.currentLogIndex = 0
-
         # a lock for this class
         self.simulatorLock = threading.Lock()
 
@@ -37,25 +32,13 @@ class BaseSimulator(threading.Thread):
         self.simulatorLock.acquire()
 
         if clientId in self.clientMap:
-            trigger = self.clientMap[clientId]['trigger']
+
+            queue = self.clientMap[clientId]
 
             # wait for data (semaphore will release when data is available)
             # note that we don't want to wait with the simulatorLock locked
             self.simulatorLock.release()
-            trigger.acquire()
-            self.simulatorLock.acquire()
-
-            if clientId not in self.clientMap:
-                self.simulatorLock.release()
-                return None
-
-            # get the log, update client data
-            index = self.clientMap[clientId]['lastLogSeen'] + 1
-            self.clientMap[clientId]['lastLogSeen'] += 1
-            log = self.logs[index]
-
-            self.simulatorLock.release()
-            return log
+            return queue.get()
 
         self.simulatorLock.release()
         return None
@@ -65,12 +48,7 @@ class BaseSimulator(threading.Thread):
             adds a client to this simulator
         """
         self.simulatorLock.acquire()
-
-        self.clientMap[clientId] = {
-            'lastLogSeen' : self.currentLogIndex - 1,
-            'trigger' : threading.Semaphore(0)
-        }
-
+        self.clientMap[clientId] = Queue();
         self.simulatorLock.release()
 
     def addLog(self, log):
@@ -79,13 +57,18 @@ class BaseSimulator(threading.Thread):
         """
         self.simulatorLock.acquire()
 
-        self.logs.append(log)
-        self.currentLogIndex += 1
+        toRemove = []
         for clientId in self.clientMap:
-            #notify all clients that data is available
-            self.clientMap[clientId]['trigger'].release()
+            queue = self.clientMap[clientId]
+            queue.put(log)
+
+            if queue.qsize() > 25:
+                toRemove.append(clientId)
 
         self.simulatorLock.release()
+
+        for clientId in toRemove:
+            self.removeClient(clientId)
 
     def removeClient(self, clientId):
         """
@@ -94,23 +77,8 @@ class BaseSimulator(threading.Thread):
         self.simulatorLock.acquire()
 
         if clientId in self.clientMap:
-            self.clientMap[clientId]['trigger'].release()
+            self.clientMap[clientId].put(None);
             del self.clientMap[clientId]
-
-        self.simulatorLock.release()
-
-    def clientBacklog(self, clientId):
-        """
-            Returns how far behind the client is on logs. This method could presumably
-            be used to determine whether a client has disconnected (that is, when the backlog
-            is large, it is most likely that the client disconnected already)
-        """
-        self.simulatorLock.acquire()
-
-        if clientId in self.clientMap:
-            backlog = self.currentLogIndex - self.clientMap[clientId]['lastLogSeen']
-            self.simulatorLock.release()
-            return backlog
 
         self.simulatorLock.release()
 
