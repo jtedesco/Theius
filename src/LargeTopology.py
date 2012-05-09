@@ -5,7 +5,7 @@ __author__ = 'Roman'
 id = 0
 
 def makeLargeTopology():
-    root = depth([10,10,5])
+    root = depth([10,10,10,5])
     machines = traverse(root, [])
 
     return {
@@ -16,8 +16,8 @@ def makeLargeTopology():
 def traverse(node, array):
     array.append(node['name'])
 
-    if 'children' in node:
-        for child in node['children']:
+    if '_children' in node:
+        for child in node['_children']:
             traverse(child, array)
 
     return array
@@ -28,12 +28,13 @@ def depth(depths):
 
     node = {
         'name': uniqueName(),
-        'children': []
+        'children': None, # hide all children at start
+        '_children': []
     }
 
     branch = depths.pop()
     for i in xrange(0, branch):
-        node['children'].append(depth(deepcopy(depths)))
+        node['_children'].append(depth(deepcopy(depths)))
 
     return node
 
